@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>杀戮尖塔 · 完整三幕高塔红包版</title>
 <script src="https://hb.lafi.sh/sdk/v1.js"></script>
+<script src="assets/spine.js"></script>
 <style>
   :root {
     --bg-deep: #0b0e17;
@@ -43,12 +44,29 @@
     background-repeat: no-repeat;
     background-size: 1600% 1600%;
   }
+  .sp-monster-wrap {
+    position: relative; display: inline-flex; align-items: flex-end; justify-content: center;
+    flex-shrink: 0; pointer-events: none;
+    transition: filter 0.25s, opacity 0.25s, transform 0.25s;
+  }
   .sp-monster {
     display: inline-block; flex-shrink: 0;
     background-image: url("assets/monsters.webp");
     background-repeat: no-repeat;
     background-size: 900% 900%;
     filter: drop-shadow(0 6px 10px rgba(0,0,0,0.75));
+    position: relative; z-index: 1;
+  }
+  .sts-spine-canvas {
+    position: absolute; inset: 0; z-index: 2;
+    opacity: 0; pointer-events: none;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.75));
+  }
+  .sp-monster-wrap.spine-ready .sp-monster {
+    opacity: 0 !important;
+  }
+  .sp-monster-wrap.spine-ready .sts-spine-canvas {
+    opacity: 1;
   }
   .sp-event {
     display: inline-block; flex-shrink: 0;
@@ -374,7 +392,7 @@
     position: relative; display: flex; align-items: flex-end; justify-content: center;
     width: 120px; height: 120px; margin-bottom: 1px;
   }
-  .sprite-stage-box.is-flying .sp-monster {
+  .sprite-stage-box.is-flying .sp-monster-wrap {
     animation: flyHover 2.4s ease-in-out infinite;
   }
   .unit-shadow {
@@ -384,15 +402,42 @@
     pointer-events: none; z-index: 0;
   }
   .sprite-stage-box .sp-monster { position: relative; z-index: 2; transition: filter 0.25s, opacity 0.25s, transform 0.25s; }
-  .sprite-stage-box.is-intangible .sp-monster {
+  .sprite-stage-box.is-intangible .sp-monster-wrap {
     opacity: 0.62;
     filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.9)) brightness(1.25);
   }
-  .sprite-stage-box.is-half-dead .sp-monster {
+  .sprite-stage-box.is-half-dead .sp-monster-wrap {
     opacity: 0.58;
     filter: brightness(0.28) drop-shadow(0 0 10px #7e22ce);
     transform: scaleY(0.68) translateY(14px);
   }
+  @keyframes stsLungeRight {
+    0% { transform: translateX(0) scale(1); }
+    28% { transform: translateX(56px) translateY(-6px) scale(1.06); }
+    100% { transform: translateX(0) scale(1); }
+  }
+  @keyframes stsLungeLeft {
+    0% { transform: translateX(0) scale(1); }
+    28% { transform: translateX(-54px) translateY(-5px) scale(1.06); }
+    100% { transform: translateX(0) scale(1); }
+  }
+  @keyframes stsHitShake {
+    0% { transform: translateX(0); filter: brightness(1); }
+    18% { transform: translateX(13px) rotate(3deg); filter: brightness(2.3) drop-shadow(0 0 14px #ef4444); }
+    38% { transform: translateX(-11px) rotate(-2.5deg); filter: brightness(1.85) drop-shadow(0 0 12px #f87171); }
+    62% { transform: translateX(7px) rotate(1.5deg); filter: brightness(1.3); }
+    82% { transform: translateX(-4px); }
+    100% { transform: translateX(0); filter: brightness(1); }
+  }
+  @keyframes stsBlockPulse {
+    0% { filter: drop-shadow(0 0 0 rgba(56, 189, 248, 0)); }
+    35% { filter: drop-shadow(0 0 18px rgba(56, 189, 248, 0.95)) brightness(1.22); }
+    100% { filter: drop-shadow(0 0 0 rgba(56, 189, 248, 0)); }
+  }
+  .sprite-stage-box.unit-lunge-right { animation: stsLungeRight 0.38s cubic-bezier(0.2, 0.85, 0.35, 1); }
+  .sprite-stage-box.unit-lunge-left { animation: stsLungeLeft 0.40s cubic-bezier(0.2, 0.85, 0.35, 1); }
+  .sprite-stage-box.unit-hit-shake { animation: stsHitShake 0.42s ease-out; }
+  .sprite-stage-box.unit-block-pulse { animation: stsBlockPulse 0.46s ease-out; }
   .hexa-orb-ring {
     position: absolute; inset: 0; pointer-events: none; z-index: 4;
   }
@@ -772,6 +817,211 @@
   }
   .sts-opt-pos { color: #4ade80; font-weight: 800; }
   .sts-opt-neg { color: #f87171; font-weight: 800; }
+
+  /* ==================== ORIGINAL STS NEOW ROOM (NeowRoom / NeowEvent / SpeechBubble) ==================== */
+  .sts-neow-stage {
+    position: relative; width: 100%; height: 100%; min-height: 0;
+    overflow: hidden;
+    --sts-floor-y: max(33.5%, 205px);
+  }
+  .sts-neow-ambient {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background:
+      radial-gradient(ellipse at 76% 48%, rgba(56, 189, 248, 0.14) 0%, transparent 52%),
+      radial-gradient(ellipse at 25% 55%, rgba(245, 196, 81, 0.08) 0%, transparent 45%);
+  }
+  .sts-neow-hero {
+    position: absolute;
+    left: 25%;
+    bottom: var(--sts-floor-y);
+    transform: translateX(-50%);
+    z-index: 8;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  }
+  .sts-neow-boss {
+    position: absolute;
+    right: -18px;
+    bottom: calc(var(--sts-floor-y) - 6%);
+    z-index: 7;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    pointer-events: none;
+  }
+  @keyframes stsSpeechPop {
+    0% { transform: scale(0.4) translate(20px, 15px); opacity: 0; }
+    65% { transform: scale(1.05) translate(0, 0); opacity: 1; }
+    100% { transform: scale(1) translate(0, 0); opacity: 1; }
+  }
+  @keyframes stsSpeechFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+  @keyframes stsWaveChar {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2.6px); }
+  }
+  .sts-neow-speech {
+    position: absolute;
+    right: 68%;
+    bottom: 62%;
+    width: 266px; height: 152px;
+    z-index: 15;
+    display: flex; align-items: center; justify-content: center;
+    padding: 18px 28px 26px 26px;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.85));
+    animation: stsSpeechPop 0.42s cubic-bezier(0.2, 0.9, 0.3, 1) forwards, stsSpeechFloat 3.2s ease-in-out 0.42s infinite;
+    pointer-events: none;
+  }
+  .sts-neow-speech-bg {
+    position: absolute; inset: 0;
+    background-image: url("assets/spine.webp");
+    background-repeat: no-repeat;
+    transform: scale(-1, -1);
+    z-index: 0;
+  }
+  .sts-neow-speech-txt {
+    position: relative; z-index: 1;
+    font-size: 14.5px; font-weight: 900; line-height: 1.5;
+    color: #fef08a; text-align: center;
+    text-shadow: -1.5px -1.5px 0 #090d16, 1.5px -1.5px 0 #090d16, -1.5px 1.5px 0 #090d16, 1.5px 1.5px 0 #090d16, 0 2px 5px #000;
+  }
+  .sts-wave-ch {
+    display: inline-block;
+    animation: stsWaveChar 1.6s ease-in-out infinite;
+  }
+  @keyframes stsRoomOptSlideIn {
+    0% { opacity: 0; transform: translateX(36px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  .sts-neow-choices-dock {
+    position: absolute;
+    right: 3.2%;
+    bottom: 4.5%;
+    width: min(560px, 60%);
+    z-index: 22;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .sts-neow-choices-dock .sts-event-opt-btn {
+    min-height: 43px;
+    padding: 7px 20px;
+    font-size: 13px;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.82));
+    animation: stsRoomOptSlideIn 0.34s cubic-bezier(0.2, 0.85, 0.3, 1) backwards;
+  }
+
+  /* ==================== COMBAT VFX CHOREOGRAPHER OVERLAY (#sts-vfx-layer) ==================== */
+  #sts-vfx-layer {
+    position: fixed; inset: 0; width: 100vw; height: 100vh;
+    pointer-events: none; z-index: 88; overflow: hidden;
+  }
+  @keyframes vfxSlashAnim {
+    0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--slash-rot, -28deg)) scale(0.35, 0.5); }
+    25% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--slash-rot, -28deg)) scale(1.18, 1.15); }
+    100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--slash-rot, -28deg)) scale(1.45, 0.2); }
+  }
+  .vfx-slash {
+    position: fixed; width: 136px; height: 136px;
+    background-image: url("assets/spine.webp");
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 12px #f59e0b) drop-shadow(0 0 22px #ef4444) brightness(1.35);
+    animation: vfxSlashAnim 0.34s cubic-bezier(0.16, 0.88, 0.3, 1) forwards;
+    pointer-events: none;
+  }
+  @keyframes vfxHitRingAnim {
+    0% { opacity: 0.95; transform: translate(-50%, -50%) scale(0.25); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.65); }
+  }
+  .vfx-hit-ring {
+    position: fixed; width: 96px; height: 96px; border-radius: 50%;
+    border: 3px solid rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.85), inset 0 0 14px rgba(251, 191, 36, 0.65);
+    animation: vfxHitRingAnim 0.36s ease-out forwards;
+    pointer-events: none;
+  }
+  .vfx-dmg-num {
+    position: fixed;
+    font-weight: 900; font-size: 27px; line-height: 1;
+    color: #ef4444;
+    text-shadow:
+      -2px -2px 0 #000, 2px -2px 0 #000,
+      -2px 2px 0 #000, 2px 2px 0 #000,
+      0 3px 8px rgba(0,0,0,0.95), 0 0 12px rgba(239,68,68,0.65);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .vfx-dmg-num.blocked-dmg {
+    color: #7dd3fc; font-size: 22px;
+  }
+  .vfx-dmg-num.heavy-dmg {
+    color: #fde047; font-size: 33px;
+    text-shadow:
+      -2px -2px 0 #7f1d1d, 2px -2px 0 #7f1d1d,
+      -2px 2px 0 #7f1d1d, 2px 2px 0 #7f1d1d,
+      0 0 16px #ef4444;
+  }
+  @keyframes vfxFloatUp {
+    0% { opacity: 0; transform: translate(-50%, 6px) scale(0.65); }
+    20% { opacity: 1; transform: translate(-50%, -6px) scale(1.08); }
+    80% { opacity: 1; transform: translate(-50%, -32px) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -44px) scale(0.92); }
+  }
+  .vfx-float-tag {
+    position: fixed;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-weight: 900; font-size: 15px; white-space: nowrap;
+    text-shadow:
+      -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000,
+      -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000,
+      0 2px 6px rgba(0,0,0,0.9);
+    animation: vfxFloatUp 0.92s cubic-bezier(0.2, 0.85, 0.3, 1) forwards;
+    pointer-events: none;
+  }
+  .vfx-float-tag.block-gain { color: #38bdf8; font-size: 17px; }
+  .vfx-float-tag.heal-gain { color: #4ade80; font-size: 18px; }
+  .vfx-float-tag.buff-gain { color: #fef08a; }
+  .vfx-float-tag.debuff-gain { color: #fda4af; }
+  @keyframes vfxTurnBannerAnim {
+    0% { opacity: 0; transform: translate(-50%, -50%) scaleX(0.4) scaleY(0.85); }
+    22% { opacity: 1; transform: translate(-50%, -50%) scaleX(1.02) scaleY(1); }
+    76% { opacity: 1; transform: translate(-50%, -50%) scaleX(1) scaleY(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1.12) scaleY(0.92); }
+  }
+  .vfx-turn-banner {
+    position: fixed; left: 50%; top: 34%;
+    min-width: 340px; padding: 10px 44px;
+    background: linear-gradient(90deg, transparent 0%, rgba(15, 23, 42, 0.92) 20%, rgba(30, 41, 59, 0.96) 50%, rgba(15, 23, 42, 0.92) 80%, transparent 100%);
+    border-top: 1.5px solid rgba(245, 196, 81, 0.65);
+    border-bottom: 1.5px solid rgba(245, 196, 81, 0.65);
+    text-align: center;
+    animation: vfxTurnBannerAnim 0.82s cubic-bezier(0.2, 0.85, 0.3, 1) forwards;
+    pointer-events: none;
+  }
+  .vfx-turn-banner-main {
+    font-size: 20px; font-weight: 900; color: #fef08a; letter-spacing: 3px;
+    text-shadow: 0 2px 8px #000, 0 0 14px rgba(245, 196, 81, 0.55);
+  }
+  .vfx-turn-banner-sub {
+    font-size: 11px; font-weight: 800; color: #cbd5e1; letter-spacing: 2px; margin-top: 2px;
+  }
+  @keyframes vfxScreenHitAnim {
+    0% { opacity: 0.78; }
+    100% { opacity: 0; }
+  }
+  .vfx-screen-hit {
+    position: fixed; inset: 0;
+    box-shadow: inset 0 0 68px rgba(220, 38, 38, 0.82);
+    animation: vfxScreenHitAnim 0.42s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes vfxDeathGhostAnim {
+    0% { opacity: 0.95; transform: scale(1) translateY(0); filter: brightness(2.2) drop-shadow(0 0 16px #ef4444); }
+    35% { opacity: 0.75; transform: scale(1.06, 0.92) translateX(8px); filter: brightness(0.4) grayscale(1) drop-shadow(0 0 18px #000); }
+    100% { opacity: 0; transform: scale(1.18, 0.55) translateY(18px); filter: brightness(0) blur(4px); }
+  }
+  .vfx-death-ghost {
+    position: fixed;
+    animation: vfxDeathGhostAnim 0.56s ease-out forwards;
+    pointer-events: none;
+  }
 
   /* ==================== ORIGINAL STS BANNERS & FLOATING BUTTONS ==================== */
   .sts-select-banner {
@@ -1182,6 +1432,12 @@
     .sts-shop-slot .sts-card { width: 92px; height: 120px; min-width: 86px; }
     .sts-shop-purge-plaque { width: 88px; height: 124px; }
     .sts-stage-hero-bg { display: none; }
+    .sts-neow-hero { left: 18%; }
+    .sts-neow-boss { left: 78%; bottom: calc(var(--sts-floor-y) + 12%); }
+    .sts-neow-speech { right: 42%; bottom: 68%; width: 206px; height: 118px; padding: 14px 20px 26px 18px; }
+    .sts-neow-speech-txt { font-size: 12px; }
+    .sts-neow-choices-dock { right: 3%; left: 3%; width: 94%; bottom: 2.5%; gap: 5px; }
+    .sts-neow-choices-dock .sts-event-opt-btn { min-height: 36px; padding: 5px 12px; font-size: 11.5px; }
   }
 </style>
 </head>
@@ -1189,6 +1445,7 @@
 <div id="app"></div>
 <svg id="sts-target-svg"></svg>
 <div id="sts-power-tip" class="sts-power-tip"></div>
+<div id="sts-vfx-layer"></div>
 
 <script>
 const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118},"powers":{"Strength":119,"Dexterity":120,"Vulnerable":121,"Weak":122,"Frail":123,"Ritual":124,"CurlUp":125,"SporeCloud":126,"Metallicize":127,"PlatedArmor":128,"Artifact":129,"Anger":130,"Thievery":131,"ModeShift":132,"SharpHide":133,"Split":134,"Flight":135,"Malleable":136,"Confusion":137,"Entangled":138,"Hex":139,"NoDraw":140,"NoBlock":141,"DrawReduction":142,"Constricted":143,"LoseStrength":144,"LoseDexterity":145,"Shackled":146,"NextTurnBlock":147,"FlameBarrier":148,"Rage":130,"DoubleTap":149,"Duplication":150,"Combust":151,"DarkEmbrace":152,"Evolve":153,"FeelNoPain":154,"FireBreathing":155,"Rupture":156,"Barricade":157,"Berserk":158,"Brutality":159,"Corruption":160,"DemonForm":161,"Juggernaut":162,"Mayhem":163,"Panache":164,"Sadistic":165,"TheBomb":166,"Regen":167,"Intangible":168,"Buffer":169,"Thorns":170,"PainfulStabs":171,"Minion":172,"Regrow":173,"Slow":174,"Explosive":175,"Fading":176,"Shifting":177,"Reactive":178,"RegenerateMonster":167,"Curiosity":179,"Unawakened":180,"TimeWarp":181,"GenericStrengthUp":119},"potions":{"Block Potion":182,"Fire Potion":183,"Explosive Potion":184,"FearPotion":185,"Weak Potion":186,"Strength Potion":187,"Dexterity Potion":188,"SpeedPotion":189,"SteroidPotion":190,"Swift Potion":191,"Energy Potion":192,"BloodPotion":193,"BlessingOfTheForge":194,"AttackPotion":195,"SkillPotion":196,"PowerPotion":197,"Regen Potion":198,"Ancient Potion":199,"EssenceOfSteel":200,"LiquidBronze":201,"DuplicationPotion":202,"CultistPotion":203,"Fruit Juice":204,"FairyPotion":205},"intents":{"attack_1":206,"attack_2":207,"attack_3":208,"attack_4":209,"attack_5":210,"attack_6":211,"attack_7":212,"defend":213,"defend_buff":214,"buff":215,"debuff1":216,"debuff2":217,"magic":218,"sleep":219,"stun":220,"unknown":221,"escape":222},"map":{"M":223,"E":224,"?":225,"R":226,"$":227,"T":228,"TheGuardian":229,"Hexaghost":230,"SlimeBoss":231,"BronzeAutomaton":232,"TheCollector":233,"Champ":234,"AwakenedOne":235,"TimeEater":236,"Donu and Deca":237},"hud":{"heart":238,"gold":239,"floor":240,"deck":241,"map":242,"block":243,"energyRed":244,"drawPile":245,"discardPile":246,"reticleCorner":247,"reticleArrow":248,"endTurn":249,"endTurnGlow":250,"proceed":251,"potionSlot":252,"countCircle":253},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11},"uiPanels":{"sheetW":1032,"sheetH":1620,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":2480,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560}}};
@@ -5799,7 +6056,7 @@ function judge(submission, tools) {
 }
 
 
-// ==================== Sprite Sheet Helpers ====================
+// ==================== Sprite Sheet Helpers & 60FPS Spine 3.4 Engine ====================
 function spIcon(cat, key, size = 18, fallback = "") {
   const map = SPRITE_MANIFEST[cat];
   const idx = map && map[key];
@@ -5809,13 +6066,438 @@ function spIcon(cat, key, size = 18, fallback = "") {
   return '<span class="sp-icon" style="width:' + size + 'px;height:' + size + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
 }
 
-function spMonster(key, size = 78) {
+function spMonster(key, size = 78, seedIdx = 0) {
   const map = SPRITE_MANIFEST.monsters;
-  const idx = (map && map[key] !== undefined) ? map[key] : 1;
+  const hasStatic = Boolean(map && map[key] !== undefined);
+  const idx = hasStatic ? map[key] : 1;
   const col = idx % 9, row = Math.floor(idx / 9);
   const px = (col / 8) * 100, py = (row / 8) * 100;
-  return '<span class="sp-monster" style="width:' + size + 'px;height:' + size + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
+  const cw = Math.max(96, Math.min(340, Math.round(size * 1.45)));
+  const staticHide = hasStatic ? "" : ";opacity:0";
+  return '<span class="sp-monster-wrap" style="width:' + size + 'px;height:' + size + 'px">' +
+    '<span class="sp-monster" style="width:' + size + 'px;height:' + size + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%' + staticHide + '"></span>' +
+    '<canvas class="sts-spine-canvas" data-spine-key="' + key + '" data-spine-seed="' + seedIdx + '" width="' + cw + '" height="' + cw + '" style="width:' + size + 'px;height:' + size + 'px"></canvas>' +
+  '</span>';
 }
+
+const STS_SpineEngine = (() => {
+  let ready = false;
+  let spineImg = null;
+  let bundle = null;
+
+  function evalCurve(curve, f) {
+    if (!curve || f <= 0 || f >= 1) return f < 0 ? 0 : (f > 1 ? 1 : f);
+    if (curve === "stepped") return 0;
+    if (Array.isArray(curve) && curve.length === 4) {
+      const cx1 = curve[0], cy1 = curve[1], cx2 = curve[2], cy2 = curve[3];
+      let u = f;
+      for (let i = 0; i < 4; i++) {
+        const u2 = u * u, u3 = u2 * u, mu = 1 - u, mu2 = mu * mu;
+        const x = 3 * mu2 * u * cx1 + 3 * mu * u2 * cx2 + u3 - f;
+        const dx = 3 * mu2 * cx1 + 6 * mu * u * (cx2 - cx1) + 3 * u2 * (1 - cx2);
+        if (Math.abs(dx) < 1e-5) break;
+        u -= x / dx;
+        if (u < 0) u = 0; else if (u > 1) u = 1;
+      }
+      const u2 = u * u, u3 = u2 * u, mu = 1 - u, mu2 = mu * mu;
+      return 3 * mu2 * u * cy1 + 3 * mu * u2 * cy2 + u3;
+    }
+    return f;
+  }
+
+  function sampleTimeline2(keys, t, defX, defY, pX, pY) {
+    if (!keys || keys.length === 0) return [defX, defY];
+    const first = keys[0];
+    if (t <= (first.time || 0)) {
+      return [first[pX] !== undefined ? first[pX] : defX, first[pY] !== undefined ? first[pY] : defY];
+    }
+    const last = keys[keys.length - 1];
+    if (t >= (last.time || 0)) {
+      return [last[pX] !== undefined ? last[pX] : defX, last[pY] !== undefined ? last[pY] : defY];
+    }
+    let k = 0;
+    while (k < keys.length - 2 && t >= (keys[k + 1].time || 0)) k++;
+    const k0 = keys[k], k1 = keys[k + 1];
+    const t0 = k0.time || 0, t1 = k1.time || 0;
+    const f = evalCurve(k0.curve, t1 > t0 ? (t - t0) / (t1 - t0) : 0);
+    const x0 = k0[pX] !== undefined ? k0[pX] : defX, x1 = k1[pX] !== undefined ? k1[pX] : defX;
+    const y0 = k0[pY] !== undefined ? k0[pY] : defY, y1 = k1[pY] !== undefined ? k1[pY] : defY;
+    return [x0 + (x1 - x0) * f, y0 + (y1 - y0) * f];
+  }
+
+  function sampleAngle(keys, t) {
+    if (!keys || keys.length === 0) return 0;
+    if (t <= (keys[0].time || 0)) return keys[0].angle || 0;
+    const last = keys[keys.length - 1];
+    if (t >= (last.time || 0)) return last.angle || 0;
+    let k = 0;
+    while (k < keys.length - 2 && t >= (keys[k + 1].time || 0)) k++;
+    const k0 = keys[k], k1 = keys[k + 1];
+    const t0 = k0.time || 0, t1 = k1.time || 0;
+    const f = evalCurve(k0.curve, t1 > t0 ? (t - t0) / (t1 - t0) : 0);
+    const v0 = k0.angle || 0, v1 = k1.angle || 0;
+    const diff = ((v1 - v0) % 360 + 540) % 360 - 180;
+    return v0 + diff * f;
+  }
+
+  function sampleDeform(keys, t, vCount) {
+    const out = new Float32Array(vCount);
+    if (!keys || keys.length === 0) return out;
+    const applyKey = (kf, weight) => {
+      const verts = kf.vertices;
+      if (!verts) return;
+      const off = kf.offset || 0;
+      for (let i = 0; i < verts.length && (off + i) < vCount; i++) out[off + i] += verts[i] * weight;
+    };
+    if (t <= (keys[0].time || 0)) { applyKey(keys[0], 1); return out; }
+    const last = keys[keys.length - 1];
+    if (t >= (last.time || 0)) { applyKey(last, 1); return out; }
+    let k = 0;
+    while (k < keys.length - 2 && t >= (keys[k + 1].time || 0)) k++;
+    const k0 = keys[k], k1 = keys[k + 1];
+    const t0 = k0.time || 0, t1 = k1.time || 0;
+    const f = evalCurve(k0.curve, t1 > t0 ? (t - t0) / (t1 - t0) : 0);
+    applyKey(k0, 1 - f);
+    applyKey(k1, f);
+    return out;
+  }
+
+  function calcAnimDur(animObj) {
+    if (!animObj) return 1.2;
+    let maxT = 0;
+    const scan = (arr) => { if (Array.isArray(arr) && arr.length > 0) maxT = Math.max(maxT, arr[arr.length - 1].time || 0); };
+    if (animObj.bones) for (const b of Object.values(animObj.bones)) { scan(b.translate); scan(b.rotate); scan(b.scale); }
+    if (animObj.slots) for (const s of Object.values(animObj.slots)) { scan(s.attachment); scan(s.color); }
+    if (animObj.deform) for (const sl of Object.values(animObj.deform)) for (const at of Object.values(sl)) scan(at);
+    return maxT > 0.05 ? maxT : 1.2;
+  }
+
+  function drawTri(ctx, img, x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, alpha) {
+    const cx = (x0 + x1 + x2) / 3, cy = (y0 + y1 + y2) / 3;
+    const dx0 = x0 - cx, dy0 = y0 - cy, l0 = Math.hypot(dx0, dy0) || 1;
+    const dx1 = x1 - cx, dy1 = y1 - cy, l1 = Math.hypot(dx1, dy1) || 1;
+    const dx2 = x2 - cx, dy2 = y2 - cy, l2 = Math.hypot(dx2, dy2) || 1;
+    const pad = 1.35;
+    const ex0 = x0 + (dx0 / l0) * pad, ey0 = y0 + (dy0 / l0) * pad;
+    const ex1 = x1 + (dx1 / l1) * pad, ey1 = y1 + (dy1 / l1) * pad;
+    const ex2 = x2 + (dx2 / l2) * pad, ey2 = y2 + (dy2 / l2) * pad;
+    const det = (u1 - u0) * (v2 - v0) - (u2 - u0) * (v1 - v0);
+    if (Math.abs(det) < 1e-5) return;
+    const idet = 1 / det;
+    const a = ((x1 - x0) * (v2 - v0) - (x2 - x0) * (v1 - v0)) * idet;
+    const b = ((y1 - y0) * (v2 - v0) - (y2 - y0) * (v1 - v0)) * idet;
+    const c = ((x2 - x0) * (u1 - u0) - (x1 - x0) * (u2 - u0)) * idet;
+    const d = ((y2 - y0) * (u1 - u0) - (y1 - y0) * (u2 - u0)) * idet;
+    const e = x0 - a * u0 - c * v0;
+    const f = y0 - b * u0 - d * v0;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(ex0, ey0); ctx.lineTo(ex1, ey1); ctx.lineTo(ex2, ey2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.transform(a, b, c, d, e, f);
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();
+  }
+
+  function renderHexaghostCanvas(canvas, key, nowSec) {
+    const ext = window.STS_SPINE_EXTRAS;
+    if (!ext || !spineImg) return false;
+    const ctx = canvas.getContext("2d");
+    const cw = canvas.width, ch = canvas.height;
+    ctx.clearRect(0, 0, cw, ch);
+    const cx = cw * 0.5, cy = ch * 0.52;
+
+    if (key === "Hexaghost") {
+      const layers = [
+        { r: ext.hexa_p3, spd: -0.36, sc: 0.96, al: 0.72 },
+        { r: ext.hexa_p2, spd: 0.52, sc: 0.88, al: 0.82 },
+        { r: ext.hexa_p1, spd: -0.74, sc: 0.78, al: 0.92 },
+      ];
+      for (const L of layers) {
+        if (!L.r) continue;
+        const dstW = cw * L.sc, dstH = ch * L.sc;
+        ctx.save();
+        ctx.globalAlpha = L.al;
+        ctx.translate(cx, cy);
+        ctx.rotate(nowSec * L.spd);
+        ctx.drawImage(spineImg, L.r.x, L.r.y, L.r.w, L.r.h, -dstW / 2, -dstH / 2, dstW, dstH);
+        ctx.restore();
+      }
+    }
+    if (ext.hexa_core) {
+      const c = ext.hexa_core;
+      const bobY = Math.sin(nowSec * 2.6) * (ch * 0.028);
+      const tilt = Math.sin(nowSec * 1.4) * 0.06;
+      const coreScale = key === "Hexaghost_dormant" ? 0.68 : 0.44;
+      const dstW = cw * coreScale, dstH = ch * coreScale;
+      ctx.save();
+      ctx.translate(cx, cy + bobY);
+      ctx.rotate(tilt);
+      ctx.drawImage(spineImg, c.x, c.y, c.w, c.h, -dstW / 2, -dstH / 2, dstW, dstH);
+      ctx.restore();
+    }
+    if (canvas.parentElement) canvas.parentElement.classList.add("spine-ready");
+    return true;
+  }
+
+  function renderSpineCanvas(canvas, nowSec) {
+    if (!ready || !bundle || !spineImg) return;
+    const key = canvas.getAttribute("data-spine-key") || "";
+    if (key === "Hexaghost" || key === "Hexaghost_dormant") {
+      renderHexaghostCanvas(canvas, key, nowSec);
+      return;
+    }
+    const cDef = bundle.creatures[key];
+    if (!cDef) return;
+    const model = bundle.models[cDef.m];
+    if (!model) return;
+
+    const seed = Number(canvas.getAttribute("data-spine-seed") || 0);
+    const animObj = model.anims[cDef.a] || null;
+    const dur = (animObj && animObj._dur) || 1.2;
+    const t = cDef.freeze ? 0 : ((nowSec + seed * 0.73) % dur);
+
+    const boneDefs = model.bones;
+    const bCount = boneDefs.length;
+    const bones = new Array(bCount);
+    const bf = cDef.bf || null;
+
+    for (let i = 0; i < bCount; i++) {
+      const b = boneDefs[i];
+      let x = b.x || 0, y = b.y || 0, rot = b.rotation || 0;
+      let sx = b.scaleX !== undefined ? b.scaleX : 1;
+      let sy = b.scaleY !== undefined ? b.scaleY : 1;
+      if (animObj && animObj.bones && animObj.bones[b.name]) {
+        const ab = animObj.bones[b.name];
+        if (ab.translate) {
+          const tr = sampleTimeline2(ab.translate, t, 0, 0, "x", "y");
+          x += tr[0]; y += tr[1];
+        }
+        if (ab.rotate) {
+          rot += sampleAngle(ab.rotate, t);
+        }
+        if (ab.scale) {
+          const sc = sampleTimeline2(ab.scale, t, 1, 1, "x", "y");
+          sx *= sc[0]; sy *= sc[1];
+        }
+      }
+      if (bf && bf[b.name]) {
+        x += (bf[b.name].x || 0);
+        y += (bf[b.name].y || 0);
+        rot += (bf[b.name].rotation || 0);
+      }
+      const rad = rot * 0.017453292519943295;
+      const cos = Math.cos(rad), sin = Math.sin(rad);
+      const la = cos * sx, lb = sin * sx, lc = -sin * sy, ld = cos * sy;
+      const pIdx = b._pIdx;
+      if (pIdx === -1) {
+        bones[i] = { a: la, b: lb, c: lc, d: ld, wx: x, wy: y };
+      } else {
+        const p = bones[pIdx];
+        bones[i] = {
+          wx: p.a * x + p.c * y + p.wx,
+          wy: p.b * x + p.d * y + p.wy,
+          a: p.a * la + p.c * lb,
+          b: p.b * la + p.d * lb,
+          c: p.a * lc + p.c * ld,
+          d: p.b * lc + p.d * ld,
+        };
+      }
+    }
+
+    const cw = canvas.width, ch = canvas.height;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, cw, ch);
+
+    const bd = cDef.bd;
+    const bw = Math.max(1, bd[2] - bd[0]), bh = Math.max(1, bd[3] - bd[1]);
+    const pad = key === "Neow" ? 0.96 : 0.90;
+    const baseScale = Math.min((cw * pad) / bw, (ch * pad) / bh);
+    const breath = cDef.freeze ? (1 + Math.sin(nowSec * 2.2 + seed) * 0.016) : 1;
+    const scale = baseScale * breath;
+    const ox = cw * 0.5 - ((bd[0] + bd[2]) * 0.5) * scale;
+    const oy = (key === "Neow" ? ch * 0.92 : ch * 0.96) - bd[3] * scale;
+
+    const skin = model.skin;
+    const regs = model.regs;
+    const defMap = (animObj && animObj.deform) || null;
+    const slots = model.slots;
+
+    for (let sIdx = 0; sIdx < slots.length; sIdx++) {
+      const slot = slots[sIdx];
+      if (slot._isShadow) continue;
+      let attName = slot.attachment;
+      let colorHex = slot.color || "ffffffff";
+      if (animObj && animObj.slots && animObj.slots[slot.name]) {
+        const as = animObj.slots[slot.name];
+        if (as.attachment && as.attachment.length > 0) {
+          let curAtt = as.attachment[0].name;
+          for (let k = 0; k < as.attachment.length; k++) {
+            if ((as.attachment[k].time || 0) <= t) curAtt = as.attachment[k].name;
+          }
+          attName = curAtt;
+        }
+        if (as.color && as.color.length > 0 && as.color[0].color) colorHex = as.color[0].color;
+      }
+      if (!attName) continue;
+      const alpha = parseInt(colorHex.slice(6, 8) || "ff", 16) / 255;
+      if (alpha <= 0.02) continue;
+
+      const slotSkin = skin[slot.name];
+      if (!slotSkin) continue;
+      const att = slotSkin[attName];
+      if (!att) continue;
+      const texName = att.path || att.name || attName;
+      const reg = regs[texName];
+      if (!reg) continue;
+      const bone = bones[slot._bIdx];
+      if (!bone) continue;
+
+      const rx = reg.xy[0], ry = reg.xy[1], rw = reg.sz[0], rh = reg.sz[1];
+      const type = att.type || "region";
+
+      if (type === "region") {
+        const ax = att.x || 0, ay = att.y || 0, arot = (att.rotation || 0) * 0.017453292519943295;
+        const asx = att.scaleX !== undefined ? att.scaleX : 1;
+        const asy = att.scaleY !== undefined ? att.scaleY : 1;
+        const w = att.width || (reg.or && reg.or[0]) || rw * 2;
+        const h = att.height || (reg.or && reg.or[1]) || rh * 2;
+        const hx = w * 0.5, hy = h * 0.5;
+        const acos = Math.cos(arot), asin = Math.sin(arot);
+        const corners = [[-hx, hy], [hx, hy], [hx, -hy], [-hx, -hy]];
+        const px = [0, 0, 0, 0], py = [0, 0, 0, 0];
+        for (let c = 0; c < 4; c++) {
+          const lx = corners[c][0] * asx, ly = corners[c][1] * asy;
+          const bx = ax + lx * acos - ly * asin;
+          const by = ay + lx * asin + ly * acos;
+          px[c] = (bone.a * bx + bone.c * by + bone.wx) * scale + ox;
+          py[c] = -(bone.b * bx + bone.d * by + bone.wy) * scale + oy;
+        }
+        if (!reg.r) {
+          drawTri(ctx, spineImg, px[0], py[0], px[1], py[1], px[2], py[2], rx, ry, rx + rw, ry, rx + rw, ry + rh, alpha);
+          drawTri(ctx, spineImg, px[0], py[0], px[2], py[2], px[3], py[3], rx, ry, rx + rw, ry + rh, rx, ry + rh, alpha);
+        } else {
+          drawTri(ctx, spineImg, px[0], py[0], px[1], py[1], px[2], py[2], rx, ry + rw, rx, ry, rx + rh, ry, alpha);
+          drawTri(ctx, spineImg, px[0], py[0], px[2], py[2], px[3], py[3], rx, ry + rw, rx + rh, ry, rx + rh, ry + rw, alpha);
+        }
+      } else if (type === "mesh" || type === "skinnedmesh") {
+        const uvsRaw = att.uvs, vtxRaw = att.vertices, vCount = uvsRaw.length >> 1;
+        const defKeys = defMap && defMap[slot.name] && defMap[slot.name][attName];
+        const defVals = defKeys ? sampleDeform(defKeys, t, vtxRaw.length) : null;
+        const wxArr = new Float32Array(vCount);
+        const wyArr = new Float32Array(vCount);
+        const uArr = new Float32Array(vCount);
+        const vArr = new Float32Array(vCount);
+
+        if (vtxRaw.length === uvsRaw.length) {
+          for (let i = 0; i < vCount; i++) {
+            const idx2 = i << 1;
+            const vx = vtxRaw[idx2] + (defVals ? defVals[idx2] : 0);
+            const vy = vtxRaw[idx2 + 1] + (defVals ? defVals[idx2 + 1] : 0);
+            wxArr[i] = (bone.a * vx + bone.c * vy + bone.wx) * scale + ox;
+            wyArr[i] = -(bone.b * vx + bone.d * vy + bone.wy) * scale + oy;
+          }
+        } else {
+          let k = 0, dIdx = 0;
+          for (let i = 0; i < vCount; i++) {
+            const bCnt = vtxRaw[k++];
+            let wx = 0, wy = 0;
+            for (let b = 0; b < bCnt; b++) {
+              const bIdx = vtxRaw[k++];
+              const vx = vtxRaw[k++] + (defVals ? (defVals[dIdx++] || 0) : 0);
+              const vy = vtxRaw[k++] + (defVals ? (defVals[dIdx++] || 0) : 0);
+              const w = vtxRaw[k++];
+              const B = bones[bIdx];
+              wx += (B.a * vx + B.c * vy + B.wx) * w;
+              wy += (B.b * vx + B.d * vy + B.wy) * w;
+            }
+            wxArr[i] = wx * scale + ox;
+            wyArr[i] = -wy * scale + oy;
+          }
+        }
+        for (let i = 0; i < vCount; i++) {
+          const idx2 = i << 1;
+          const u = uvsRaw[idx2], v = uvsRaw[idx2 + 1];
+          if (!reg.r) {
+            uArr[i] = rx + u * rw;
+            vArr[i] = ry + v * rh;
+          } else {
+            uArr[i] = rx + v * rh;
+            vArr[i] = ry + (1 - u) * rw;
+          }
+        }
+        const tris = att.triangles;
+        for (let i = 0; i < tris.length; i += 3) {
+          const i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
+          drawTri(ctx, spineImg, wxArr[i0], wyArr[i0], wxArr[i1], wyArr[i1], wxArr[i2], wyArr[i2], uArr[i0], vArr[i0], uArr[i1], vArr[i1], uArr[i2], vArr[i2], alpha);
+        }
+      }
+    }
+    if (canvas.parentElement) canvas.parentElement.classList.add("spine-ready");
+  }
+
+  function renderAllCanvases(nowSec) {
+    if (!ready) return;
+    const list = document.querySelectorAll("canvas.sts-spine-canvas");
+    for (let i = 0; i < list.length; i++) {
+      renderSpineCanvas(list[i], nowSec);
+    }
+  }
+
+  function tick(ts) {
+    renderAllCanvases(ts * 0.001);
+    requestAnimationFrame(tick);
+  }
+
+  async function init() {
+    try {
+      if (!window.STS_SPINE_GZ || typeof DecompressionStream === "undefined") return;
+      const imgP = new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = reject;
+        im.src = "assets/spine.webp";
+      });
+      const binStr = atob(window.STS_SPINE_GZ);
+      const bytes = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+      const ds = new DecompressionStream("gzip");
+      const writer = ds.writable.getWriter();
+      writer.write(bytes);
+      writer.close();
+      const jsonP = new Response(ds.readable).json();
+
+      const [im, parsed] = await Promise.all([imgP, jsonP]);
+      spineImg = im;
+      bundle = parsed;
+
+      // Pre-link parent bone indices, slot bone indices, and animation durations
+      for (const m of Object.values(bundle.models)) {
+        const nameToIdx = {};
+        m.bones.forEach((b, i) => { nameToIdx[b.name] = i; });
+        m.bones.forEach(b => { b._pIdx = (b.parent && nameToIdx[b.parent] !== undefined) ? nameToIdx[b.parent] : -1; });
+        m.slots.forEach(s => {
+          s._bIdx = nameToIdx[s.bone] !== undefined ? nameToIdx[s.bone] : 0;
+          const low = (s.name || "").toLowerCase() + " " + (s.attachment || "").toLowerCase();
+          s._isShadow = low.includes("shadow") || low.includes("ground");
+        });
+        for (const aObj of Object.values(m.anims || {})) {
+          aObj._dur = calcAnimDur(aObj);
+        }
+      }
+      ready = true;
+      renderAllCanvases(performance.now() * 0.001);
+      requestAnimationFrame(tick);
+    } catch (err) {
+      console.warn("Spine init fallback to static sprites:", err);
+    }
+  }
+
+  init();
+  return { renderAllCanvases, isReady: () => ready };
+})();
 
 function getMonsterStateSpriteKey(m) {
   if (!m || !m.id) return "Cultist";
@@ -6661,15 +7343,431 @@ window.addEventListener("pagehide", () => {
   if (pendingActionsQueue.length > 0) flushPendingActions();
 });
 
+function spineExtraBgStyle(extraKey) {
+  const ext = window.STS_SPINE_EXTRAS;
+  const p = ext && ext[extraKey];
+  if (!p) return "";
+  const SW = 2048, SH = 1977;
+  const sx = ((SW / p.w) * 100).toFixed(3) + "%";
+  const sy = ((SH / p.h) * 100).toFixed(3) + "%";
+  const px = ((p.x / (SW - p.w)) * 100).toFixed(3) + "%";
+  const py = ((p.y / (SH - p.h)) * 100).toFixed(3) + "%";
+  return "background-image:url(assets/spine.webp);background-repeat:no-repeat;background-size:" + sx + " " + sy + ";background-position:" + px + " " + py + ";";
+}
+
+// ==================== COMBAT VFX & ACTION DIFF CHOREOGRAPHER ====================
+const CombatVfxEngine = (() => {
+  const activeUnitAnims = {}; // unitKey -> { cls, until }
+
+  function getLayer() {
+    return document.getElementById("sts-vfx-layer");
+  }
+
+  function setUnitAnim(unitKey, cls, durMs = 420, delayMs = 0) {
+    const run = () => {
+      activeUnitAnims[unitKey] = { cls, until: performance.now() + durMs };
+      applyActiveUnitClasses();
+      setTimeout(() => {
+        if (activeUnitAnims[unitKey] && performance.now() >= activeUnitAnims[unitKey].until - 10) {
+          delete activeUnitAnims[unitKey];
+          applyActiveUnitClasses();
+        }
+      }, durMs + 20);
+    };
+    if (delayMs > 0) setTimeout(run, delayMs);
+    else run();
+  }
+
+  function applyActiveUnitClasses() {
+    const now = performance.now();
+    const heroBox = document.querySelector(".sts-unit.hero-unit .sprite-stage-box");
+    if (heroBox) {
+      heroBox.classList.remove("unit-lunge-right", "unit-lunge-left", "unit-hit-shake", "unit-block-pulse");
+      const ha = activeUnitAnims.hero;
+      if (ha && ha.until > now) heroBox.classList.add(ha.cls);
+    }
+    document.querySelectorAll(".sts-unit.enemy-unit").forEach(u => {
+      const idx = u.getAttribute("data-enemy-idx");
+      const box = u.querySelector(".sprite-stage-box");
+      if (!box) return;
+      box.classList.remove("unit-lunge-right", "unit-lunge-left", "unit-hit-shake", "unit-block-pulse");
+      const ea = activeUnitAnims["enemy-" + idx];
+      if (ea && ea.until > now) box.classList.add(ea.cls);
+    });
+  }
+
+  function spawnSlash(cx, cy, rotDeg = -28, delayMs = 0) {
+    setTimeout(() => {
+      const layer = getLayer();
+      if (!layer) return;
+      const slash = document.createElement("div");
+      slash.className = "vfx-slash";
+      slash.setAttribute("style", spineExtraBgStyle("slash1"));
+      slash.style.left = cx + "px";
+      slash.style.top = cy + "px";
+      slash.style.setProperty("--slash-rot", rotDeg + "deg");
+      layer.appendChild(slash);
+
+      const ring = document.createElement("div");
+      ring.className = "vfx-hit-ring";
+      ring.style.left = cx + "px";
+      ring.style.top = cy + "px";
+      layer.appendChild(ring);
+
+      setTimeout(() => { slash.remove(); ring.remove(); }, 390);
+    }, delayMs);
+  }
+
+  function spawnDamageNumber(cx, cy, amount, clsExtra = "", delayMs = 0) {
+    setTimeout(() => {
+      const layer = getLayer();
+      if (!layer) return;
+      const el = document.createElement("div");
+      el.className = "vfx-dmg-num" + (clsExtra ? " " + clsExtra : "");
+      el.textContent = "-" + amount;
+      layer.appendChild(el);
+
+      const vx = (Math.random() - 0.5) * 115;
+      const vy0 = -165 - Math.random() * 55;
+      const g = 460;
+      const start = performance.now();
+      const dur = 820;
+
+      function step(now) {
+        const dt = (now - start) * 0.001;
+        const p = Math.min(1, (now - start) / dur);
+        const x = cx + vx * dt;
+        const y = cy + vy0 * dt + 0.5 * g * dt * dt;
+        const sc = p < 0.16 ? (0.65 + (p / 0.16) * 0.55) : (1.2 - ((p - 0.16) / 0.84) * 0.25);
+        const op = p > 0.72 ? Math.max(0, 1 - (p - 0.72) / 0.28) : 1;
+        el.style.left = x.toFixed(1) + "px";
+        el.style.top = y.toFixed(1) + "px";
+        el.style.transform = "translate(-50%, -50%) scale(" + sc.toFixed(2) + ")";
+        el.style.opacity = op.toFixed(2);
+        if (p < 1) requestAnimationFrame(step);
+        else el.remove();
+      }
+      requestAnimationFrame(step);
+    }, delayMs);
+  }
+
+  function spawnFloatTag(cx, cy, htmlText, clsType = "buff-gain", delayMs = 0) {
+    setTimeout(() => {
+      const layer = getLayer();
+      if (!layer) return;
+      const el = document.createElement("div");
+      el.className = "vfx-float-tag " + clsType;
+      el.innerHTML = htmlText;
+      el.style.left = cx.toFixed(1) + "px";
+      el.style.top = cy.toFixed(1) + "px";
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 950);
+    }, delayMs);
+  }
+
+  function spawnTurnBanner(mainTxt, subTxt) {
+    const layer = getLayer();
+    if (!layer) return;
+    const el = document.createElement("div");
+    el.className = "vfx-turn-banner";
+    el.innerHTML =
+      '<div class="vfx-turn-banner-main">' + mainTxt + '</div>' +
+      (subTxt ? '<div class="vfx-turn-banner-sub">' + subTxt + '</div>' : '');
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 860);
+  }
+
+  function spawnScreenHit(delayMs = 0) {
+    setTimeout(() => {
+      const layer = getLayer();
+      if (!layer) return;
+      const el = document.createElement("div");
+      el.className = "vfx-screen-hit";
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 440);
+    }, delayMs);
+  }
+
+  function spawnFlyingCard(cardHtml, startRect, midX, midY, endX, endY, cardType) {
+    const layer = getLayer();
+    if (!layer || !startRect || !cardHtml) return;
+    const wrap = document.createElement("div");
+    wrap.innerHTML = cardHtml;
+    const cardEl = wrap.firstElementChild;
+    if (!cardEl) return;
+    cardEl.style.position = "fixed";
+    cardEl.style.margin = "0";
+    cardEl.style.left = startRect.left + "px";
+    cardEl.style.top = startRect.top + "px";
+    cardEl.style.width = startRect.width + "px";
+    cardEl.style.height = startRect.height + "px";
+    cardEl.style.pointerEvents = "none";
+    cardEl.style.transition = "none";
+    cardEl.style.zIndex = "92";
+    layer.appendChild(cardEl);
+
+    const sx = startRect.left + startRect.width * 0.5;
+    const sy = startRect.top + startRect.height * 0.5;
+    const t0 = performance.now();
+    const dur = 420;
+
+    function step(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      let x, y, sc, rot, op;
+      if (p < 0.48) {
+        const u = 1 - Math.pow(1 - p / 0.48, 2.2);
+        x = sx + (midX - sx) * u;
+        y = sy + (midY - sy) * u;
+        sc = 1 + u * 0.14;
+        rot = u * (cardType === "A" ? 8 : 0);
+        op = 1;
+      } else {
+        const u = (p - 0.48) / 0.52;
+        const ease = u * u;
+        x = midX + (endX - midX) * ease;
+        y = midY + (endY - midY) * ease;
+        sc = 1.14 * (1 - ease * 0.78);
+        rot = (cardType === "A" ? 8 : 0) + ease * 140;
+        op = 1 - ease * 0.92;
+      }
+      cardEl.style.left = (x - startRect.width * 0.5).toFixed(1) + "px";
+      cardEl.style.top = (y - startRect.height * 0.5).toFixed(1) + "px";
+      cardEl.style.transform = "scale(" + sc.toFixed(2) + ") rotate(" + rot.toFixed(1) + "deg)";
+      cardEl.style.opacity = op.toFixed(2);
+      if (p < 1) requestAnimationFrame(step);
+      else cardEl.remove();
+    }
+    requestAnimationFrame(step);
+  }
+
+  function spawnDeathGhost(rect, spriteKey, size, idx) {
+    const layer = getLayer();
+    if (!layer || !rect) return;
+    const el = document.createElement("div");
+    el.className = "vfx-death-ghost";
+    el.style.left = rect.left + "px";
+    el.style.top = rect.top + "px";
+    el.style.width = rect.width + "px";
+    el.style.height = rect.height + "px";
+    el.innerHTML = spMonster(spriteKey, size, idx);
+    layer.appendChild(el);
+    if (STS_SpineEngine.isReady()) {
+      STS_SpineEngine.renderAllCanvases(performance.now() * 0.001);
+    }
+    setTimeout(() => el.remove(), 580);
+  }
+
+  function capturePreAction(actObj) {
+    if (!currentData) return null;
+    const st = currentData;
+    const bt = st.bt;
+    const heroBox = document.querySelector(".sts-unit.hero-unit .sprite-stage-box");
+    const heroRect = heroBox ? heroBox.getBoundingClientRect() : null;
+    const enemyRects = {};
+    document.querySelectorAll(".sts-unit.enemy-unit").forEach(u => {
+      const idx = u.getAttribute("data-enemy-idx");
+      const box = u.querySelector(".sprite-stage-box") || u;
+      enemyRects[idx] = box.getBoundingClientRect();
+    });
+
+    let cardRect = null, cardHtml = null, cardDef = null;
+    if (actObj && actObj.type === "play_card" && bt && bt.h && bt.h[actObj.cardIdx]) {
+      const cStr = bt.h[actObj.cardIdx];
+      cardDef = getCardDef(cStr);
+      const cEl = document.querySelector('.hand-tray .sts-card[data-hand-idx="' + actObj.cardIdx + '"]');
+      if (cEl) {
+        cardRect = cEl.getBoundingClientRect();
+        cardHtml = cEl.outerHTML;
+      }
+    }
+    const disEl = document.getElementById("btn-discard-pile");
+    const discardRect = disEl ? disEl.getBoundingClientRect() : null;
+
+    return {
+      ph: st.ph,
+      hp: st.hp,
+      mhp: st.mhp,
+      b: bt ? (bt.b || 0) : 0,
+      t: bt ? (bt.t || 1) : 1,
+      pw: bt && bt.pw ? Object.assign({}, bt.pw) : {},
+      enemies: bt && bt.m ? bt.m.map((m, idx) => ({
+        id: m.id,
+        name: m.name,
+        spriteKey: getMonsterStateSpriteKey(m),
+        size: getMonsterVisualSpec(getMonsterStateSpriteKey(m), m.id, bt.m.length).size,
+        hp: m.hp,
+        mhp: m.mhp,
+        b: m.b || 0,
+        pw: Object.assign({}, m.pw || {}),
+        intent: m.in || m.it || "",
+        dmg: (m.dmg !== undefined ? m.dmg : m.idmg) || 0,
+        idx,
+      })) : [],
+      heroRect,
+      enemyRects,
+      cardRect,
+      cardHtml,
+      cardDef,
+      discardRect,
+    };
+  }
+
+  function diffPowerFloaters(prevPw, nextPw, cx, cy, baseDelay = 60) {
+    const allKeys = new Set([...Object.keys(prevPw || {}), ...Object.keys(nextPw || {})]);
+    let seq = 0;
+    for (const k of allKeys) {
+      const pv = (prevPw && prevPw[k]) || 0;
+      const nv = (nextPw && nextPw[k]) || 0;
+      const delta = nv - pv;
+      if (delta === 0) continue;
+      // Skip automatic 1-turn duration tickdowns on end_turn
+      if (delta === -1 && (k === "Vulnerable" || k === "Weak" || k === "Frail" || k === "Entangled" || k === "NoBlock")) continue;
+      const info = formatPowerDesc(k, nv || pv, null);
+      const sign = delta > 0 ? "+" : "";
+      const cls = info.isDebuff ? "debuff-gain" : "buff-gain";
+      spawnFloatTag(
+        cx + (seq % 2 === 0 ? -12 : 14),
+        cy - 18 - seq * 20,
+        spIcon("powers", k, 18, info.icon) + "<span>" + info.name + " " + sign + delta + "</span>",
+        cls,
+        baseDelay + seq * 110
+      );
+      seq++;
+    }
+  }
+
+  function playPostAction(snap, nextSt, actObj) {
+    if (!snap || !nextSt) return;
+    const t = actObj && actObj.type;
+
+    // 1. Entering Combat Banner
+    if (snap.ph !== "COMBAT" && nextSt.ph === "COMBAT") {
+      spawnTurnBanner("⚔️ 遭遇战斗", "第 1 回合 · 玩家回合");
+      return;
+    }
+
+    const nextBt = nextSt.bt;
+    const heroRect = snap.heroRect || { left: window.innerWidth * 0.22, top: window.innerHeight * 0.45, width: 110, height: 110 };
+    const hCx = heroRect.left + heroRect.width * 0.5;
+    const hCy = heroRect.top + heroRect.height * 0.45;
+
+    // 2. Card Flight Trail on play_card
+    if (t === "play_card" && snap.cardRect && snap.cardHtml && snap.cardDef) {
+      const def = snap.cardDef;
+      const midX = window.innerWidth * (def.target === "E" ? 0.48 : 0.44);
+      const midY = window.innerHeight * 0.46;
+      const disRect = snap.discardRect || { left: window.innerWidth - 55, top: window.innerHeight - 55, width: 40, height: 40 };
+      const endX = def.type === "P" ? hCx : (disRect.left + disRect.width * 0.5);
+      const endY = def.type === "P" ? hCy : (disRect.top + disRect.height * 0.5);
+      spawnFlyingCard(snap.cardHtml, snap.cardRect, midX, midY, endX, endY, def.type);
+
+      if (def.type === "A") {
+        setUnitAnim("hero", "unit-lunge-right", 390, 0);
+      }
+    }
+
+    // 3. Enemy Damage, Block Loss, Hit Shake, Slash & Death Ghost
+    if (snap.ph === "COMBAT") {
+      snap.enemies.forEach((prevM, idx) => {
+        const nextM = (nextBt && nextBt.m && nextBt.m[idx]) ? nextBt.m[idx] : { hp: 0, b: 0, pw: {} };
+        const eRect = snap.enemyRects[idx] || { left: window.innerWidth * 0.72, top: window.innerHeight * 0.45, width: 110, height: 110 };
+        const eCx = eRect.left + eRect.width * 0.5;
+        const eCy = eRect.top + eRect.height * 0.45;
+
+        const hpLoss = Math.max(0, prevM.hp - Math.max(0, nextM.hp));
+        const blkLoss = (t === "play_card" || t === "use_potion") ? Math.max(0, prevM.b - nextM.b) : 0;
+        const totalHit = hpLoss + blkLoss;
+
+        if (totalHit > 0) {
+          spawnSlash(eCx, eCy, -28 + (idx % 2) * 52, 40);
+          setUnitAnim("enemy-" + idx, "unit-hit-shake", 430, 40);
+          if (hpLoss > 0) {
+            spawnDamageNumber(eCx, eCy - 10, hpLoss, hpLoss >= 18 ? "heavy-dmg" : "", 55);
+          } else if (blkLoss > 0) {
+            spawnDamageNumber(eCx, eCy - 10, blkLoss, "blocked-dmg", 55);
+          }
+        }
+
+        // Enemy died! Spawn death ghost so it dissolves cleanly
+        if (prevM.hp > 0 && nextM.hp <= 0) {
+          spawnDeathGhost(eRect, prevM.spriteKey, prevM.size, idx);
+        }
+
+        // Enemy block gain
+        if (nextM.hp > 0 && nextM.b > prevM.b && t === "end_turn") {
+          spawnFloatTag(eCx, eCy - 16, "🛡️ +" + (nextM.b - prevM.b), "block-gain", 180 + idx * 90);
+          setUnitAnim("enemy-" + idx, "unit-block-pulse", 450, 180 + idx * 90);
+        }
+
+        // Enemy power changes
+        if (nextM.hp > 0) {
+          diffPowerFloaters(prevM.pw, nextM.pw, eCx, eCy, 95);
+        }
+      });
+
+      // 4. Hero Block Gain, Heal, Damage Taken & Power Changes
+      const nextB = nextBt ? (nextBt.b || 0) : 0;
+      if (t !== "end_turn" && nextB > snap.b) {
+        spawnFloatTag(hCx, hCy - 18, "🛡️ +" + (nextB - snap.b), "block-gain", 50);
+        setUnitAnim("hero", "unit-block-pulse", 450, 40);
+      }
+      if (nextSt.hp > snap.hp) {
+        spawnFloatTag(hCx, hCy - 26, "💚 +" + (nextSt.hp - snap.hp), "heal-gain", 60);
+      }
+      if (nextBt) {
+        diffPowerFloaters(snap.pw, nextBt.pw, hCx, hCy, 80);
+      }
+
+      // 5. End Turn Enemy Attacks & Turn Banner
+      if (t === "end_turn") {
+        let atkSeq = 0;
+        snap.enemies.forEach((prevM, idx) => {
+          if (prevM.hp <= 0) return;
+          const it = String(prevM.intent || "");
+          if (it.includes("ATK") || it.includes("ATTACK")) {
+            setUnitAnim("enemy-" + idx, "unit-lunge-left", 420, 60 + atkSeq * 130);
+            atkSeq++;
+          }
+        });
+
+        const heroHpLoss = Math.max(0, snap.hp - Math.max(0, nextSt.hp));
+        if (heroHpLoss > 0 || atkSeq > 0) {
+          const hitDelay = 120;
+          if (heroHpLoss > 0) {
+            spawnSlash(hCx, hCy, 32, hitDelay);
+            setUnitAnim("hero", "unit-hit-shake", 440, hitDelay);
+            spawnScreenHit(hitDelay);
+            spawnDamageNumber(hCx, hCy - 12, heroHpLoss, heroHpLoss >= 15 ? "heavy-dmg" : "", hitDelay + 20);
+          } else if (atkSeq > 0) {
+            spawnSlash(hCx, hCy, 32, hitDelay);
+            setUnitAnim("hero", "unit-block-pulse", 440, hitDelay);
+            spawnFloatTag(hCx, hCy - 18, "🛡️ 格挡", "block-gain", hitDelay + 20);
+          }
+        }
+
+        if (nextSt.ph === "COMBAT" && nextBt) {
+          setTimeout(() => {
+            spawnTurnBanner("第 " + nextBt.t + " 回合", "玩家回合");
+          }, atkSeq > 0 ? 280 : 60);
+        }
+      }
+    }
+  }
+
+  return { capturePreAction, playPostAction, applyActiveUnitClasses };
+})();
+
 function sendAction(payload) {
   clearTargeting(false);
   mapOverlayOpen = false;
   const actObj = typeof payload === "string" ? JSON.parse(payload) : payload;
   const prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "NEOW";
+  const vfxSnap = CombatVfxEngine.capturePreAction(actObj);
 
   // Always execute locally at 0ms for instant UI responsiveness
   runLocalJudge(actObj);
   const nextPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || prevPh;
+  CombatVfxEngine.playPostAction(vfxSnap, currentData, actObj);
 
   if (hbConnected && window.hb && typeof window.hb.submit === "function") {
     pendingActionsQueue.push(actObj);
@@ -7087,7 +8185,7 @@ function renderCombatStage(st) {
       '<div class="sts-intent ' + intent.cls + '" title="' + (intent.tip || "") + '">' + intent.text + '</div>' +
       '<div class="sprite-stage-box' + (mSpec.fly ? ' is-flying' : '') + (mIntangible ? ' is-intangible' : '') + (mHalfDead ? ' is-half-dead' : '') + '" style="width:' + mSpec.size + 'px;height:' + mSpec.size + 'px">' +
         '<div class="unit-shadow" style="width:' + mSpec.shadowW + 'px"></div>' +
-        spMonster(mSpriteKey, mSpec.size) +
+        spMonster(mSpriteKey, mSpec.size, idx + 1) +
         renderHexaghostOrbsHtml(m) +
         (isAlive ? renderReticleCorners() : '') +
       '</div>' +
@@ -7248,8 +8346,91 @@ function formatStsEventOptionLabel(raw) {
   return s;
 }
 
+function renderWavySpeechText(str) {
+  return Array.from(str).map((ch, i) =>
+    '<span class="sts-wave-ch" style="animation-delay:' + (i * 0.055).toFixed(3) + 's">' + ch + '</span>'
+  ).join("");
+}
+
+function renderNeowRoomStage(st) {
+  const def = UI_EVENTS_DEF.NEOW;
+  const stageWrap = document.createElement("div");
+  stageWrap.className = "sts-neow-stage";
+
+  const bgDecor = document.createElement("div");
+  bgDecor.className = "arena-bg-decor";
+  bgDecor.setAttribute("style", combatBgStyle("Exordium"));
+  stageWrap.appendChild(bgDecor);
+
+  const vignette = document.createElement("div");
+  vignette.className = "arena-vignette";
+  stageWrap.appendChild(vignette);
+
+  const ambient = document.createElement("div");
+  ambient.className = "sts-neow-ambient";
+  stageWrap.appendChild(ambient);
+
+  // Left: Ironclad standing on the Exordium floor (drawX = 25%, drawY = floorY)
+  const hero = document.createElement("div");
+  hero.className = "sts-neow-hero";
+  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
+  hero.innerHTML =
+    '<div class="sprite-stage-box" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
+      '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
+      spMonster("Ironclad", heroSpec.size, 0) +
+    '</div>' +
+    '<div class="sts-under-foot">' +
+      '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
+        '<div class="hp-bar-outer">' +
+          '<div class="hp-bar-inner" style="width:' + Math.max(0, Math.min(100, (st.hp / st.mhp) * 100)) + '%"></div>' +
+          '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="unit-name" style="opacity:1">铁甲战士</div>' +
+    '</div>';
+  stageWrap.appendChild(hero);
+
+  // Right: Giant Animated Neow (images/npcs/neow/skeleton.json) + Original SpeechBubble3
+  const isPhone = typeof window !== "undefined" && window.innerWidth <= 620;
+  const neowSize = isPhone ? 228 : 408;
+  const neowBoss = document.createElement("div");
+  neowBoss.className = "sts-neow-boss";
+  neowBoss.innerHTML =
+    '<div class="sts-neow-speech">' +
+      '<div class="sts-neow-speech-bg" style="' + spineExtraBgStyle("speechBubble3") + '"></div>' +
+      '<div class="sts-neow-speech-txt">' + renderWavySpeechText("高塔再次苏醒……") + '<br/>' + renderWavySpeechText("来吧，接受我的赐福……") + '</div>' +
+    '</div>' +
+    '<div class="sprite-stage-box" style="width:' + neowSize + 'px;height:' + neowSize + 'px">' +
+      '<div class="unit-shadow" style="width:' + Math.round(neowSize * 0.86) + 'px;height:20px"></div>' +
+      spMonster("Neow", neowSize, 0) +
+    '</div>';
+  stageWrap.appendChild(neowBoss);
+
+  // Bottom-Right RoomEventDialog Option Buttons
+  const dock = document.createElement("div");
+  dock.className = "sts-neow-choices-dock";
+  dock.id = "ev-choices";
+  const btnBgStyle = uiPanelBgStyle("eventBtnEnabled");
+  def.opts.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "sts-event-opt-btn";
+    btn.setAttribute("style", btnBgStyle + "animation-delay:" + (idx * 0.065).toFixed(3) + "s;");
+    btn.innerHTML = '<span>' + formatStsEventOptionLabel(opt.label) + '</span>';
+    btn.addEventListener("click", () => {
+      sendAction({ type: "neow_blessing", choiceIdx: idx, cardIdx: 0 });
+    });
+    dock.appendChild(btn);
+  });
+  stageWrap.appendChild(dock);
+
+  return stageWrap;
+}
+
 function renderEventStage(st) {
-  const evId = (st.ev && st.ev.id) ? st.ev.id : (st.ph === "NEOW" ? "NEOW" : "BigFish");
+  if (st.ph === "NEOW") {
+    return renderNeowRoomStage(st);
+  }
+  const evId = (st.ev && st.ev.id) ? st.ev.id : "BigFish";
   const def = UI_EVENTS_DEF[evId] || UI_EVENTS_DEF.BigFish;
 
   const stageWrap = document.createElement("div");
@@ -8055,6 +9236,13 @@ function renderApp() {
       body.appendChild(el);
     });
     root.appendChild(back);
+  }
+
+  if (typeof STS_SpineEngine !== "undefined" && STS_SpineEngine.isReady()) {
+    STS_SpineEngine.renderAllCanvases(performance.now() * 0.001);
+  }
+  if (typeof CombatVfxEngine !== "undefined") {
+    CombatVfxEngine.applyActiveUnitClasses();
   }
 }
 
