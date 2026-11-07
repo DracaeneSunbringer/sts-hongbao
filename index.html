@@ -47,14 +47,14 @@
     display: inline-block; flex-shrink: 0;
     background-image: url("assets/monsters.webp");
     background-repeat: no-repeat;
-    background-size: 900% 800%;
+    background-size: 900% 900%;
     filter: drop-shadow(0 6px 10px rgba(0,0,0,0.75));
   }
   .sp-event {
     display: inline-block; flex-shrink: 0;
     background-image: url("assets/events.webp");
     background-repeat: no-repeat;
-    background-size: 500% 400%;
+    background-size: 500% 1240%;
     border-radius: 8px;
     border: 1px solid rgba(245, 196, 81, 0.4);
     box-shadow: 0 4px 14px rgba(0,0,0,0.6);
@@ -252,31 +252,28 @@
     text-align: center;
   }
 
-  /* ==================== ORIGINAL STS COMBAT VIEW ==================== */
+  /* ==================== ORIGINAL STS COMBAT VIEW (1920x1080 COORDINATE SYSTEM) ==================== */
   .combat-layout {
-    display: flex; flex-direction: column; justify-content: space-between;
-    height: 100%; position: relative; overflow: hidden;
+    width: 100%; height: 100%; position: relative; overflow: hidden;
+    --sts-floor-y: max(33.5%, 205px);
   }
   .arena-bg-decor {
-    position: absolute; inset: 0; opacity: 0.42; pointer-events: none;
+    position: absolute; inset: 0; opacity: 0.92; pointer-events: none;
     background-image: url("assets/events.webp");
     background-repeat: no-repeat;
-    background-size: 500% 400%;
-    filter: saturate(1.15) contrast(1.05);
+    filter: saturate(1.16) contrast(1.06);
     z-index: 0;
   }
   .arena-vignette {
     position: absolute; inset: 0; pointer-events: none; z-index: 1;
     background:
-      radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(6, 9, 15, 0.72) 100%),
-      linear-gradient(180deg, rgba(8, 11, 18, 0.45) 0%, transparent 25%, rgba(8, 11, 18, 0.82) 78%, rgba(7, 10, 16, 0.97) 100%);
+      radial-gradient(ellipse at 50% 38%, transparent 42%, rgba(6, 9, 15, 0.58) 100%),
+      linear-gradient(180deg, rgba(8, 11, 18, 0.34) 0%, transparent 20%, transparent 58%, rgba(8, 11, 18, 0.66) 80%, rgba(7, 10, 16, 0.93) 100%);
   }
 
   .arena-stage {
-    flex: 1; min-height: 185px;
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: 16px; padding: 14px 48px 10px;
-    position: relative; z-index: 5;
+    position: absolute; inset: 0;
+    z-index: 5; pointer-events: auto;
   }
   .arena-stage.drop-ready {
     box-shadow: inset 0 0 36px rgba(56, 189, 248, 0.28);
@@ -285,7 +282,7 @@
     position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
     background: rgba(15, 23, 42, 0.92); border: 1px solid var(--gold);
     color: #fde047; font-weight: 800; font-size: 12px;
-    padding: 4px 14px; border-radius: 16px; z-index: 35;
+    padding: 4px 14px; border-radius: 16px; z-index: 55;
     box-shadow: 0 4px 14px rgba(0,0,0,0.65);
     pointer-events: auto; display: flex; align-items: center; gap: 8px;
   }
@@ -294,76 +291,135 @@
     border: 1px solid rgba(239,68,68,0.6); color: #fca5a5; font-size: 11px; cursor: pointer;
   }
 
-  /* Floor-standing Hero & Monster Units (No Box Borders!) */
+  /* Authentic STS Floor-Anchored Hero & Monster Units:
+     Hero: drawX = 1920 * 0.25 (25%), drawY = floorY
+     Monster: drawX = 1920 * 0.75 + offsetX, drawY = floorY + offsetY */
   .sts-unit {
-    display: flex; flex-direction: column; align-items: center;
-    position: relative; z-index: 5; min-width: 110px; max-width: 190px;
-    padding: 4px 6px;
+    position: absolute;
+    left: var(--unit-x, 75%);
+    bottom: calc(var(--sts-floor-y) + var(--unit-off-y, 0%));
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    z-index: 10;
+    padding: 0;
+    pointer-events: auto;
+  }
+  .sts-unit:hover {
+    z-index: 45 !important;
   }
   .sts-unit.hero-unit {
-    width: 28%; max-width: 195px;
-  }
-  .enemies-column {
-    flex: 1; display: flex; align-items: flex-end; justify-content: space-around;
-    gap: 12px; flex-wrap: nowrap; padding: 4px 4px 0;
-    position: relative; z-index: 5;
+    --unit-x: 25%;
+    --unit-off-y: 0%;
   }
   .sts-unit.enemy-unit {
-    cursor: pointer; transition: transform 0.15s, filter 0.15s;
-  }
-  .sts-unit.enemy-unit:hover {
-    transform: translateY(-3px);
+    cursor: pointer; transition: filter 0.15s;
   }
   .sts-unit.enemy-unit.dead {
-    opacity: 0.25; pointer-events: none; filter: grayscale(1);
+    opacity: 0; pointer-events: none; visibility: hidden;
+  }
+  /* Under-Foot HUD (HP Bar + Bare Power Icons + Hover Name) hangs downward below drawY
+     so buffs/debuffs NEVER shift the creature's feet vertically! */
+  .sts-under-foot {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    pointer-events: auto;
+    z-index: 12;
   }
 
-  /* Floating Bobbing Intent Above Monster */
+  /* Free-Floating Bobbing Intent Above Monster (Original STS AbstractMonster.renderIntent — No Pill Box!) */
   @keyframes intentBob {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-4px); }
+    50% { transform: translateY(-5px); }
   }
   .sts-intent {
-    display: inline-flex; align-items: center; justify-content: center; gap: 3px;
-    min-height: 28px; padding: 2px 8px; border-radius: 14px;
-    background: rgba(9, 13, 22, 0.78); border: 1px solid rgba(255,255,255,0.16);
-    font-weight: 900; font-size: 13px; color: #fff;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-    margin-bottom: 4px; animation: intentBob 2.2s ease-in-out infinite;
-    white-space: nowrap; box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 42px; height: 42px; padding: 0;
+    background: none; border: none; box-shadow: none;
+    font-weight: 900; font-size: 14px; color: #fff;
+    text-shadow:
+      -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000,
+      -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000,
+      0 2px 4px rgba(0,0,0,0.9);
+    margin-bottom: 2px; animation: intentBob 2.2s ease-in-out infinite;
+    white-space: nowrap; pointer-events: auto;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.72));
   }
-  .sts-intent.atk { color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); }
-  .sts-intent.def { color: #93c5fd; border-color: rgba(59, 130, 246, 0.45); }
-  .sts-intent.buf { color: #fde047; border-color: rgba(234, 179, 8, 0.45); }
-  .sts-intent.deb { color: #d8b4fe; border-color: rgba(168, 85, 247, 0.45); }
+  .sts-intent .intent-main-ico {
+    position: relative; z-index: 2; display: inline-flex;
+  }
+  .sts-intent .intent-sub-ico {
+    position: absolute; right: -9px; top: -4px; z-index: 1;
+    display: inline-flex; opacity: 0.96;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.85));
+  }
+  .sts-intent .intent-dmg-num {
+    position: absolute; left: -2px; bottom: -2px; z-index: 3;
+    font-size: 15.5px; font-weight: 900; line-height: 1; color: #fff;
+    letter-spacing: -0.3px;
+    text-shadow:
+      -1.6px -1.6px 0 #000, 1.6px -1.6px 0 #000,
+      -1.6px 1.6px 0 #000, 1.6px 1.6px 0 #000,
+      0 2px 4px #000;
+  }
 
+  @keyframes flyHover {
+    0%, 100% { transform: translateY(-5px); }
+    50% { transform: translateY(-12px); }
+  }
   .sprite-stage-box {
-    position: relative; display: flex; align-items: center; justify-content: center;
-    width: 112px; height: 112px; margin-bottom: 2px;
+    position: relative; display: flex; align-items: flex-end; justify-content: center;
+    width: 120px; height: 120px; margin-bottom: 1px;
+  }
+  .sprite-stage-box.is-flying .sp-monster {
+    animation: flyHover 2.4s ease-in-out infinite;
   }
   .unit-shadow {
-    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-    width: 78%; height: 16px; border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 75%);
+    position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%);
+    width: 82%; height: 14px; border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0) 74%);
     pointer-events: none; z-index: 0;
   }
-  .sprite-stage-box .sp-monster { position: relative; z-index: 2; }
+  .sprite-stage-box .sp-monster { position: relative; z-index: 2; transition: filter 0.25s, opacity 0.25s, transform 0.25s; }
+  .sprite-stage-box.is-intangible .sp-monster {
+    opacity: 0.62;
+    filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.9)) brightness(1.25);
+  }
+  .sprite-stage-box.is-half-dead .sp-monster {
+    opacity: 0.58;
+    filter: brightness(0.28) drop-shadow(0 0 10px #7e22ce);
+    transform: scaleY(0.68) translateY(14px);
+  }
+  .hexa-orb-ring {
+    position: absolute; inset: 0; pointer-events: none; z-index: 4;
+  }
+  .hexa-orb {
+    position: absolute; width: 13px; height: 13px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.4) 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.35);
+    transition: all 0.25s;
+  }
+  .hexa-orb.lit {
+    background: radial-gradient(circle, #ecfdf5 0%, #34d399 45%, #059669 100%);
+    border-color: #a7f3d0;
+    box-shadow: 0 0 10px #34d399, 0 0 18px #10b981;
+  }
 
-  /* 4-Corner STS Targeting Reticle */
+  /* 4-Corner STS Targeting Reticle (Only Shown When Aiming Single-Target Cards/Potions) */
   .sts-reticle {
     position: absolute; inset: -4px; pointer-events: none; z-index: 10;
     opacity: 0; transition: opacity 0.12s, transform 0.12s;
     transform: scale(1.08);
   }
-  .sts-unit.enemy-unit.selected .sts-reticle {
-    opacity: 0.55; transform: scale(1);
-  }
   .sts-unit.enemy-unit.target-candidate .sts-reticle {
-    opacity: 0.78; transform: scale(1.02);
+    opacity: 0.68; transform: scale(1.02);
     filter: drop-shadow(0 0 6px #f59e0b);
   }
-  .sts-unit.enemy-unit.target-locked .sts-reticle,
-  .sts-unit.enemy-unit:hover .sts-reticle {
+  .sts-unit.enemy-unit.target-locked .sts-reticle {
     opacity: 1; transform: scale(0.95);
     filter: drop-shadow(0 0 8px #ef4444);
   }
@@ -375,11 +431,11 @@
 
   /* Original STS HP Bar + Shield Icon */
   .sts-hp-wrap {
-    width: 100%; max-width: 148px; position: relative;
-    display: flex; align-items: center; margin-top: 2px; margin-bottom: 3px;
+    width: 108px; position: relative;
+    display: flex; align-items: center; margin-top: 2px; margin-bottom: 2px;
   }
   .sts-block-badge {
-    position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+    position: absolute; left: -11px; top: 50%; transform: translateY(-50%);
     width: 26px; height: 26px; z-index: 6;
     display: flex; align-items: center; justify-content: center;
   }
@@ -389,9 +445,9 @@
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
   }
   .hp-bar-outer {
-    width: 100%; height: 13px; background: #1a0f12;
-    border-radius: 7px; border: 1.5px solid rgba(0,0,0,0.85);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.7), inset 0 1px 3px rgba(0,0,0,0.8);
+    width: 100%; height: 12px; background: #1a0f12;
+    border-radius: 6px; border: 1.5px solid rgba(0,0,0,0.88);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.75), inset 0 1px 3px rgba(0,0,0,0.85);
     position: relative; overflow: hidden;
   }
   .hp-bar-inner {
@@ -408,78 +464,138 @@
   }
   .unit-name {
     font-weight: 800; font-size: 11.5px; color: #e2e8f0;
-    text-shadow: 0 1px 3px #000; margin-top: 1px; text-align: center;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 1px 3px #000;
+    margin-top: 1px; text-align: center;
+    opacity: 0; transition: opacity 0.14s; pointer-events: none;
   }
+  .sts-unit:hover .unit-name,
+  .sts-unit.target-candidate .unit-name,
+  .sts-unit.target-locked .unit-name {
+    opacity: 1;
+  }
+  /* Bare Power Icons Directly Under HP Bar (Original STS AbstractCreature.renderPowerIcons) */
   .power-row {
-    display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;
-    min-height: 20px; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap;
+    min-height: 22px; margin-top: 1px;
   }
   .pw-chip {
-    display: inline-flex; align-items: center; gap: 1px;
-    padding: 1px 4px; border-radius: 4px; font-size: 10px; font-weight: 900;
-    background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.45);
-    color: #fff; cursor: help;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    position: relative; width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0; background: none; border: none;
+    cursor: help; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.88));
+    transition: transform 0.12s;
   }
-  .pw-chip.debuff {
-    border-color: rgba(244, 63, 94, 0.55); color: #fda4af;
+  .pw-chip:hover {
+    transform: scale(1.22);
+    z-index: 25;
+  }
+  .pw-chip .pw-num {
+    position: absolute; right: -3px; bottom: -4px;
+    font-size: 11px; font-weight: 900; line-height: 1;
+    color: #fff;
+    text-shadow:
+      -1.2px -1.2px 0 #000, 1.2px -1.2px 0 #000,
+      -1.2px 1.2px 0 #000, 1.2px 1.2px 0 #000,
+      0 1px 2px #000;
+    pointer-events: none;
+  }
+  .pw-chip.debuff .pw-num {
+    color: #fda4af;
+  }
+  .sts-power-tip {
+    position: fixed; z-index: 150; pointer-events: none;
+    max-width: 240px; padding: 8px 11px; border-radius: 8px;
+    background: rgba(12, 18, 30, 0.96);
+    border: 1.5px solid rgba(245, 196, 81, 0.65);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+    color: #f1f5f9; font-size: 11.5px; line-height: 1.45;
+    display: none;
+  }
+  .sts-power-tip.debuff {
+    border-color: rgba(244, 63, 94, 0.72);
+  }
+  .sts-power-tip-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font-weight: 900; font-size: 12.5px; color: #fef08a; margin-bottom: 3px;
+  }
+  .sts-power-tip.debuff .sts-power-tip-head {
+    color: #fda4af;
+  }
+  .sts-power-tip-tag {
+    font-size: 10px; padding: 1px 5px; border-radius: 4px;
+    background: rgba(56, 189, 248, 0.2); color: #7dd3fc;
+  }
+  .sts-power-tip.debuff .sts-power-tip-tag {
+    background: rgba(244, 63, 94, 0.25); color: #fda4af;
   }
 
   /* ==================== ORIGINAL STS LOWER COMBAT HUD (ORB / PILES / FANNED HAND / END TURN) ==================== */
   .combat-bottom-dock {
-    position: relative; z-index: 20;
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
     display: flex; align-items: flex-end; justify-content: space-between;
-    padding: 0 12px 6px; min-height: 196px; flex-shrink: 0;
+    padding: 0 14px 6px; min-height: 196px; pointer-events: none;
+  }
+  .combat-bottom-dock .dock-side,
+  .combat-bottom-dock .hand-tray {
+    pointer-events: auto;
   }
   .dock-side {
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
     gap: 8px; z-index: 25; flex-shrink: 0; padding-bottom: 4px;
   }
   .sts-energy-orb {
-    position: relative; width: 58px; height: 58px;
+    position: relative; width: 68px; height: 68px;
     display: flex; align-items: center; justify-content: center;
     filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.65));
+  }
+  .sts-energy-orb > .sp-icon {
+    width: 100% !important; height: 100% !important;
   }
   .sts-energy-orb.empty-energy {
     filter: grayscale(0.65) brightness(0.75);
   }
   .sts-energy-text {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-size: 17px; font-weight: 900; color: #fff;
+    font-size: 18px; font-weight: 900; color: #fff;
     text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 0 8px #f59e0b;
   }
 
   .sts-pile-btn {
-    position: relative; width: 50px; height: 50px;
+    position: relative; width: 54px; height: 54px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: transform 0.15s;
     background: transparent; border: none;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.75));
+  }
+  .sts-pile-btn > .sp-icon {
+    width: 92% !important; height: 92% !important;
   }
   .sts-pile-btn:hover { transform: scale(1.12); }
   .sts-pile-count {
-    position: absolute; bottom: -2px; right: -2px;
-    min-width: 20px; height: 20px; padding: 0 4px; border-radius: 50%;
-    background: radial-gradient(circle, #dc2626 0%, #7f1d1d 100%);
-    border: 1.5px solid #fca5a5; color: #fff;
-    font-size: 11px; font-weight: 900;
+    position: absolute; bottom: -3px; right: -4px;
+    width: 24px; height: 24px;
     display: flex; align-items: center; justify-content: center;
-    text-shadow: 0 1px 2px #000;
+    color: #fff; font-size: 11px; font-weight: 900;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
   }
-  .sts-pile-label {
-    position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
-    font-size: 9.5px; color: #cbd5e1; white-space: nowrap; font-weight: 700;
-    text-shadow: 0 1px 2px #000;
+  .sts-pile-count .sp-icon {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .sts-pile-count .cnt-txt {
+    position: relative; z-index: 1;
   }
 
   .end-turn-btn {
-    padding: 8px 18px; border-radius: 8px; cursor: pointer;
-    background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
-    border: 1.5px solid #f5c451; color: #fef08a; font-weight: 900; font-size: 13px;
-    text-shadow: 0 1px 3px #000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75), 0 0 12px rgba(239, 68, 68, 0.35);
-    transition: all 0.15s; white-space: nowrap;
+    min-width: 122px; min-height: 54px; padding: 8px 18px;
+    border-radius: 8px; cursor: pointer;
+    background-color: transparent; border: none;
+    color: #fef08a; font-weight: 900; font-size: 14px; letter-spacing: 1px;
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 1px 4px #000;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    transition: transform 0.15s, filter 0.15s; white-space: nowrap;
+    display: inline-flex; align-items: center; justify-content: center;
   }
-  .end-turn-btn:hover { transform: translateY(-2px) scale(1.04); filter: brightness(1.15); box-shadow: 0 0 16px rgba(245, 196, 81, 0.6); }
+  .end-turn-btn:hover { transform: translateY(-2px) scale(1.05); filter: brightness(1.15) drop-shadow(0 0 12px rgba(245, 196, 81, 0.7)); }
 
   /* Fanned Hand Tray & Genuine STS Card Template (ui.webp) */
   .hand-tray {
@@ -521,12 +637,19 @@
 
   .card-art {
     position: absolute;
-    left: 13.6%; top: 18.2%; width: 72.8%; height: 42.8%;
+    left: 14.5%; top: 19.6%; width: 71.0%; height: 36.6%;
     background-color: #141824;
     background-image: url("assets/cards.webp");
     background-repeat: no-repeat;
     background-size: 1200% 1100%;
     z-index: 1;
+    overflow: hidden;
+  }
+  .sts-card.type-A .card-art {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 84%, 50% 100%, 0% 84%);
+  }
+  .sts-card.type-P .card-art {
+    border-radius: 50%;
   }
   .card-frame-overlay {
     position: absolute; inset: 0;
@@ -537,16 +660,16 @@
   }
   .card-cost {
     position: absolute;
-    left: 2.2%; top: 1.5%; width: 21%; height: 16.5%;
+    left: 0.9%; top: 0.5%; width: 20.9%; height: 15.6%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 14px; color: #fff;
+    font-weight: 900; font-size: 14.5px; color: #fff;
     text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
     z-index: 3; pointer-events: none;
   }
   .card-cost.cost-modified { color: #4ade80; }
   .card-name {
     position: absolute;
-    left: 16%; right: 10%; top: 10.2%; height: 11%;
+    left: 12%; right: 12%; top: 6.7%; height: 10.2%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 11px; color: #f8fafc;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -556,9 +679,9 @@
   .card-name.upgraded { color: #7fff00; }
   .card-type-pill {
     position: absolute;
-    left: 22%; right: 22%; top: 53.6%; height: 6%;
+    left: 22%; right: 22%; top: 54.0%; height: 5.6%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 8.5px; font-weight: 800; color: #e2e8f0;
+    font-size: 8.5px; font-weight: 800; color: #d6d3d1;
     text-shadow: 0 1px 2px #000;
     z-index: 3; pointer-events: none;
   }
@@ -708,15 +831,20 @@
     position: relative; width: 100%; height: 100%; min-height: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 10px 16px; overflow: hidden;
+    --sts-floor-y: max(33.5%, 205px);
   }
   .sts-stage-dim {
     position: absolute; inset: 0; background: rgba(5, 8, 14, 0.68);
     pointer-events: none; z-index: 2;
   }
   .sts-stage-hero-bg {
-    position: absolute; left: 56px; bottom: 44px; z-index: 3;
-    pointer-events: none; opacity: 0.78;
-    display: flex; flex-direction: column; align-items: center;
+    position: absolute;
+    left: 25%;
+    bottom: var(--sts-floor-y);
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none; opacity: 0.85;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   }
   .sts-reward-center {
     position: relative; z-index: 15;
@@ -993,8 +1121,10 @@
   }
 
   @media (max-width: 620px) {
-    .arena-stage { padding: 8px 10px 6px; gap: 6px; }
-    .sts-unit.hero-unit { width: 32%; min-width: 88px; }
+    .combat-layout, .sts-reward-stage {
+      --sts-floor-y: max(35.5%, 190px);
+    }
+    .sts-unit.hero-unit { --unit-x: 18%; }
     .sprite-stage-box { width: 76px; height: 76px; }
     .combat-bottom-dock {
       flex-wrap: wrap;
@@ -1026,7 +1156,7 @@
     .card-name { font-size: 8.5px; }
     .card-type-pill { font-size: 7px; }
     .card-desc { font-size: 7.5px; line-height: 1.12; }
-    .end-turn-btn { padding: 5px 10px; font-size: 11px; }
+    .end-turn-btn { width: 112px; height: 38px; padding: 0 8px 2px; font-size: 11.5px; }
     .map-scroll { padding: 8px 8px 16px; }
     .sts-legend-card {
       position: static; transform: none; width: 92%; max-width: 320px;
@@ -1058,9 +1188,10 @@
 <body>
 <div id="app"></div>
 <svg id="sts-target-svg"></svg>
+<div id="sts-power-tip" class="sts-power-tip"></div>
 
 <script>
-const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118},"powers":{"Strength":119,"Dexterity":120,"Vulnerable":121,"Weak":122,"Frail":123,"Ritual":124,"CurlUp":125,"SporeCloud":126,"Metallicize":127,"PlatedArmor":128,"Artifact":129,"Anger":130,"Thievery":131,"ModeShift":132,"SharpHide":133,"Split":134,"Flight":135,"Malleable":136,"Confusion":137,"Entangled":138,"NoDraw":139,"NoBlock":140,"DrawReduction":141,"Constricted":142,"LoseStrength":143,"LoseDexterity":144,"FlameBarrier":145,"Rage":130,"DoubleTap":146,"Duplication":147,"Combust":148,"DarkEmbrace":149,"Evolve":150,"FeelNoPain":151,"FireBreathing":152,"Rupture":153,"Barricade":154,"Berserk":155,"Brutality":156,"Corruption":157,"DemonForm":158,"Juggernaut":159,"Mayhem":160,"Panache":161,"Sadistic":162,"TheBomb":163,"Regen":164,"Intangible":165,"Buffer":166,"Thorns":167,"PainfulStabs":168,"Minion":169,"Regrow":170,"Slow":171,"Explosive":172,"Fading":173,"Shifting":174,"Reactive":175,"RegenerateMonster":164,"Curiosity":176,"Unawakened":177,"TimeWarp":178,"GenericStrengthUp":119},"potions":{"Block Potion":179,"Fire Potion":180,"Explosive Potion":181,"FearPotion":182,"Weak Potion":183,"Strength Potion":184,"Dexterity Potion":185,"SpeedPotion":186,"SteroidPotion":187,"Swift Potion":188,"Energy Potion":189,"BloodPotion":190,"BlessingOfTheForge":191,"AttackPotion":192,"SkillPotion":193,"PowerPotion":194,"Regen Potion":195,"Ancient Potion":196,"EssenceOfSteel":197,"LiquidBronze":198,"DuplicationPotion":199,"CultistPotion":200,"Fruit Juice":201,"FairyPotion":202},"intents":{"attack_1":203,"attack_2":204,"attack_3":205,"attack_4":206,"attack_5":207,"attack_6":208,"attack_7":209,"defend":210,"defend_buff":211,"buff":212,"debuff1":213,"debuff2":214,"magic":215,"sleep":216,"stun":217,"unknown":218,"escape":219},"map":{"M":220,"E":221,"?":222,"R":223,"$":224,"T":225,"TheGuardian":226,"Hexaghost":227,"SlimeBoss":228,"BronzeAutomaton":229,"TheCollector":230,"Champ":231,"AwakenedOne":232,"TimeEater":233,"Donu and Deca":234},"campfire":{"sleep":235,"smith":236,"lift":237,"dig":238,"toke":239},"hud":{"heart":240,"gold":241,"floor":242,"deck":243,"map":244,"block":245,"energyRed":246,"drawPile":247,"discardPile":248,"reticleCorner":249,"reticleArrow":250,"endTurn":251,"endTurnGlow":252,"proceed":253,"potionSlot":254,"countCircle":255},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11},"uiPanels":{"sheetW":1032,"sheetH":1620,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19}};
+const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118},"powers":{"Strength":119,"Dexterity":120,"Vulnerable":121,"Weak":122,"Frail":123,"Ritual":124,"CurlUp":125,"SporeCloud":126,"Metallicize":127,"PlatedArmor":128,"Artifact":129,"Anger":130,"Thievery":131,"ModeShift":132,"SharpHide":133,"Split":134,"Flight":135,"Malleable":136,"Confusion":137,"Entangled":138,"Hex":139,"NoDraw":140,"NoBlock":141,"DrawReduction":142,"Constricted":143,"LoseStrength":144,"LoseDexterity":145,"Shackled":146,"NextTurnBlock":147,"FlameBarrier":148,"Rage":130,"DoubleTap":149,"Duplication":150,"Combust":151,"DarkEmbrace":152,"Evolve":153,"FeelNoPain":154,"FireBreathing":155,"Rupture":156,"Barricade":157,"Berserk":158,"Brutality":159,"Corruption":160,"DemonForm":161,"Juggernaut":162,"Mayhem":163,"Panache":164,"Sadistic":165,"TheBomb":166,"Regen":167,"Intangible":168,"Buffer":169,"Thorns":170,"PainfulStabs":171,"Minion":172,"Regrow":173,"Slow":174,"Explosive":175,"Fading":176,"Shifting":177,"Reactive":178,"RegenerateMonster":167,"Curiosity":179,"Unawakened":180,"TimeWarp":181,"GenericStrengthUp":119},"potions":{"Block Potion":182,"Fire Potion":183,"Explosive Potion":184,"FearPotion":185,"Weak Potion":186,"Strength Potion":187,"Dexterity Potion":188,"SpeedPotion":189,"SteroidPotion":190,"Swift Potion":191,"Energy Potion":192,"BloodPotion":193,"BlessingOfTheForge":194,"AttackPotion":195,"SkillPotion":196,"PowerPotion":197,"Regen Potion":198,"Ancient Potion":199,"EssenceOfSteel":200,"LiquidBronze":201,"DuplicationPotion":202,"CultistPotion":203,"Fruit Juice":204,"FairyPotion":205},"intents":{"attack_1":206,"attack_2":207,"attack_3":208,"attack_4":209,"attack_5":210,"attack_6":211,"attack_7":212,"defend":213,"defend_buff":214,"buff":215,"debuff1":216,"debuff2":217,"magic":218,"sleep":219,"stun":220,"unknown":221,"escape":222},"map":{"M":223,"E":224,"?":225,"R":226,"$":227,"T":228,"TheGuardian":229,"Hexaghost":230,"SlimeBoss":231,"BronzeAutomaton":232,"TheCollector":233,"Champ":234,"AwakenedOne":235,"TimeEater":236,"Donu and Deca":237},"hud":{"heart":238,"gold":239,"floor":240,"deck":241,"map":242,"block":243,"energyRed":244,"drawPile":245,"discardPile":246,"reticleCorner":247,"reticleArrow":248,"endTurn":249,"endTurnGlow":250,"proceed":251,"potionSlot":252,"countCircle":253},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11},"uiPanels":{"sheetW":1032,"sheetH":1620,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":2480,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560}}};
 
 // ==================== 1. Deterministic PRNG ====================
 function Rng(seed) {
@@ -1612,69 +1743,72 @@ const POTIONS = {
 
 // ==================== 6. Powers & Monster Metadata (ZHS) ====================
 const POWERS_META = {
-  "Strength": { name: "力量", icon: "💪", desc: "攻击伤害调整。" },
-  "Dexterity": { name: "敏捷", icon: "🦶", desc: "从卡牌获得的格挡调整。" },
-  "Vulnerable": { name: "易伤", icon: "💔", debuff: true, desc: "受到的攻击伤害增加 50%。" },
-  "Weak": { name: "虚弱", icon: "💫", debuff: true, desc: "攻击造成的伤害减少 25%。" },
-  "Frail": { name: "脆弱", icon: "🦴", debuff: true, desc: "从卡牌获得的格挡减少 25%。" },
-  "Ritual": { name: "仪式", icon: "🕯️", desc: "回合结束时获得力量。" },
-  "CurlUp": { name: "蜷身", icon: "🐚", desc: "首次受到攻击伤害时获得格挡。" },
-  "SporeCloud": { name: "孢子云", icon: "🍄", desc: "死亡时给予玩家 2 层易伤。" },
-  "Metallicize": { name: "金属化", icon: "🛡️", desc: "回合结束时获得格挡。" },
-  "PlatedArmor": { name: "多层护甲", icon: "🧱", desc: "回合结束时获得格挡；受到未格挡伤害减 1 层。" },
-  "Artifact": { name: "人工制品", icon: "🏺", desc: "免疫下一次负面状态。" },
-  "Anger": { name: "激怒", icon: "😡", desc: "每当玩家打出一张技能牌，获得力量。" },
-  "Thievery": { name: "偷窃", icon: "💰", desc: "攻击时偷取金币。" },
-  "ModeShift": { name: "模式转换", icon: "⚙️", desc: "受到指定伤害后切换至防御模式并获得 20 格挡。" },
-  "SharpHide": { name: "锋利外皮", icon: "🌵", desc: "每当玩家打出攻击牌，对其造成伤害。" },
-  "Split": { name: "分裂", icon: "🦠", desc: "生命值 <= 50% 时分裂为两个史莱姆。" },
-  "Flight": { name: "飞行", icon: "🪽", desc: "受到攻击伤害减半；一回合受 3 次攻击将坠落眩晕。" },
-  "Malleable": { name: "柔韧", icon: "🐍", desc: "每受到一次攻击获得递增格挡。" },
-  "Confusion": { name: "混乱", icon: "🌀", debuff: true, desc: "抽到的卡牌耗能随机变为 0~3。" },
+  "Strength": { name: "力量", icon: "💪", desc: "攻击伤害调整 !A! 点。" },
+  "Dexterity": { name: "敏捷", icon: "🦶", desc: "从卡牌获得的格挡调整 !A! 点。" },
+  "Vulnerable": { name: "易伤", icon: "💔", debuff: true, desc: "受到的攻击伤害增加 50%，持续 !A! 回合。" },
+  "Weak": { name: "虚弱", icon: "💫", debuff: true, desc: "攻击造成的伤害减少 25%，持续 !A! 回合。" },
+  "Frail": { name: "脆弱", icon: "🦴", debuff: true, desc: "从卡牌获得的格挡减少 25%，持续 !A! 回合。" },
+  "Ritual": { name: "仪式", icon: "🕯️", desc: "回合结束时获得 !A! 点力量。" },
+  "CurlUp": { name: "蜷身", icon: "🐚", desc: "首次受到攻击伤害时获得 !A! 点格挡（每场战斗触发一次）。" },
+  "SporeCloud": { name: "孢子云", icon: "🍄", desc: "死亡时给予玩家 !A! 层易伤。" },
+  "Metallicize": { name: "金属化", icon: "🛡️", desc: "回合结束时获得 !A! 点格挡。" },
+  "PlatedArmor": { name: "多层护甲", icon: "🧱", desc: "回合结束时获得 !A! 点格挡；受到未格挡攻击伤害减 1 层。" },
+  "Artifact": { name: "人工制品", icon: "🏺", desc: "抵消下 !A! 次受到的负面效果。" },
+  "Anger": { name: "激怒", icon: "😡", desc: "每当玩家打出一张技能牌，获得 !A! 点力量。" },
+  "Thievery": { name: "偷窃", icon: "💰", desc: "每次攻击时偷取 !A! 金币（击杀可夺回）。" },
+  "ModeShift": { name: "模式转换", icon: "⚙️", desc: "再受到 !A! 点伤害后切换至防御模式并获得 20 格挡。" },
+  "SharpHide": { name: "锋利外皮", icon: "🌵", desc: "每当玩家打出一张攻击牌，对其造成 !A! 点伤害。" },
+  "Split": { name: "分裂", icon: "🦠", desc: "生命值 <= 50% 时分裂为两个当前生命值的史莱姆。" },
+  "Flight": { name: "飞行", icon: "🪽", desc: "受到攻击伤害减半；本回合再受 !A! 次攻击将坠落眩晕。" },
+  "Malleable": { name: "柔韧", icon: "🐍", desc: "受到攻击伤害时获得 !A! 点格挡并递增（回合结束重置为 3）。" },
+  "Confusion": { name: "混乱", icon: "🌀", debuff: true, desc: "每当抽到卡牌时，耗能随机变为 0~3。" },
   "Entangled": { name: "缠绕", icon: "🕸️", debuff: true, desc: "本回合不能打出攻击牌。" },
-  "NoDraw": { name: "无法抽牌", icon: "🚫", debuff: true, desc: "本回合不能再抽牌。" },
-  "NoBlock": { name: "无法格挡", icon: "🚫", debuff: true, desc: "无法从卡牌获得格挡。" },
-  "DrawReduction": { name: "抽牌减少", icon: "📉", debuff: true, desc: "下回合少抽 1 张牌。" },
-  "Constricted": { name: "缠紧", icon: "🪢", debuff: true, desc: "在你的回合结束时受到伤害。" },
-  "LoseStrength": { name: "活动肌肉", icon: "⏳", debuff: true, desc: "回合结束时失去临时力量。" },
-  "LoseDexterity": { name: "速度消退", icon: "⏳", debuff: true, desc: "回合结束时失去临时敏捷。" },
-  "FlameBarrier": { name: "火焰屏障", icon: "🔥", desc: "本回合受到攻击时反弹火焰伤害。" },
-  "Rage": { name: "狂怒", icon: "💢", desc: "本回合每打出一张攻击牌获得格挡。" },
-  "DoubleTap": { name: "双发", icon: "⚔️", desc: "本回合下一张攻击牌打出两次。" },
-  "Duplication": { name: "复制", icon: "✨", desc: "本回合下一张牌打出两次。" },
-  "Combust": { name: "自燃", icon: "💥", desc: "回合结束失去 1 生命并对全体造成伤害。" },
-  "DarkEmbrace": { name: "黑暗之拥", icon: "🖤", desc: "每消耗一张牌抽 1 张牌。" },
-  "Evolve": { name: "进化", icon: "🧬", desc: "抽到状态牌时抽牌。" },
-  "FeelNoPain": { name: "无惧疼痛", icon: "🛡️", desc: "每消耗一张牌获得格挡。" },
-  "FireBreathing": { name: "火焰吐息", icon: "🐉", desc: "抽到状态或诅咒牌时对全体造成伤害。" },
-  "Rupture": { name: "撕裂", icon: "🩸", desc: "从卡牌失去生命时获得力量。" },
+  "Hex": { name: "邪咒", icon: "🔮", debuff: true, desc: "每当你打出一张非攻击牌，将 !A! 张【晕眩】洗入抽牌堆。" },
+  "NoDraw": { name: "无法抽牌", icon: "🚫", debuff: true, desc: "本回合不能再抽任何牌。" },
+  "NoBlock": { name: "无法格挡", icon: "🚫", debuff: true, desc: "接下来 !A! 回合内无法从卡牌获得格挡。" },
+  "DrawReduction": { name: "抽牌减少", icon: "📉", debuff: true, desc: "下回合开始时少抽 !A! 张牌。" },
+  "Constricted": { name: "缠紧", icon: "🪢", debuff: true, desc: "在你的回合结束时受到 !A! 点伤害。" },
+  "LoseStrength": { name: "活动肌肉", icon: "⏳", debuff: true, desc: "回合结束时失去 !A! 点临时力量。" },
+  "LoseDexterity": { name: "速度消退", icon: "⏳", debuff: true, desc: "回合结束时失去 !A! 点临时敏捷。" },
+  "Shackled": { name: "镣铐", icon: "⛓️", debuff: true, desc: "本回合被削弱力量，回合结束时恢复 !A! 点力量。" },
+  "NextTurnBlock": { name: "下回合格挡", icon: "🛡️", desc: "在下回合开始时获得 !A! 点格挡。" },
+  "FlameBarrier": { name: "火焰屏障", icon: "🔥", desc: "本回合受到攻击时反弹 !A! 点火焰伤害。" },
+  "Rage": { name: "狂怒", icon: "💢", desc: "本回合每打出一张攻击牌获得 !A! 点格挡。" },
+  "DoubleTap": { name: "双发", icon: "⚔️", desc: "本回合下 !A! 张攻击牌打出两次。" },
+  "Duplication": { name: "复制", icon: "✨", desc: "本回合下 !A! 张牌打出两次。" },
+  "Combust": { name: "自燃", icon: "💥", desc: "回合结束失去 1 生命并对全体敌人造成 !A! 点伤害。" },
+  "DarkEmbrace": { name: "黑暗之拥", icon: "🖤", desc: "每消耗一张牌抽 !A! 张牌。" },
+  "Evolve": { name: "进化", icon: "🧬", desc: "每抽到一张状态牌时抽 !A! 张牌。" },
+  "FeelNoPain": { name: "无惧疼痛", icon: "🛡️", desc: "每消耗一张牌获得 !A! 点格挡。" },
+  "FireBreathing": { name: "火焰吐息", icon: "🐉", desc: "每抽到状态或诅咒牌时对全体敌人造成 !A! 点伤害。" },
+  "Rupture": { name: "撕裂", icon: "🩸", desc: "每当从卡牌失去生命时获得 !A! 点力量。" },
   "Barricade": { name: "壁垒", icon: "🏰", desc: "格挡不会在回合开始时消失。" },
-  "Berserk": { name: "狂暴", icon: "⚡", desc: "回合开始获得额外能量。" },
-  "Brutality": { name: "残暴", icon: "🗡️", desc: "回合开始失去 1 生命并抽 1 张牌。" },
-  "Corruption": { name: "腐化", icon: "☠️", desc: "技能牌 0 费并消耗。" },
-  "DemonForm": { name: "恶魔形态", icon: "👿", desc: "每回合开始获得力量。" },
-  "Juggernaut": { name: "势不可当", icon: "☄️", desc: "获得格挡时对随机敌人造成伤害。" },
-  "Mayhem": { name: "乱战", icon: "🎲", desc: "回合开始自动打出牌库顶牌。" },
-  "Panache": { name: "神气制胜", icon: "🎭", desc: "同回合每打出 5 张牌对全体造成伤害。" },
-  "Sadistic": { name: "残虐天性", icon: "🗡️", desc: "给予敌人负面状态时造成伤害。" },
-  "TheBomb": { name: "炸弹", icon: "💣", desc: "倒计时结束后对全体敌人造成高额伤害。" },
-  "Regen": { name: "再生", icon: "💚", desc: "回合结束回复生命并减 1 层。" },
-  "Intangible": { name: "无实体", icon: "👻", desc: "将受到的所有伤害和生命损失降为 1。" },
-  "Buffer": { name: "缓冲", icon: "🫧", desc: "阻止下一次受到的生命值损伤。" },
-  "Thorns": { name: "荆棘", icon: "🌹", desc: "被攻击时反弹伤害。" },
-  "PainfulStabs": { name: "疼痛戳刺", icon: "🩸", desc: "造成未被格挡伤害时塞入一张伤口。" },
+  "Berserk": { name: "狂暴", icon: "⚡", desc: "每回合开始额外获得 !A! 点能量。" },
+  "Brutality": { name: "残暴", icon: "🗡️", desc: "每回合开始失去 !A! 点生命并抽 !A! 张牌。" },
+  "Corruption": { name: "腐化", icon: "☠️", desc: "所有技能牌耗能变为 0，且打出时全部消耗。" },
+  "DemonForm": { name: "恶魔形态", icon: "👿", desc: "每回合开始获得 !A! 点力量。" },
+  "Juggernaut": { name: "势不可当", icon: "☄️", desc: "每当获得格挡时对随机敌人造成 !A! 点伤害。" },
+  "Mayhem": { name: "乱战", icon: "🎲", desc: "每回合开始自动打出抽牌堆顶部的 !A! 张牌。" },
+  "Panache": { name: "神气制胜", icon: "🎭", desc: "同回合每打出 5 张牌对全体敌人造成 !A! 点伤害。" },
+  "Sadistic": { name: "残虐天性", icon: "🗡️", desc: "每当给予敌人负面状态时对其造成 !A! 点伤害。" },
+  "TheBomb": { name: "炸弹", icon: "💣", desc: "倒计时 !A! 回合结束时对全体敌人造成高额爆炸伤害。" },
+  "Regen": { name: "再生", icon: "💚", desc: "回合结束回复 !A! 点生命并减 1 层。" },
+  "Intangible": { name: "无实体", icon: "👻", desc: "将受到的所有伤害和生命损失降为 1，持续 !A! 回合。" },
+  "Buffer": { name: "缓冲", icon: "🫧", desc: "阻止下 !A! 次受到的生命值损伤。" },
+  "Thorns": { name: "荆棘", icon: "🌹", desc: "每次被攻击时反弹 !A! 点伤害。" },
+  "PainfulStabs": { name: "疼痛戳刺", icon: "🩸", desc: "每次造成未被格挡的攻击伤害时往弃牌堆塞入 1 张【伤口】。" },
   "Minion": { name: "爪牙", icon: "🐾", desc: "首领死亡时随之逃跑或死亡。" },
   "Regrow": { name: "重生", icon: "🌑", desc: "若同伴存活，倒下后 2 回合半血复活。" },
-  "Slow": { name: "缓慢", icon: "🐌", debuff: true, desc: "本回合每打出一张牌，受到的攻击伤害 +10%。" },
-  "Explosive": { name: "爆炸", icon: "💣", desc: "3 回合后自爆造成 30 点伤害。" },
-  "Fading": { name: "消逝", icon: "⏳", desc: "倒计时结束时自动消亡。" },
-  "Shifting": { name: "变幻", icon: "🌫️", desc: "受到生命损伤时本回合失去等量力量。" },
-  "Reactive": { name: "反应", icon: "👁️", desc: "受到攻击伤害时重新随机切换意图。" },
-  "RegenerateMonster": { name: "再生", icon: "💚", desc: "每回合结束时回复生命。" },
-  "Curiosity": { name: "好奇", icon: "🪶", desc: "每当玩家打出一张能力牌，获得力量。" },
-  "Unawakened": { name: "未觉醒", icon: "🐦‍⬛", desc: "倒下后将在下一回合觉醒重生为第二形态。" },
-  "TimeWarp": { name: "时间扭曲", icon: "⏱️", desc: "玩家每打出 12 张牌，强制结束回合并获得 2 点力量。" },
-  "GenericStrengthUp": { name: "强化", icon: "📈", desc: "每回合结束时获得力量。" }
+  "Slow": { name: "缓慢", icon: "🐌", debuff: true, desc: "本回合你每打出一张牌，其受到的攻击伤害 +10%（当前 +!A!0%）。" },
+  "Explosive": { name: "爆炸", icon: "💣", desc: "倒计时 !A! 回合后自爆造成 30 点伤害。" },
+  "Fading": { name: "消逝", icon: "⏳", desc: "倒计时 !A! 回合结束时自动消亡。" },
+  "Shifting": { name: "变幻", icon: "🌫️", desc: "受到未格挡伤害时，本回合失去等量力量。" },
+  "Reactive": { name: "反应", icon: "👁️", desc: "每次受到攻击伤害时重新随机切换行动意图。" },
+  "RegenerateMonster": { name: "再生", icon: "💚", desc: "每回合结束时回复 !A! 点生命。" },
+  "Curiosity": { name: "好奇", icon: "🪶", desc: "每当玩家打出一张能力牌，获得 !A! 点力量。" },
+  "Unawakened": { name: "未觉醒", icon: "🐦‍⬛", desc: "倒下后将在下一回合满血觉醒重生为第二形态。" },
+  "TimeWarp": { name: "时间扭曲", icon: "⏱️", desc: "玩家每累计打出 12 张牌（当前 !A!/12），强制结束回合并 +2 力量。" },
+  "GenericStrengthUp": { name: "成长", icon: "📈", desc: "每回合结束时获得 !A! 点力量。" }
 };
 
 const MONSTER_META = {
@@ -2479,12 +2613,28 @@ function addLog(state, msg) {
   if (state.lg.length > 5) state.lg.shift();
 }
 
+function syncRedSkull(state) {
+  if (!state.bt || !hasRelic(state, "Red Skull")) return;
+  const bt = state.bt;
+  const low = state.hp > 0 && state.hp <= Math.floor(state.mhp / 2);
+  if (low && !bt.rsOn) {
+    bt.rsOn = true;
+    bt.pw.Strength = (bt.pw.Strength || 0) + 3;
+    if (bt.pw.Strength === 0) delete bt.pw.Strength;
+  } else if (!low && bt.rsOn) {
+    bt.rsOn = false;
+    bt.pw.Strength = (bt.pw.Strength || 0) - 3;
+    if (bt.pw.Strength === 0) delete bt.pw.Strength;
+  }
+}
+
 function healPlayer(state, amt, inCombat) {
   if (amt <= 0 || hasRelic(state, "Mark of the Bloom")) return 0;
   let v = amt;
   if (inCombat && hasRelic(state, "Magic Flower")) v = Math.round(v * 1.5);
   const before = state.hp;
   state.hp = Math.min(state.mhp, state.hp + v);
+  syncRedSkull(state);
   return state.hp - before;
 }
 
@@ -2509,44 +2659,49 @@ function addCardToMasterDeck(state, cardStr) {
   if (def.up === 0) {
     if (def.type === "A" && hasRelic(state, "Molten Egg 2")) finalStr = def.id + "+";
     if (def.type === "S" && hasRelic(state, "Toxic Egg 2")) finalStr = def.id + "+";
+    if (def.type === "P" && hasRelic(state, "Frozen Egg 2")) finalStr = def.id + "+";
   }
   state.dk.push(finalStr);
   if (hasRelic(state, "CeramicFish")) addGold(state, 9);
 }
 
 function getPlayerStr(state, bt) {
-  let s = (bt.pw.Strength || 0) + ((state.rc && state.rc.Girya) || 0);
-  if (hasRelic(state, "Red Skull") && state.hp <= Math.floor(state.mhp / 2)) s += 3;
-  return s;
+  return (bt && bt.pw && bt.pw.Strength) || 0;
 }
 
 function applyPlayerPower(state, bt, pId, amt) {
-  if (!amt) return;
+  if (!bt || !amt) return false;
   const meta = POWERS_META[pId] || {};
-  if (meta.debuff) {
-    if (pId === "Weak" && hasRelic(state, "Ginger")) return;
-    if (pId === "Frail" && hasRelic(state, "Turnip")) return;
+  const isDebuff = Boolean(meta.debuff || ((pId === "Strength" || pId === "Dexterity") && amt < 0));
+  if (isDebuff) {
+    if (pId === "Weak" && hasRelic(state, "Ginger")) return false;
+    if (pId === "Frail" && hasRelic(state, "Turnip")) return false;
     if ((bt.pw.Artifact || 0) > 0) {
       bt.pw.Artifact--;
       if (bt.pw.Artifact <= 0) delete bt.pw.Artifact;
       addLog(state, "【人工制品】免疫了 " + (meta.name || pId));
-      return;
+      return false;
+    }
+    if (bt.inMonsterPhase && ["Weak", "Vulnerable", "Frail", "NoBlock"].indexOf(pId) !== -1) {
+      if (!bt.ja) bt.ja = {};
+      bt.ja[pId] = 1;
     }
   }
   bt.pw[pId] = (bt.pw[pId] || 0) + amt;
   if (bt.pw[pId] === 0) delete bt.pw[pId];
+  return true;
 }
 
 function applyMonsterPower(state, bt, m, pId, amt) {
-  if (!m || (m.hp <= 0 && !m.st.halfDead) || !amt) return;
+  if (!m || (m.hp <= 0 && !m.st.halfDead) || !amt) return false;
   const meta = POWERS_META[pId] || {};
   const isDebuff = Boolean(meta.debuff || (pId === "Strength" && amt < 0));
   if (isDebuff) {
     if ((m.pw.Artifact || 0) > 0) {
       m.pw.Artifact--;
       if (m.pw.Artifact <= 0) delete m.pw.Artifact;
-      addLog(state, m.name + " 的【人工制品】免疫了负面效果");
-      return;
+      addLog(state, m.name + " 的【人工制品】免疫了 " + (meta.name || pId));
+      return false;
     }
     if ((bt.pw.Sadistic || 0) > 0) {
       damageMonster(state, bt, m, bt.pw.Sadistic, "THORNS", Rng(state.rs));
@@ -2557,6 +2712,7 @@ function applyMonsterPower(state, bt, m, pId, amt) {
   if (pId === "Vulnerable" && amt > 0 && hasRelic(state, "Champion Belt")) {
     applyMonsterPower(state, bt, m, "Weak", 1);
   }
+  return true;
 }
 
 function gainPlayerBlock(state, bt, amt, fromCard, rng) {
@@ -2580,12 +2736,14 @@ function checkFatalProtection(state) {
     state.pot[fIdx] = "";
     const pct = hasRelic(state, "SacredBark") ? 60 : 30;
     state.hp = Math.max(1, Math.floor(state.mhp * pct / 100));
+    syncRedSkull(state);
     addLog(state, "【瓶中精灵】触发！免死并恢复至 " + state.hp + " 生命！");
     return true;
   }
   if (hasRelic(state, "Lizard Tail") && !state.rc.LizardUsed && !hasRelic(state, "Mark of the Bloom")) {
     state.rc.LizardUsed = 1;
     state.hp = Math.max(1, Math.floor(state.mhp / 2));
+    syncRedSkull(state);
     addLog(state, "【蜥蜴尾巴】触发！免死并恢复至 " + state.hp + " 生命！");
     return true;
   }
@@ -2606,6 +2764,7 @@ function losePlayerHp(state, bt, amt, fromCard, rng) {
   }
   state.hp = Math.max(0, state.hp - v);
   bt.lh = (bt.lh || 0) + 1;
+  syncRedSkull(state);
   if (fromCard && (bt.pw.Rupture || 0) > 0) {
     applyPlayerPower(state, bt, "Strength", bt.pw.Rupture);
   }
@@ -2645,6 +2804,10 @@ function monsterAttackPlayer(state, bt, m, baseDmg, hits, rng) {
     if (unblocked > 0 && unblocked <= 5 && hasRelic(state, "Torii")) unblocked = 1;
     if (unblocked > 0) {
       const lost = losePlayerHp(state, bt, unblocked, false, rng);
+      if (lost > 0 && (bt.pw.PlatedArmor || 0) > 0) {
+        bt.pw.PlatedArmor--;
+        if (bt.pw.PlatedArmor <= 0) delete bt.pw.PlatedArmor;
+      }
       if (lost > 0 && (m.pw.PainfulStabs || 0) > 0) {
         bt.di.push("Wound");
       }
@@ -2753,8 +2916,9 @@ function damageMonster(state, bt, m, rawDmg, type, rng) {
     }
     // Transient Shifting
     if ((m.pw.Shifting || 0) > 0 && m.hp > 0) {
-      m.pw.Strength = (m.pw.Strength || 0) - unblocked;
-      m.st.shiftLoss = (m.st.shiftLoss || 0) + unblocked;
+      if (applyMonsterPower(state, bt, m, "Strength", -unblocked)) {
+        m.pw.Shackled = (m.pw.Shackled || 0) + unblocked;
+      }
     }
     // Slime Split intent check
     if ((m.pw.Split || 0) > 0 && m.hp > 0 && m.hp <= Math.floor(m.mhp / 2) && m.mv !== 3) {
@@ -2772,6 +2936,7 @@ function damageMonster(state, bt, m, rawDmg, type, rng) {
     if ((m.pw.CurlUp || 0) > 0) {
       m.b += m.pw.CurlUp;
       delete m.pw.CurlUp;
+      m.st.curled = true;
     }
     if ((m.pw.Malleable || 0) > 0) {
       m.b += m.pw.Malleable;
@@ -2814,6 +2979,7 @@ function onMonsterZeroHp(state, bt, m, rng) {
     delete m.pw.Unawakened;
     delete m.pw.Weak;
     delete m.pw.Vulnerable;
+    delete m.pw.Shackled;
     if ((m.pw.Strength || 0) < 0) delete m.pw.Strength;
     setIntent(m, 3, "UNKNOWN");
     addLog(state, "【觉醒者】倒下……但它即将觉醒重生！");
@@ -2874,6 +3040,10 @@ function drawCards(state, bt, count, rng) {
       if (bt.di.length === 0) break;
       bt.dr = rng.shuffle(bt.di);
       bt.di = [];
+      if (hasRelic(state, "Sundial")) {
+        state.rc.Sundial = ((state.rc.Sundial || 0) + 1) % 3;
+        if (state.rc.Sundial === 0) bt.e += 2;
+      }
     }
     let c = bt.dr.pop();
     const def = getCardDef(c);
@@ -2924,7 +3094,7 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
   const mv = m.mv;
   switch (m.id) {
     case "Cultist":
-      if (mv === 3) m.pw.Ritual = (m.pw.Ritual || 0) + 3;
+      if (mv === 3) { m.pw.Ritual = (m.pw.Ritual || 0) + 3; m.st.justRitual = true; }
       else monsterAttackPlayer(state, bt, m, 6, 1, rng);
       break;
     case "JawWorm":
@@ -3231,6 +3401,7 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       else if (mv === 7) {
         delete m.pw.Weak;
         delete m.pw.Vulnerable;
+        delete m.pw.Shackled;
         if ((m.pw.Strength || 0) < 0) delete m.pw.Strength;
         applyMonsterPower(state, bt, m, "Strength", 6);
         addLog(state, "第一勇士暴怒！移除所有负面状态并获得 6 点力量！");
@@ -3257,8 +3428,10 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       break;
     case "Exploder":
       m.st.tc = (m.st.tc || 0) + 1;
-      if (mv === 1) monsterAttackPlayer(state, bt, m, 9, 1, rng);
-      else {
+      if (mv === 1) {
+        monsterAttackPlayer(state, bt, m, 9, 1, rng);
+        if ((m.pw.Explosive || 0) > 1) m.pw.Explosive--;
+      } else {
         const dmg = 30;
         const b = Math.min(bt.b, dmg);
         bt.b -= b;
@@ -3302,7 +3475,6 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       if (mv === 2) monsterAttackPlayer(state, bt, m, 6, 3, rng);
       else if (mv === 3) monsterAttackPlayer(state, bt, m, 45, 1, rng);
       else bt.di.push("Burn", "Burn", "Burn");
-      if (!m.pw.Intangible) m.pw.Intangible = 1;
       break;
     case "Reptomancer":
       if (mv === 1) { monsterAttackPlayer(state, bt, m, 13, 2, rng); applyPlayerPower(state, bt, "Weak", 1); }
@@ -3321,6 +3493,7 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
     case "AwakenedOne":
       if (mv === 3) {
         m.st.halfDead = false;
+        m.st.p2 = true;
         m.hp = m.mhp = 300;
         addLog(state, "【觉醒者】重生进入第二形态（300 HP）！");
       } else if (mv === 1) monsterAttackPlayer(state, bt, m, 20, 1, rng);
@@ -3336,6 +3509,7 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       else if (mv === 5) {
         delete m.pw.Weak;
         delete m.pw.Vulnerable;
+        delete m.pw.Shackled;
         if ((m.pw.Strength || 0) < 0) delete m.pw.Strength;
         m.hp = Math.max(m.hp, Math.floor(m.mhp / 2));
         addLog(state, "时间吞噬者恢复至半血并清除负面状态！");
@@ -3444,6 +3618,8 @@ function startCombat(state, encId, roomType, rng) {
   if (hasRelic(state, "Thread and Needle")) bt.pw.PlatedArmor = 4;
   if (hasRelic(state, "Bronze Scales")) bt.pw.Thorns = 3;
   if (hasRelic(state, "Vajra")) bt.pw.Strength = (bt.pw.Strength || 0) + 1;
+  if (hasRelic(state, "Girya") && state.rc && state.rc.Girya) bt.pw.Strength = (bt.pw.Strength || 0) + state.rc.Girya;
+  syncRedSkull(state);
   if (hasRelic(state, "Oddly Smooth Stone")) bt.pw.Dexterity = (bt.pw.Dexterity || 0) + 1;
   if (hasRelic(state, "ClockworkSouvenir")) bt.pw.Artifact = (bt.pw.Artifact || 0) + 1;
   if (hasRelic(state, "FossilizedHelix")) bt.pw.Buffer = (bt.pw.Buffer || 0) + 1;
@@ -3463,6 +3639,14 @@ function startCombat(state, encId, roomType, rng) {
     for (const m of monsters) applyMonsterPower(state, bt, m, "Weak", 1);
   }
   if (hasRelic(state, "Lantern")) bt.e += 1;
+  if (hasRelic(state, "Happy Flower")) {
+    state.rc.Flower = ((state.rc.Flower || 0) + 1) % 3;
+    if (state.rc.Flower === 0) bt.e += 1;
+  }
+  if (hasRelic(state, "Incense Burner")) {
+    state.rc.Burner = ((state.rc.Burner || 0) + 1) % 6;
+    if (state.rc.Burner === 0) applyPlayerPower(state, bt, "Intangible", 1);
+  }
   if (hasRelic(state, "Ancient Tea Set") && state.rc.TeaSet) {
     bt.e += 2;
     state.rc.TeaSet = 0;
@@ -3541,14 +3725,11 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
     }
   } else if (def.type === "S") {
-    // Gremlin Nob Anger & Chosen Hex
+    // Gremlin Nob Anger
     for (const m of bt.m) {
       if (m.hp > 0 && (m.pw.Anger || 0) > 0) {
         applyMonsterPower(state, bt, m, "Strength", m.pw.Anger);
       }
-    }
-    if ((bt.pw.Hex || 0) > 0) {
-      bt.dr.push("Dazed");
     }
   } else if (def.type === "P") {
     if (hasRelic(state, "Bird Faced Urn")) healPlayer(state, 2, true);
@@ -3569,6 +3750,11 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
         applyMonsterPower(state, bt, m, "Strength", m.pw.Curiosity);
       }
     }
+  }
+  // Chosen Hex: shuffle 1 Dazed into draw pile whenever a non-Attack card is played
+  if (def.type !== "A" && (bt.pw.Hex || 0) > 0) {
+    const insIdx = bt.dr.length > 0 ? rng.int(0, bt.dr.length) : 0;
+    bt.dr.splice(insIdx, 0, "Dazed");
   }
 
   // Block gain
@@ -3903,10 +4089,19 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       else applyMonsterPower(state, bt, t, "Weak", mag);
       break;
     case "Dark Shackles":
-      applyMonsterPower(state, bt, t, "Strength", -mag);
+      if (applyMonsterPower(state, bt, t, "Strength", -mag)) {
+        t.pw.Shackled = (t.pw.Shackled || 0) + mag;
+      }
       break;
     case "Deep Breath":
-      if (bt.di.length > 0) { bt.dr = rng.shuffle(bt.dr.concat(bt.di)); bt.di = []; }
+      if (bt.di.length > 0) {
+        bt.dr = rng.shuffle(bt.dr.concat(bt.di));
+        bt.di = [];
+        if (hasRelic(state, "Sundial")) {
+          state.rc.Sundial = ((state.rc.Sundial || 0) + 1) % 3;
+          if (state.rc.Sundial === 0) bt.e += 2;
+        }
+      }
       drawCards(state, bt, mag, rng);
       break;
     case "Discovery": {
@@ -3960,7 +4155,10 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       if (idx !== -1 && bt.h.length < 10) bt.h.push(bt.dr.splice(idx, 1)[0]);
       break;
     }
-    case "The Bomb": applyPlayerPower(state, bt, "TheBomb", mag); break;
+    case "The Bomb":
+      bt.pw.TheBomb = 3;
+      bt.bombDmg = (bt.bombDmg || 0) + mag;
+      break;
     case "Trip":
       if (def.up) { for (const m of bt.m) if (m.hp > 0) applyMonsterPower(state, bt, m, "Vulnerable", mag); }
       else applyMonsterPower(state, bt, t, "Vulnerable", mag);
@@ -4018,11 +4216,15 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
 
   // Pain curse check in hand
   for (const c of bt.h) {
-    if (getCardDef(c).id === "Pain") losePlayerHp(state, bt, 1, false, rng);
+    if (getCardDef(c).id === "Pain") losePlayerHp(state, bt, 1, true, rng);
   }
 
   // Increment counters
   bt.ct = (bt.ct || 0) + 1;
+  if (hasRelic(state, "Ink Bottle")) {
+    state.rc.InkBottle = ((state.rc.InkBottle || 0) + 1) % 10;
+    if (state.rc.InkBottle === 0) drawCards(state, bt, 1, rng);
+  }
   for (const m of bt.m) {
     if (m.hp > 0 && m.pw.Slow !== undefined) m.pw.Slow = (m.pw.Slow || 0) + 1;
   }
@@ -4046,7 +4248,11 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
   if (hasRelic(state, "OrangePellets") && bt.at > 0 && bt.sk > 0 && bt.po > 0 && !bt.pelletsDone) {
     bt.pelletsDone = true;
     for (const k of Object.keys(bt.pw)) {
-      if (POWERS_META[k] && POWERS_META[k].debuff) delete bt.pw[k];
+      const isNegStat = (k === "Strength" || k === "Dexterity") && bt.pw[k] < 0;
+      if ((POWERS_META[k] && POWERS_META[k].debuff) || isNegStat) {
+        delete bt.pw[k];
+        if (bt.ja) delete bt.ja[k];
+      }
     }
   }
 
@@ -4055,7 +4261,7 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bt.pw.Panache, "THORNS", rng);
   }
 
-  // Execute effect (and Double Tap / Duplication)
+  // Execute effect (and Double Tap / Duplication / Necronomicon)
   let repeats = 1;
   if ((bt.pw.Duplication || 0) > 0) {
     bt.pw.Duplication--;
@@ -4065,6 +4271,11 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
     bt.pw.DoubleTap--;
     if (bt.pw.DoubleTap <= 0) delete bt.pw.DoubleTap;
     repeats++;
+  }
+  if (def.type === "A" && (cost >= 2 || (cost === -1 && xEnergy >= 2)) && hasRelic(state, "Necronomicon") && !bt.necroDone) {
+    bt.necroDone = true;
+    repeats++;
+    addLog(state, "【死灵之书】触发双重攻击！");
   }
 
   for (let r = 0; r < repeats; r++) {
@@ -4210,8 +4421,18 @@ function endPlayerTurn(state, rng) {
     gainPlayerBlock(state, bt, bt.pw.PlatedArmor, false, rng);
   }
   if ((bt.pw.Combust || 0) > 0) {
-    losePlayerHp(state, bt, 1, false, rng);
+    losePlayerHp(state, bt, 1, true, rng);
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bt.pw.Combust, "THORNS", rng);
+  }
+  if ((bt.pw.TheBomb || 0) > 0) {
+    bt.pw.TheBomb--;
+    if (bt.pw.TheBomb <= 0) {
+      const bDmg = bt.bombDmg || 40;
+      delete bt.pw.TheBomb;
+      delete bt.bombDmg;
+      for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bDmg, "THORNS", rng);
+      addLog(state, "【炸弹】引爆，对所有敌人造成 " + bDmg + " 点伤害！");
+    }
   }
   if ((bt.pw.Regen || 0) > 0) {
     healPlayer(state, bt.pw.Regen, true);
@@ -4241,6 +4462,9 @@ function endPlayerTurn(state, rng) {
   delete bt.pw.NoDraw;
   delete bt.pw.Entangled;
 
+  // Enter Monster/End-of-Turn phase: debuffs applied to player from here until player's next turn are marked justApplied (bt.ja)
+  bt.inMonsterPhase = true;
+
   // 2. End-of-turn cards in hand (Burn, Decay, Doubt, Shame, Regret, Ethereal)
   const handSnapshot = bt.h.slice();
   const keptHand = [];
@@ -4250,17 +4474,17 @@ function endPlayerTurn(state, rng) {
       const bDmg = def.mag;
       const b = Math.min(bt.b, bDmg);
       bt.b -= b;
-      if (bDmg - b > 0) losePlayerHp(state, bt, bDmg - b, false, rng);
+      if (bDmg - b > 0) losePlayerHp(state, bt, bDmg - b, true, rng);
     } else if (def.id === "Decay") {
       const b = Math.min(bt.b, 2);
       bt.b -= b;
-      if (2 - b > 0) losePlayerHp(state, bt, 2 - b, false, rng);
+      if (2 - b > 0) losePlayerHp(state, bt, 2 - b, true, rng);
     } else if (def.id === "Doubt") {
       applyPlayerPower(state, bt, "Weak", 1);
     } else if (def.id === "Shame") {
       applyPlayerPower(state, bt, "Frail", 1);
     } else if (def.id === "Regret") {
-      losePlayerHp(state, bt, handSnapshot.length, false, rng);
+      losePlayerHp(state, bt, handSnapshot.length, true, rng);
     }
     if (def.ethereal) {
       triggerExhaustCard(state, bt, c, rng);
@@ -4274,8 +4498,8 @@ function endPlayerTurn(state, rng) {
   }
   bt.h = keptHand;
 
-  if (state.hp <= 0) { onPlayerDefeat(state); return; }
-  if (isCombatWon(bt)) { onCombatVictory(state, rng); return; }
+  if (state.hp <= 0) { delete bt.inMonsterPhase; onPlayerDefeat(state); return; }
+  if (isCombatWon(bt)) { delete bt.inMonsterPhase; onCombatVictory(state, rng); return; }
 
   // 3. Monsters start of turn (lose block unless Barricade) & execute turns
   for (const m of bt.m) {
@@ -4289,17 +4513,25 @@ function endPlayerTurn(state, rng) {
     const curIdx = bt.m.indexOf(m);
     if (curIdx === -1) continue;
     executeMonsterTurn(m, curIdx, bt, state, rng);
-    if (state.hp <= 0) { onPlayerDefeat(state); return; }
+    if (state.hp <= 0) { delete bt.inMonsterPhase; onPlayerDefeat(state); return; }
   }
 
-  // 4. Monsters end-of-turn powers (Ritual, Metallicize, PlatedArmor, RegenerateMonster, Fading, Shifting, Weak/Vuln/Intangible tick)
+  // 4. Monsters end-of-turn powers (Ritual, Metallicize, PlatedArmor, RegenerateMonster, Fading, Shackled/Shifting, Weak/Vuln/Intangible tick)
   for (const m of bt.m) {
     if (m.hp <= 0 && !m.st.halfDead) continue;
-    if ((m.pw.Ritual || 0) > 0) applyMonsterPower(state, bt, m, "Strength", m.pw.Ritual);
+    if ((m.pw.Ritual || 0) > 0) {
+      if (m.st.justRitual) m.st.justRitual = false;
+      else applyMonsterPower(state, bt, m, "Strength", m.pw.Ritual);
+    }
     if ((m.pw.GenericStrengthUp || 0) > 0) applyMonsterPower(state, bt, m, "Strength", m.pw.GenericStrengthUp);
     if ((m.pw.Metallicize || 0) > 0) m.b += m.pw.Metallicize;
     if ((m.pw.PlatedArmor || 0) > 0) m.b += m.pw.PlatedArmor;
     if ((m.pw.RegenerateMonster || 0) > 0 && m.hp > 0) m.hp = Math.min(m.mhp, m.hp + m.pw.RegenerateMonster);
+    if ((m.pw.Shackled || 0) > 0) {
+      m.pw.Strength = (m.pw.Strength || 0) + m.pw.Shackled;
+      if (m.pw.Strength === 0) delete m.pw.Strength;
+      delete m.pw.Shackled;
+    }
     if (m.st.shiftLoss) {
       applyMonsterPower(state, bt, m, "Strength", m.st.shiftLoss);
       m.st.shiftLoss = 0;
@@ -4313,13 +4545,18 @@ function endPlayerTurn(state, rng) {
       m.pw.Fading--;
       if (m.pw.Fading <= 0) { m.hp = 0; m.b = 0; addLog(state, m.name + " 消逝了！"); }
     }
+    const hadIntangible = (m.pw.Intangible || 0) > 0;
     for (const dKey of ["Weak", "Vulnerable", "Intangible"]) {
       if ((m.pw[dKey] || 0) > 0) {
         m.pw[dKey]--;
         if (m.pw[dKey] <= 0) delete m.pw[dKey];
       }
     }
+    if (m.id === "Nemesis" && m.hp > 0 && !hadIntangible) {
+      m.pw.Intangible = 1;
+    }
   }
+  delete bt.inMonsterPhase;
 
   if (isCombatWon(bt)) { onCombatVictory(state, rng); return; }
 
@@ -4332,7 +4569,7 @@ function endPlayerTurn(state, rng) {
   const prevAtks = bt.at || 0;
   const prevCards = bt.ct || 0;
   bt.t += 1;
-  bt.ct = 0; bt.at = 0; bt.sk = 0; bt.po = 0; bt.pelletsDone = false;
+  bt.ct = 0; bt.at = 0; bt.sk = 0; bt.po = 0; bt.pelletsDone = false; bt.necroDone = false;
 
   // Player Block decay
   if ((bt.pw.Barricade || 0) > 0) {
@@ -4350,17 +4587,27 @@ function endPlayerTurn(state, rng) {
   if (bt.t === 3 && hasRelic(state, "CaptainsWheel")) gainPlayerBlock(state, bt, 18, false, rng);
   delete bt.pw.FlameBarrier;
 
-  // Player debuff ticks
-  for (const dKey of ["Weak", "Vulnerable", "Frail", "Intangible", "NoBlock"]) {
+  // Player debuff ticks (skipping justApplied debuffs from monster phase)
+  for (const dKey of ["Weak", "Vulnerable", "Frail", "NoBlock"]) {
     if ((bt.pw[dKey] || 0) > 0) {
-      bt.pw[dKey]--;
-      if (bt.pw[dKey] <= 0) delete bt.pw[dKey];
+      if (bt.ja && bt.ja[dKey]) {
+        delete bt.ja[dKey];
+      } else {
+        bt.pw[dKey]--;
+        if (bt.pw[dKey] <= 0) delete bt.pw[dKey];
+      }
+    } else if (bt.ja && bt.ja[dKey]) {
+      delete bt.ja[dKey];
     }
+  }
+  if ((bt.pw.Intangible || 0) > 0) {
+    bt.pw.Intangible--;
+    if (bt.pw.Intangible <= 0) delete bt.pw.Intangible;
   }
   if ((bt.pw.Ritual || 0) > 0) applyPlayerPower(state, bt, "Strength", bt.pw.Ritual);
   if ((bt.pw.DemonForm || 0) > 0) applyPlayerPower(state, bt, "Strength", bt.pw.DemonForm);
   if ((bt.pw.Brutality || 0) > 0) {
-    losePlayerHp(state, bt, bt.pw.Brutality, false, rng);
+    losePlayerHp(state, bt, bt.pw.Brutality, true, rng);
     drawCards(state, bt, bt.pw.Brutality, rng);
   }
 
@@ -4370,8 +4617,14 @@ function endPlayerTurn(state, rng) {
   if ((bt.pw.Berserk || 0) > 0) bt.e += bt.pw.Berserk;
   if ((state.rt === "E" || state.rt === "B") && hasRelic(state, "SlaversCollar")) bt.e += 1;
   if (hasRelic(state, "Art of War") && prevAtks === 0) bt.e += 1;
-  if (hasRelic(state, "Happy Flower") && bt.t % 3 === 0) bt.e += 1;
-  if (hasRelic(state, "Incense Burner") && bt.t % 6 === 0) applyPlayerPower(state, bt, "Intangible", 1);
+  if (hasRelic(state, "Happy Flower")) {
+    state.rc.Flower = ((state.rc.Flower || 0) + 1) % 3;
+    if (state.rc.Flower === 0) bt.e += 1;
+  }
+  if (hasRelic(state, "Incense Burner")) {
+    state.rc.Burner = ((state.rc.Burner || 0) + 1) % 6;
+    if (state.rc.Burner === 0) applyPlayerPower(state, bt, "Intangible", 1);
+  }
   if (hasRelic(state, "Mercury Hourglass")) {
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, 3, "THORNS", rng);
   }
@@ -5457,13 +5710,14 @@ function judge(submission, tools) {
 
   let settle = false;
 
-  if (act && act.type !== "init" && st.ph !== "VICTORY" && st.ph !== "DEFEAT" && st.ph !== "RETREAT") {
-    const t = act.type;
+  function applySingleAction(subAct) {
+    if (!subAct || subAct.type === "init" || st.ph === "VICTORY" || st.ph === "DEFEAT" || st.ph === "RETREAT") return;
+    const t = subAct.type;
 
     if (t === "use_potion") {
-      usePotion(st, Number(act.potIdx ?? act.index ?? 0), Number(act.targetIdx ?? 0), rng);
+      usePotion(st, Number(subAct.potIdx ?? subAct.index ?? 0), Number(subAct.targetIdx ?? 0), rng);
     } else if (t === "discard_potion") {
-      const pIdx = Number(act.potIdx ?? act.index ?? 0);
+      const pIdx = Number(subAct.potIdx ?? subAct.index ?? 0);
       if (st.pot && st.pot[pIdx]) st.pot[pIdx] = "";
     } else if (t === "cash_out" || t === "rest_retreat") {
       if (st.ph === "REST" && (st.fl || 0) >= 1) {
@@ -5475,29 +5729,39 @@ function judge(submission, tools) {
       }
     } else if (st.ph === "NEOW" || st.ph === "EVENT") {
       if (t === "event_choice" || t === "neow_blessing") {
-        handleEventAction(st, act.choiceIdx ?? act.index ?? 0, act.cardIdx ?? 0, rng);
+        handleEventAction(st, subAct.choiceIdx ?? subAct.index ?? 0, subAct.cardIdx ?? 0, rng);
       }
     } else if (st.ph === "MAP") {
       if (t === "choose_node") {
-        enterMapNode(st, Number(act.x ?? act.col ?? 0), Number(act.y ?? act.row ?? 0), rng);
+        enterMapNode(st, Number(subAct.x ?? subAct.col ?? 0), Number(subAct.y ?? subAct.row ?? 0), rng);
       }
     } else if (st.ph === "COMBAT") {
       if (t === "play_card") {
-        playCardInCombat(st, Number(act.cardIdx ?? act.index ?? 0), Number(act.targetIdx ?? 0), rng);
+        playCardInCombat(st, Number(subAct.cardIdx ?? subAct.index ?? 0), Number(subAct.targetIdx ?? 0), rng);
       } else if (t === "end_turn") {
         endPlayerTurn(st, rng);
       }
     } else if (st.ph === "REWARD") {
-      handleRewardAction(st, act, rng);
+      handleRewardAction(st, subAct, rng);
     } else if (st.ph === "BOSS_RELIC") {
-      handleBossRelicAction(st, act, rng);
+      handleBossRelicAction(st, subAct, rng);
     } else if (st.ph === "SHOP") {
-      handleShopAction(st, act, rng);
+      handleShopAction(st, subAct, rng);
     } else if (st.ph === "REST") {
-      handleRestAction(st, act, rng);
+      handleRestAction(st, subAct, rng);
     } else if (st.ph === "TREASURE") {
-      handleTreasureAction(st, act, rng);
+      handleTreasureAction(st, subAct, rng);
     }
+  }
+
+  if (act && act.type === "batch" && Array.isArray(act.actions)) {
+    const list = act.actions.slice(0, 300);
+    for (let i = 0; i < list.length; i++) {
+      applySingleAction(list[i]);
+      if (st.ph === "VICTORY" || st.ph === "DEFEAT" || st.ph === "RETREAT") break;
+    }
+  } else {
+    applySingleAction(act);
   }
 
   st.rs = rng.s;
@@ -5549,24 +5813,351 @@ function spMonster(key, size = 78) {
   const map = SPRITE_MANIFEST.monsters;
   const idx = (map && map[key] !== undefined) ? map[key] : 1;
   const col = idx % 9, row = Math.floor(idx / 9);
-  const px = (col / 8) * 100, py = (row / 7) * 100;
+  const px = (col / 8) * 100, py = (row / 8) * 100;
   return '<span class="sp-monster" style="width:' + size + 'px;height:' + size + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
+}
+
+function getMonsterStateSpriteKey(m) {
+  if (!m || !m.id) return "Cultist";
+  const st = m.st || {};
+  if (m.id === "Lagavulin" && st.asleep) return "Lagavulin_sleep";
+  if (m.id === "TheGuardian" && st.open === false) return "TheGuardian_def";
+  if (m.id === "FuzzyLouseNormal" && st.curled) return "FuzzyLouseNormal_curl";
+  if (m.id === "FuzzyLouseDefensive" && st.curled) return "FuzzyLouseDefensive_curl";
+  if (m.id === "Byrd" && st.air === false) return "Byrd_grounded";
+  if (m.id === "AwakenedOne" && st.p2 && !st.halfDead) return "AwakenedOne_p2";
+  if (m.id === "GiantHead" && (st.cnt || 0) > 1 && m.mv !== 2) return "GiantHead_closed";
+  if (m.id === "Hexaghost" && !st.activated) return "Hexaghost_dormant";
+  return m.id;
+}
+
+// Authentic Original Slay the Spire Creature Proportions & Hitbox Widths (desktop-1.0.jar)
+const MONSTER_VISUAL_SPEC = {
+  Ironclad: { size: 132, hpW: 108, shadowW: 86 },
+  // Tiny / Small Monsters
+  AcidSlime_S: { size: 64, hpW: 64, shadowW: 54 },
+  SpikeSlime_S: { size: 64, hpW: 64, shadowW: 54 },
+  FuzzyLouseNormal: { size: 74, hpW: 76, shadowW: 64 },
+  FuzzyLouseDefensive: { size: 74, hpW: 76, shadowW: 64 },
+  FuzzyLouseNormal_curl: { size: 62, hpW: 72, shadowW: 52 },
+  FuzzyLouseDefensive_curl: { size: 62, hpW: 72, shadowW: 52 },
+  GremlinThief: { size: 78, hpW: 66, shadowW: 52 },
+  GremlinWizard: { size: 80, hpW: 66, shadowW: 52 },
+  GremlinWarrior: { size: 82, hpW: 68, shadowW: 54 },
+  GremlinTsundere: { size: 78, hpW: 66, shadowW: 52 },
+  GremlinFat: { size: 86, hpW: 66, shadowW: 56 },
+  SnakeDagger: { size: 74, hpW: 66, shadowW: 44, fly: true },
+  Exploder: { size: 78, hpW: 68, shadowW: 52 },
+  Spiker: { size: 78, hpW: 68, shadowW: 52 },
+  Repulsor: { size: 80, hpW: 72, shadowW: 54 },
+  BronzeOrb: { size: 72, hpW: 68, shadowW: 44, fly: true },
+  Hexaghost_dormant: { size: 96, hpW: 168, shadowW: 64, fly: true },
+  // Medium / Humanoid Monsters
+  AcidSlime_M: { size: 96, hpW: 88, shadowW: 78 },
+  SpikeSlime_M: { size: 96, hpW: 88, shadowW: 78 },
+  FungiBeast: { size: 108, hpW: 106, shadowW: 88 },
+  JawWorm: { size: 116, hpW: 110, shadowW: 94 },
+  Looter: { size: 118, hpW: 96, shadowW: 78 },
+  Mugger: { size: 118, hpW: 96, shadowW: 78 },
+  SlaverBlue: { size: 122, hpW: 96, shadowW: 80 },
+  SlaverRed: { size: 122, hpW: 96, shadowW: 80 },
+  Cultist: { size: 124, hpW: 104, shadowW: 84 },
+  Byrd: { size: 104, hpW: 96, shadowW: 64, fly: true },
+  Byrd_grounded: { size: 88, hpW: 96, shadowW: 74 },
+  Sentry: { size: 128, hpW: 96, shadowW: 66, fly: true },
+  SphericGuardian: { size: 124, hpW: 114, shadowW: 76, fly: true },
+  Chosen: { size: 132, hpW: 102, shadowW: 82 },
+  Healer: { size: 122, hpW: 96, shadowW: 76 },
+  Centurion: { size: 138, hpW: 112, shadowW: 94 },
+  BanditPointy: { size: 96, hpW: 82, shadowW: 68 },
+  BanditRomeo: { size: 122, hpW: 100, shadowW: 80 },
+  BanditBear: { size: 136, hpW: 104, shadowW: 92 },
+  Taskmaster: { size: 128, hpW: 104, shadowW: 84 },
+  TorchHead: { size: 100, hpW: 82, shadowW: 68 },
+  Darkling: { size: 114, hpW: 106, shadowW: 88 },
+  OrbWalker: { size: 132, hpW: 114, shadowW: 96 },
+  // Large & Elite Monsters
+  AcidSlime_L: { size: 156, hpW: 132, shadowW: 124 },
+  SpikeSlime_L: { size: 156, hpW: 132, shadowW: 124 },
+  Lagavulin_sleep: { size: 164, hpW: 140, shadowW: 132 },
+  Lagavulin: { size: 184, hpW: 148, shadowW: 140 },
+  GremlinNob: { size: 192, hpW: 146, shadowW: 132 },
+  ShelledParasite: { size: 164, hpW: 142, shadowW: 128 },
+  SnakePlant: { size: 160, hpW: 130, shadowW: 114 },
+  Snecko: { size: 168, hpW: 140, shadowW: 124 },
+  GremlinLeader: { size: 158, hpW: 122, shadowW: 102 },
+  BookOfStabbing: { size: 168, hpW: 126, shadowW: 98, fly: true },
+  SpireGrowth: { size: 182, hpW: 158, shadowW: 144 },
+  Transient: { size: 188, hpW: 154, shadowW: 132 },
+  Maw: { size: 192, hpW: 164, shadowW: 146 },
+  WrithingMass: { size: 178, hpW: 158, shadowW: 144 },
+  GiantHead: { size: 194, hpW: 168, shadowW: 150 },
+  GiantHead_closed: { size: 194, hpW: 168, shadowW: 150 },
+  Nemesis: { size: 188, hpW: 150, shadowW: 116, fly: true },
+  Reptomancer: { size: 166, hpW: 130, shadowW: 102 },
+  TheGuardian_def: { size: 172, hpW: 176, shadowW: 142 },
+  // Giant Act Bosses
+  TheGuardian: { size: 228, hpW: 188, shadowW: 176 },
+  Hexaghost: { size: 214, hpW: 176, shadowW: 138, fly: true },
+  SlimeBoss: { size: 222, hpW: 186, shadowW: 176 },
+  BronzeAutomaton: { size: 224, hpW: 172, shadowW: 152 },
+  TheCollector: { size: 206, hpW: 168, shadowW: 148 },
+  Champ: { size: 218, hpW: 178, shadowW: 156 },
+  AwakenedOne: { size: 214, hpW: 184, shadowW: 166 },
+  AwakenedOne_p2: { size: 228, hpW: 190, shadowW: 172 },
+  TimeEater: { size: 228, hpW: 192, shadowW: 172 },
+  Deca: { size: 188, hpW: 156, shadowW: 136 },
+  Donu: { size: 188, hpW: 156, shadowW: 136 },
+};
+
+function getMonsterVisualSpec(spriteKey, baseId, totalEnemies = 1) {
+  const raw = MONSTER_VISUAL_SPEC[spriteKey] || MONSTER_VISUAL_SPEC[baseId] || { size: 120, hpW: 100, shadowW: 82 };
+  const isPhone = typeof window !== "undefined" && window.innerWidth <= 620;
+  const hFactor = (typeof window !== "undefined" && window.innerHeight < 680)
+    ? Math.max(0.74, (window.innerHeight - 260) / 420)
+    : 1.0;
+  // In Original STS, monsters never shrink on desktop when grouped because MonsterHelper spaces their (offsetX, offsetY).
+  const groupFactor = isPhone ? (totalEnemies >= 4 ? 0.78 : (totalEnemies === 3 ? 0.86 : 1.0)) : 1.0;
+  const screenFactor = isPhone ? 0.64 : hFactor;
+  const f = groupFactor * screenFactor;
+  return {
+    size: Math.round(raw.size * f),
+    hpW: Math.round(raw.hpW * f),
+    shadowW: Math.round((raw.shadowW || raw.size * 0.72) * f),
+    fly: Boolean(raw.fly),
+  };
+}
+
+// Authentic Original Slay the Spire Encounter Coordinates (extracted from MonsterHelper.class & Monster.<init> in desktop-1.0.jar)
+// Virtual Screen: 1920x1080 | Player drawX = 1920 * 0.25 = 480, drawY = floorY (340)
+// Monster drawX = 1920 * 0.75 + offsetX = 1440 + offsetX, drawY = floorY + offsetY
+const STS_ENCOUNTER_OFFSETS = {
+  // Act 1 Weak & Strong
+  "Cultist": [[0, -10]],
+  "Jaw Worm": [[0, 25]],
+  "2 Louse": [[-200, 10], [80, 30]],
+  "Small Slimes": [[-230, 32], [35, 8]],
+  "Blue Slaver": [[0, 0]],
+  "Red Slaver": [[0, 0]],
+  "Looter": [[0, 0]],
+  "Large Slime": [[0, 0]],
+  "Lots of Slimes": [[-480, 30], [-320, 2], [-160, 32], [10, -12], [200, 9]],
+  "Gremlin Gang": [[-320, 25], [-160, -12], [25, -35], [205, 40]],
+  "Exordium Thugs": [[-160, 20], [130, 20]],
+  "Exordium Wildlife": [[-150, 20], [150, 20]],
+  "3 Louse": [[-350, 25], [-125, 10], [80, 30]],
+  "2 Fungi Beasts": [[-400, 30], [-40, 20]],
+  "3 Fungi Beasts": [[-450, 30], [-145, 20], [180, 15]],
+  // Act 1 Elites & Bosses
+  "Gremlin Nob": [[0, 0]],
+  "Lagavulin": [[0, 20]],
+  "3 Sentries": [[-330, 25], [-85, 10], [140, 30]],
+  "TheGuardian": [[-50, 0]],
+  "Hexaghost": [[0, 65]],
+  "SlimeBoss": [[0, 28]],
+  // Act 2 Weak & Strong
+  "Spheric Guardian": [[0, 10]],
+  "Chosen": [[0, -20]],
+  "Shell Parasite": [[-20, 10]],
+  "3 Byrds": [[-360, 50], [-80, 50], [200, 50]],
+  "2 Thieves": [[-200, 15], [80, 0]],
+  "Chosen and Byrds": [[-170, 50], [80, -20]],
+  "Sentry and Sphere": [[-305, 30], [0, 10]],
+  "Snake Plant": [[-30, 20]],
+  "Snecko": [[0, 0]],
+  "Centurion and Healer": [[-200, 15], [120, 0]],
+  "Cultist and Chosen": [[-230, 15], [100, 5]],
+  "3 Cultists": [[-465, -20], [-130, 15], [200, -5]],
+  "Shelled Parasite and Fungi": [[-260, 15], [120, 0]],
+  // Act 2 Elites, Events & Bosses
+  "Slavers": [[-385, -15], [-133, 0], [125, -30]],
+  "Book of Stabbing": [[0, 5]],
+  "Masked Bandits": [[-320, 0], [-75, -6], [150, -6]],
+  "Champ": [[-90, 0]],
+  // Act 3 Weak, Strong, Elites & Bosses
+  "3 Darklings": [[-440, 30], [-140, 50], [180, 15]],
+  "Orb Walker": [[-30, 20]],
+  "3 Shapes": [[-480, 16], [-240, 4], [0, -2]],
+  "4 Shapes": [[-480, 16], [-240, 4], [0, -2], [240, 22]],
+  "Sphere and 2 Shapes": [[-435, 10], [-210, 10], [110, 20]],
+  "Jaw Worm Horde": [[-490, -5], [-150, 20], [175, 5]],
+  "Spire Growth": [[0, 10]],
+  "Transient": [[0, 20]],
+  "Maw": [[-70, 20]],
+  "Writhing Mass": [[0, 15]],
+  "Giant Head": [[-70, 40]],
+  "Nemesis": [[0, 0]],
+  "AwakenedOne": [[-590, 10], [-298, -10], [100, 15]],
+  "TimeEater": [[-50, 30]],
+  "Donu and Deca": [[-350, 30], [100, 20]],
+};
+
+function getOriginalMonsterOffset(st, bt, m, idx) {
+  if (m && typeof m.ox === "number" && typeof m.oy === "number") {
+    return [m.ox, m.oy];
+  }
+  const enc = (bt && bt.enc) || "";
+  const list = (bt && bt.m) || [];
+  const total = list.length;
+
+  // 1. Dynamic Summon / Split Encounters from desktop-1.0.jar
+  if (enc === "Large Slime" && total === 2) {
+    // AcidSlime_L / SpikeSlime_L split into (-134, 0) and (134, 0)
+    return idx === 0 ? [-134, 0] : [134, 0];
+  }
+  if (enc === "Exordium Wildlife" && total === 3) {
+    if (idx === 0) return [-150, 20];
+    return idx === 1 ? [36, 24] : [254, 16];
+  }
+  if (enc === "SlimeBoss") {
+    if (m.id === "SlimeBoss") return [0, 28];
+    if (m.id === "SpikeSlime_L") return [-385, 20];
+    if (m.id === "AcidSlime_L") return [120, -8];
+    if (m.id === "SpikeSlime_M") {
+      const spkList = list.filter(x => x.id === "SpikeSlime_M");
+      return spkList.indexOf(m) === 0 ? [-519, 24] : [-251, 16];
+    }
+    if (m.id === "AcidSlime_M") {
+      const acdList = list.filter(x => x.id === "AcidSlime_M");
+      return acdList.indexOf(m) === 0 ? [-14, -4] : [254, -12];
+    }
+  }
+  if (enc === "Gremlin Leader") {
+    if (m.id === "GremlinLeader") return [35, 0];
+    // GremlinLeader.POSX = [-366, -170, -532], POSY = [-4, 6, 0]
+    const slots = [[-366, -4], [-170, 6], [-532, 0]];
+    const aliveMinions = list.filter(x => x.id !== "GremlinLeader" && x.hp > 0);
+    const sIdx = Math.max(0, aliveMinions.indexOf(m)) % 3;
+    const base = slots[sIdx];
+    return [base[0] + (m.id === "GremlinWizard" ? -35 : 0), base[1]];
+  }
+  if (enc === "BronzeAutomaton") {
+    if (m.id === "BronzeAutomaton") return [-50, 20];
+    const autoIdx = list.findIndex(x => x.id === "BronzeAutomaton");
+    // Left orb (-300, 200), Right orb (200, 130)
+    return (autoIdx === -1 || idx < autoIdx) ? [-300, 200] : [200, 130];
+  }
+  if (enc === "TheCollector") {
+    if (m.id === "TheCollector") return [60, 10];
+    // TheCollector TorchHead slots: spawnX = -100 + i * -185 -> (-285, 10), (-470, 15)
+    const aliveTorches = list.filter(x => x.id === "TorchHead" && x.hp > 0);
+    const sIdx = Math.max(0, aliveTorches.indexOf(m));
+    return sIdx === 0 ? [-285, 10] : [-470, 15];
+  }
+  if (enc === "Reptomancer") {
+    if (m.id === "Reptomancer") return [-20, 10];
+    // Reptomancer.POSX = [-220, 210, -250, 180], POSY = [115, 75, 225, 235]
+    const daggerSlots = [[-220, 115], [210, 75], [-250, 225], [180, 235]];
+    const aliveDaggers = list.filter(x => x.id === "SnakeDagger" && x.hp > 0);
+    const sIdx = Math.max(0, aliveDaggers.indexOf(m)) % 4;
+    return daggerSlots[sIdx];
+  }
+
+  // 2. Standard Encounter Table Lookup
+  const table = STS_ENCOUNTER_OFFSETS[enc];
+  if (table && table[idx]) {
+    let [ox, oy] = table[idx];
+    if (enc === "Gremlin Gang" && m && m.id === "GremlinWizard") {
+      ox -= 35; // GremlinWizard.<init> subtracts 35 from x
+    }
+    return [ox, oy];
+  }
+
+  // 3. Fallback for custom/synthetic multi-monster test states
+  if (total === 1) return [0, 0];
+  const span = Math.min(640, (total - 1) * 210);
+  const startX = -span * 0.62;
+  const stepX = span / Math.max(1, total - 1);
+  return [Math.round(startX + idx * stepX), (idx % 2 === 0 ? 10 : 25)];
+}
+
+function getMonsterStageCssVars(st, bt, m, idx) {
+  const [ox, oy] = getOriginalMonsterOffset(st, bt, m, idx);
+  const isPhone = typeof window !== "undefined" && window.innerWidth <= 620;
+  // Monster drawX = 1920 * 0.75 + ox = 1440 + ox -> percentage of 1920
+  let leftPct = ((1440 + ox) / 1920) * 100;
+  if (isPhone) {
+    // Compress slightly on narrow 360px screens so wide 4-5 enemy groups stay inside viewport
+    leftPct = 66 + ((leftPct - 75) * 0.72);
+    leftPct = Math.max(38, Math.min(89, leftPct));
+  }
+  const offYPct = (oy / 1080) * 100;
+  const zIdx = Math.max(6, Math.min(38, Math.round(22 - oy * 0.08)));
+  return {
+    leftPct: leftPct.toFixed(2) + "%",
+    offYPct: offYPct.toFixed(2) + "%",
+    zIdx,
+  };
+}
+
+function renderHexaghostOrbsHtml(m) {
+  if (!m || m.id !== "Hexaghost") return "";
+  const st = m.st || {};
+  const litCount = !st.activated ? 0 : (m.mv === 1 || m.mv === 6 ? 6 : Math.max(1, Math.min(6, (st.orb || 0) + 1)));
+  const coords = [
+    [50, 8], [86, 28], [86, 72],
+    [50, 92], [14, 72], [14, 28],
+  ];
+  return '<div class="hexa-orb-ring">' +
+    coords.map(([x, y], i) => '<span class="hexa-orb' + (i < litCount ? ' lit' : '') + '" style="left:' + x + '%;top:' + y + '%"></span>').join("") +
+  '</div>';
 }
 
 function spEventBanner(key, w = 135, h = 90) {
   const map = SPRITE_MANIFEST.events;
   const idx = (map && map[key] !== undefined) ? map[key] : 0;
   const col = idx % 5, row = Math.floor(idx / 5);
-  const px = (col / 4) * 100, py = (row / 3) * 100;
-  return '<span class="sp-event" style="width:' + w + 'px;height:' + h + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
+  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 2480;
+  const px = (col / 4) * 100, py = ((row * 200) / (SH - 200)) * 100;
+  return '<span class="sp-event" style="width:' + w + 'px;height:' + h + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
 }
 
 function spEventSquare(key, size = 240) {
   const map = SPRITE_MANIFEST.events;
   const idx = (map && map[key] !== undefined) ? map[key] : 4;
   const col = idx % 5, row = Math.floor(idx / 5);
-  const px = (col / 4) * 100, py = (row / 3) * 100;
-  return '<span class="sp-event" style="width:' + size + 'px;height:' + size + 'px;border-radius:4px;border:none;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
+  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 2480;
+  const px = (col / 4) * 100, py = ((row * 200) / (SH - 200)) * 100;
+  return '<span class="sp-event" style="width:' + size + 'px;height:' + size + 'px;border-radius:4px;border:none;background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
+}
+
+function combatBgStyle(actSceneKey) {
+  const bgs = SPRITE_MANIFEST.combatBgs || {};
+  const p = bgs[actSceneKey] || bgs.Exordium || { x: 0, y: 800, w: 1000, h: 560 };
+  const SW = bgs.sheetW || 1000;
+  const SH = bgs.sheetH || 2480;
+  const sx = ((SW / p.w) * 100).toFixed(3) + "%";
+  const sy = ((SH / p.h) * 100).toFixed(3) + "%";
+  const px = p.w < SW ? ((p.x / (SW - p.w)) * 100).toFixed(3) + "%" : "0%";
+  const py = p.h < SH ? ((p.y / (SH - p.h)) * 100).toFixed(3) + "%" : "0%";
+  return "background-image:url(assets/events.webp);background-repeat:no-repeat;background-size:" + sx + " " + sy + ";background-position:" + px + " " + py + ";";
+}
+
+function formatPowerDesc(k, val, extraCtx) {
+  const meta = POWERS_META[k] || { name: k, icon: "✨", desc: "" };
+  const isDebuff = Boolean(meta.debuff || ((k === "Strength" || k === "Dexterity") && val < 0));
+  let desc = meta.desc || "";
+  if (k === "Strength" && val < 0) {
+    desc = "攻击伤害减少 " + Math.abs(val) + " 点。";
+  } else if (k === "Dexterity" && val < 0) {
+    desc = "从卡牌获得的格挡减少 " + Math.abs(val) + " 点。";
+  } else if (k === "TheBomb") {
+    desc = "在 " + val + " 回合后，对所有敌人造成 " + ((extraCtx && extraCtx.bombDmg) || 40) + " 点伤害。";
+  } else {
+    desc = desc.replace(/!A!/g, String(Math.abs(val)));
+  }
+  return { name: meta.name || k, icon: meta.icon || "✨", desc, isDebuff };
+}
+
+function renderPowerChipsHtml(pwObj, extraCtx) {
+  return Object.keys(pwObj || {}).map(k => {
+    const val = pwObj[k];
+    if (!val) return "";
+    const info = formatPowerDesc(k, val, extraCtx);
+    const escTip = (info.name + "：" + info.desc).replace(/"/g, "&quot;");
+    return '<span class="pw-chip ' + (info.isDebuff ? "debuff" : "") + '" data-pw-key="' + k + '" data-pw-val="' + val + '" data-pw-name="' + info.name + '" data-pw-desc="' + info.desc.replace(/"/g, "&quot;") + '" data-pw-debuff="' + (info.isDebuff ? "1" : "0") + '" title="' + escTip + '">' +
+      spIcon("powers", k, 20, info.icon) + '<span class="pw-num">' + val + '</span></span>';
+  }).join("");
 }
 
 function uiPanelBgStyle(panelKey) {
@@ -5871,15 +6462,17 @@ function updateLiveTargetingArrow(clientX, clientY) {
   if (hitIdx !== null && !Number.isNaN(hitIdx)) {
     hoveredEnemyIdx = hitIdx;
     locked = true;
-    const eRect = enemyUnit.getBoundingClientRect();
+    const boxEl = enemyUnit.querySelector(".sprite-stage-box") || enemyUnit;
+    const eRect = boxEl.getBoundingClientRect();
     x2 = eRect.left + eRect.width / 2;
-    y2 = eRect.top + eRect.height * 0.45;
+    y2 = eRect.top + eRect.height * 0.52;
   } else if ( !(clientX > 0 && clientY > 0) ) {
     const defEnemy = document.querySelector('.sts-unit.enemy-unit[data-enemy-idx="' + selectedTargetIdx + '"]');
     if (defEnemy) {
-      const eRect = defEnemy.getBoundingClientRect();
+      const boxEl = defEnemy.querySelector(".sprite-stage-box") || defEnemy;
+      const eRect = boxEl.getBoundingClientRect();
       x2 = eRect.left + eRect.width / 2;
-      y2 = eRect.top + eRect.height * 0.45;
+      y2 = eRect.top + eRect.height * 0.52;
       locked = true;
     }
   } else {
@@ -5904,6 +6497,32 @@ window.addEventListener("pointermove", (e) => {
   }
   if (activeCardIdx !== null || activePotionIdx !== null) {
     updateLiveTargetingArrow(e.clientX, e.clientY);
+  }
+  const tipEl = document.getElementById("sts-power-tip");
+  if (tipEl) {
+    const chip = e.target && e.target.closest ? e.target.closest(".pw-chip") : null;
+    if (chip) {
+      const k = chip.getAttribute("data-pw-key") || "";
+      const name = chip.getAttribute("data-pw-name") || k;
+      const val = chip.getAttribute("data-pw-val") || "";
+      const desc = chip.getAttribute("data-pw-desc") || "";
+      const isDeb = chip.getAttribute("data-pw-debuff") === "1";
+      tipEl.className = "sts-power-tip" + (isDeb ? " debuff" : "");
+      tipEl.innerHTML =
+        '<div class="sts-power-tip-head">' +
+          '<span style="display:inline-flex;align-items:center;gap:5px">' + spIcon("powers", k, 18, "✨") + name + ' (' + val + ')</span>' +
+          '<span class="sts-power-tip-tag">' + (isDeb ? "负面状态" : "增益能力") + '</span>' +
+        '</div>' +
+        '<div>' + desc + '</div>';
+      tipEl.style.display = "block";
+      const rect = chip.getBoundingClientRect();
+      const tx = Math.max(8, Math.min(window.innerWidth - 248, rect.left + rect.width / 2 - 110));
+      const ty = rect.top > 90 ? (rect.top - tipEl.offsetHeight - 8) : (rect.bottom + 8);
+      tipEl.style.left = tx + "px";
+      tipEl.style.top = Math.max(8, ty) + "px";
+    } else {
+      tipEl.style.display = "none";
+    }
   }
 });
 
@@ -5948,11 +6567,26 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-function runLocalJudge(payload) {
+let pendingActionsQueue = [];
+let isFlushingBatch = false;
+
+function persistSessionState() {
+  try {
+    sessionStorage.setItem("sts_hb_standalone", JSON.stringify({
+      localPlayerState,
+      localPending,
+      currentData,
+      pendingActionsQueue,
+    }));
+  } catch {}
+}
+
+function runLocalJudge(payload, skipRender = false) {
   const baseState = localPlayerState || currentData || createInitialState("sts-spire-seed-" + Date.now());
+  const maxR = (currentData && currentData.mr) || 1000;
   const res = judge({
     input: typeof payload === "string" ? payload : JSON.stringify(payload),
-    params: { maxReward: 1000, retainPercent: 50 },
+    params: { maxReward: maxR, retainPercent: 50 },
     user: { id: 10001, username: "铁甲战士" },
     player: {
       pending: localPending,
@@ -5963,14 +6597,8 @@ function runLocalJudge(payload) {
     localPlayerState = res.player.state;
     localPending = Math.max(0, localPending + (res.add || 0));
     currentData = res.player.view.data;
-    try {
-      sessionStorage.setItem("sts_hb_standalone", JSON.stringify({
-        localPlayerState,
-        localPending,
-        currentData,
-      }));
-    } catch {}
-    renderApp();
+    persistSessionState();
+    if (!skipRender) renderApp();
   }
 }
 
@@ -5978,33 +6606,81 @@ function resetLocalRun() {
   const fresh = createInitialState("sts-spire-seed-" + Date.now() + "-" + Math.floor(Math.random() * 100000));
   localPlayerState = fresh;
   localPending = 0;
+  pendingActionsQueue = [];
   currentData = Object.assign({}, fresh, { mr: 1000, pd: 0 });
-  try {
-    sessionStorage.setItem("sts_hb_standalone", JSON.stringify({
-      localPlayerState,
-      localPending,
-      currentData,
-    }));
-  } catch {}
+  persistSessionState();
   renderApp();
 }
+
+function shouldFlushToServer(prevPh, nextPh, actObj) {
+  const t = actObj && actObj.type;
+  // 1. Initial Neow blessing initializes server seed
+  if (prevPh === "NEOW" && nextPh !== "NEOW") return true;
+  // 2. Every time a floor's monster combat finishes (COMBAT -> REWARD / VICTORY / DEFEAT)
+  if (prevPh === "COMBAT" && nextPh !== "COMBAT") return true;
+  // 3. Act Boss Relic chosen (entering next Act)
+  if (prevPh === "BOSS_RELIC" && nextPh === "MAP") return true;
+  // 4. Run settlement (Victory, Defeat, or Campfire Retreat / Cash Out)
+  if (nextPh === "VICTORY" || nextPh === "DEFEAT" || nextPh === "RETREAT" || t === "cash_out" || t === "rest_retreat") return true;
+  return false;
+}
+
+function flushPendingActions() {
+  if (!hbConnected || !window.hb || typeof window.hb.submit !== "function") return;
+  if (isFlushingBatch || pendingActionsQueue.length === 0) return;
+
+  isFlushingBatch = true;
+  const batchToSend = pendingActionsQueue.splice(0, pendingActionsQueue.length);
+  persistSessionState();
+  renderApp();
+
+  const payload = batchToSend.length === 1
+    ? batchToSend[0]
+    : { type: "batch", actions: batchToSend };
+  const str = typeof payload === "string" ? payload : JSON.stringify(payload);
+
+  window.hb.submit(str).then((res) => {
+    isFlushingBatch = false;
+    if (!res || !res.judged) {
+      // Server rejected or didn't judge; keep local state
+    }
+    if (pendingActionsQueue.length > 0 && currentData && (currentData.ph === "VICTORY" || currentData.ph === "DEFEAT" || currentData.ph === "RETREAT")) {
+      flushPendingActions();
+    } else {
+      renderApp();
+    }
+  }).catch(() => {
+    isFlushingBatch = false;
+    pendingActionsQueue = batchToSend.concat(pendingActionsQueue);
+    persistSessionState();
+    renderApp();
+  });
+}
+
+window.addEventListener("pagehide", () => {
+  if (pendingActionsQueue.length > 0) flushPendingActions();
+});
 
 function sendAction(payload) {
   clearTargeting(false);
   mapOverlayOpen = false;
-  const str = typeof payload === "string" ? payload : JSON.stringify(payload);
+  const actObj = typeof payload === "string" ? JSON.parse(payload) : payload;
+  const prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "NEOW";
+
+  // Always execute locally at 0ms for instant UI responsiveness
+  runLocalJudge(actObj);
+  const nextPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || prevPh;
+
   if (hbConnected && window.hb && typeof window.hb.submit === "function") {
-    window.hb.submit(str).then((res) => {
-      if (!res || !res.judged) {
-        runLocalJudge(payload);
-      }
-    }).catch(() => {
-      runLocalJudge(payload);
-    });
+    pendingActionsQueue.push(actObj);
+    persistSessionState();
+    if (shouldFlushToServer(prevPh, nextPh, actObj)) {
+      flushPendingActions();
+    } else {
+      renderApp();
+    }
   } else if (window.HB && typeof window.HB.send === "function") {
-    window.HB.send(payload);
-  } else {
-    runLocalJudge(payload);
+    window.HB.send(actObj);
   }
 }
 
@@ -6021,7 +6697,13 @@ function formatCardDesc(def, nums) {
 }
 
 function getMonsterIntentInfo(st, bt, m) {
-  if (hasRelic(st, "Runic Dome")) return { cls: "deb", text: spIcon("intents", "unknown", 22, "❓"), tip: "符文圆顶：无法查看敌人意图" };
+  if (hasRelic(st, "Runic Dome")) {
+    return {
+      cls: "deb",
+      text: '<span class="intent-main-ico">' + spIcon("intents", "unknown", 36, "❓") + '</span>',
+      tip: "符文圆顶：无法查看敌人意图"
+    };
+  }
   const it = m.in || m.it || "UNKNOWN";
   let dmg = (m.dmg !== undefined ? m.dmg : m.idmg) || 0;
   if (dmg > 0) {
@@ -6032,25 +6714,68 @@ function getMonsterIntentInfo(st, bt, m) {
     dmg = Math.max(0, d);
   }
   const hitCnt = m.hits || m.ihit || 1;
-  const hits = hitCnt > 1 ? ("×" + hitCnt) : "";
+  const hits = hitCnt > 1 ? ("x" + hitCnt) : "";
   const totalDmg = dmg * hitCnt;
   const atkTier = totalDmg < 5 ? 1 : (totalDmg < 10 ? 2 : (totalDmg < 15 ? 3 : (totalDmg < 20 ? 4 : (totalDmg < 25 ? 5 : (totalDmg < 30 ? 6 : 7)))));
-  const atkIcon = spIcon("intents", "attack_" + atkTier, 24, "⚔️");
+  const atkIcon = '<span class="intent-main-ico">' + spIcon("intents", "attack_" + atkTier, 38, "⚔️") + '</span>';
+  const dmgNumHtml = '<span class="intent-dmg-num">' + dmg + hits + '</span>';
 
-  if (it === "ATTACK" || it === "ATK") return { cls: "atk", text: atkIcon + " " + dmg + hits, tip: "准备攻击，造成 " + dmg + hits + " 点伤害" };
-  if (it === "ATTACK_DEFEND" || it === "ATK_DEF") return { cls: "atk", text: atkIcon + " " + dmg + hits + " " + spIcon("intents", "defend", 18, "🛡️"), tip: "准备攻击造成 " + dmg + hits + " 点伤害，并获得格挡" };
-  if (it === "ATTACK_BUFF" || it === "ATK_BUFF") return { cls: "atk", text: atkIcon + " " + dmg + hits + " " + spIcon("intents", "buff", 18, "💪"), tip: "准备攻击造成 " + dmg + hits + " 点伤害，并强化自身" };
-  if (it === "ATTACK_DEBUFF" || it === "ATK_DEB") return { cls: "atk", text: atkIcon + " " + dmg + hits + " " + spIcon("intents", "debuff1", 18, "🌀"), tip: "准备攻击造成 " + dmg + hits + " 点伤害，并施加负面效果" };
-  if (it === "DEFEND" || it === "DEF") return { cls: "def", text: spIcon("intents", "defend", 22, "🛡️"), tip: "准备进行防御，获得格挡" };
-  if (it === "DEFEND_BUFF" || it === "DEF_BUFF") return { cls: "def", text: spIcon("intents", "defend_buff", 22, "🛡️"), tip: "准备获得格挡并强化自身" };
-  if (it === "DEFEND_DEBUFF") return { cls: "def", text: spIcon("intents", "defend", 20, "🛡️") + spIcon("intents", "debuff1", 18, "🌀"), tip: "准备防御并施加负面状态" };
-  if (it === "BUFF") return { cls: "buf", text: spIcon("intents", "buff", 22, "💪"), tip: "准备使用强化效果" };
-  if (it === "DEBUFF" || it === "DEB") return { cls: "deb", text: spIcon("intents", "debuff1", 22, "🌀"), tip: "准备对你施加负面状态" };
-  if (it === "STRONG_DEBUFF" || it === "STRONG_DEB") return { cls: "deb", text: spIcon("intents", "debuff2", 22, "🌀"), tip: "准备对你施加极其强大的诅咒/负面效果" };
-  if (it === "SLEEP") return { cls: "def", text: spIcon("intents", "sleep", 22, "💤"), tip: "正在沉睡中" };
-  if (it === "STUN") return { cls: "def", text: spIcon("intents", "stun", 22, "💫"), tip: "已被眩晕，本回合无法行动" };
-  if (it === "ESCAPE" || it === "ESC") return { cls: "deb", text: spIcon("intents", "escape", 22, "🏃"), tip: "准备逃跑" };
-  return { cls: "buf", text: spIcon("intents", "magic", 22, "🔮"), tip: "准备发动特殊行动" };
+  if (it === "ATTACK" || it === "ATK") {
+    return { cls: "atk", text: atkIcon + dmgNumHtml, tip: "准备攻击，造成 " + dmg + hits + " 点伤害" };
+  }
+  if (it === "ATTACK_DEFEND" || it === "ATK_DEF") {
+    return {
+      cls: "atk",
+      text: '<span class="intent-sub-ico">' + spIcon("intents", "defend", 28, "🛡️") + '</span>' + atkIcon + dmgNumHtml,
+      tip: "准备攻击造成 " + dmg + hits + " 点伤害，并获得格挡"
+    };
+  }
+  if (it === "ATTACK_BUFF" || it === "ATK_BUFF") {
+    return {
+      cls: "atk",
+      text: '<span class="intent-sub-ico">' + spIcon("intents", "buff", 28, "💪") + '</span>' + atkIcon + dmgNumHtml,
+      tip: "准备攻击造成 " + dmg + hits + " 点伤害，并强化自身"
+    };
+  }
+  if (it === "ATTACK_DEBUFF" || it === "ATK_DEB") {
+    return {
+      cls: "atk",
+      text: '<span class="intent-sub-ico">' + spIcon("intents", "debuff1", 28, "🌀") + '</span>' + atkIcon + dmgNumHtml,
+      tip: "准备攻击造成 " + dmg + hits + " 点伤害，并施加负面效果"
+    };
+  }
+  if (it === "DEFEND" || it === "DEF") {
+    return { cls: "def", text: '<span class="intent-main-ico">' + spIcon("intents", "defend", 36, "🛡️") + '</span>', tip: "准备进行防御，获得格挡" };
+  }
+  if (it === "DEFEND_BUFF" || it === "DEF_BUFF") {
+    return { cls: "def", text: '<span class="intent-main-ico">' + spIcon("intents", "defend_buff", 38, "🛡️") + '</span>', tip: "准备获得格挡并强化自身" };
+  }
+  if (it === "DEFEND_DEBUFF") {
+    return {
+      cls: "def",
+      text: '<span class="intent-sub-ico">' + spIcon("intents", "debuff1", 26, "🌀") + '</span><span class="intent-main-ico">' + spIcon("intents", "defend", 34, "🛡️") + '</span>',
+      tip: "准备防御并施加负面状态"
+    };
+  }
+  if (it === "BUFF") {
+    return { cls: "buf", text: '<span class="intent-main-ico">' + spIcon("intents", "buff", 36, "💪") + '</span>', tip: "准备使用强化效果" };
+  }
+  if (it === "DEBUFF" || it === "DEB") {
+    return { cls: "deb", text: '<span class="intent-main-ico">' + spIcon("intents", "debuff1", 36, "🌀") + '</span>', tip: "准备对你施加负面状态" };
+  }
+  if (it === "STRONG_DEBUFF" || it === "STRONG_DEB") {
+    return { cls: "deb", text: '<span class="intent-main-ico">' + spIcon("intents", "debuff2", 38, "🌀") + '</span>', tip: "准备对你施加极其强大的诅咒/负面效果" };
+  }
+  if (it === "SLEEP") {
+    return { cls: "def", text: '<span class="intent-main-ico">' + spIcon("intents", "sleep", 36, "💤") + '</span>', tip: "正在沉睡中" };
+  }
+  if (it === "STUN") {
+    return { cls: "def", text: '<span class="intent-main-ico">' + spIcon("intents", "stun", 36, "💫") + '</span>', tip: "已被眩晕，本回合无法行动" };
+  }
+  if (it === "ESCAPE" || it === "ESC") {
+    return { cls: "deb", text: '<span class="intent-main-ico">' + spIcon("intents", "escape", 36, "🏃") + '</span>', tip: "准备逃跑" };
+  }
+  return { cls: "buf", text: '<span class="intent-main-ico">' + spIcon("intents", "magic", 36, "🔮") + '</span>', tip: "准备发动特殊行动" };
 }
 
 function renderCardElement(cardStr, st, bt, onClick, extraBadge) {
@@ -6259,13 +6984,11 @@ function renderCombatStage(st) {
     selectedTargetIdx = firstAlive !== -1 ? firstAlive : 0;
   }
 
-  // Full-stage Scene Backdrop & Vignette
+  // Full-stage Widescreen Scene Backdrop & Vignette
   const actSceneKey = st.a === 2 ? "TheCity" : (st.a >= 3 ? "TheBeyond" : "Exordium");
-  const sceneIdx = SPRITE_MANIFEST.events[actSceneKey] || 0;
-  const sCol = sceneIdx % 5, sRow = Math.floor(sceneIdx / 5);
   const bgDecor = document.createElement("div");
   bgDecor.className = "arena-bg-decor";
-  bgDecor.style.backgroundPosition = ((sCol / 4) * 100).toFixed(2) + "% " + ((sRow / 3) * 100).toFixed(2) + "%";
+  bgDecor.setAttribute("style", combatBgStyle(actSceneKey));
   layout.appendChild(bgDecor);
 
   const vignette = document.createElement("div");
@@ -6297,7 +7020,7 @@ function renderCombatStage(st) {
   }
 
   arena.addEventListener("click", (ev) => {
-    if (ev.target === arena || ev.target.classList.contains("enemies-column")) {
+    if (ev.target === arena) {
       if (selCardDef && selCardDef.target !== "E") {
         const cIdx = activeCardIdx;
         clearTargeting(false);
@@ -6308,35 +7031,34 @@ function renderCombatStage(st) {
     }
   });
 
-  // Hero Floor-standing Unit
+  // Hero Floor-standing Unit (Original STS: drawX = 1920 * 0.25 = 25%, drawY = floorY)
   const hero = document.createElement("div");
   hero.className = "sts-unit hero-unit";
-  const heroPws = Object.keys(bt.pw || {}).map(k => {
-    const meta = POWERS_META[k] || { name: k, icon: "✨" };
-    return '<span class="pw-chip ' + (meta.debuff ? "debuff" : "") + '" title="' + meta.name + '：' + (meta.desc || "") + '">' +
-      spIcon("powers", k, 15, meta.icon) + bt.pw[k] + '</span>';
-  }).join("");
+  const heroPws = renderPowerChipsHtml(bt.pw, bt);
+  const heroIntangible = ((bt.pw && bt.pw.Intangible) || 0) > 0;
+  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
 
   hero.innerHTML =
-    '<div class="sts-intent def" style="animation:none;font-size:11px;padding:1px 8px">第 ' + bt.t + ' 回合</div>' +
-    '<div class="sprite-stage-box">' +
-      '<div class="unit-shadow"></div>' +
-      spMonster("Ironclad", 110) +
+    '<div class="sprite-stage-box' + (heroIntangible ? ' is-intangible' : '') + '" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
+      '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
+      spMonster("Ironclad", heroSpec.size) +
     '</div>' +
-    '<div class="sts-hp-wrap">' +
-      (bt.b > 0 ? '<div class="sts-block-badge">' + spIcon("hud", "block", 26, "🛡️") + '<span class="blk-num">' + bt.b + '</span></div>' : '') +
-      '<div class="hp-bar-outer">' +
-        '<div class="hp-bar-inner ' + (bt.b > 0 ? "block-on" : "") + '" style="width:' + Math.max(0, Math.min(100, (st.hp / st.mhp) * 100)) + '%"></div>' +
-        '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
+    '<div class="sts-under-foot">' +
+      '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
+        (bt.b > 0 ? '<div class="sts-block-badge">' + spIcon("hud", "block", 26, "🛡️") + '<span class="blk-num">' + bt.b + '</span></div>' : '') +
+        '<div class="hp-bar-outer">' +
+          '<div class="hp-bar-inner ' + (bt.b > 0 ? "block-on" : "") + '" style="width:' + Math.max(0, Math.min(100, (st.hp / st.mhp) * 100)) + '%"></div>' +
+          '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
+        '</div>' +
       '</div>' +
-    '</div>' +
-    '<div class="power-row">' + heroPws + '</div>' +
-    '<div class="unit-name">铁甲战士</div>';
+      '<div class="power-row">' + heroPws + '</div>' +
+      '<div class="unit-name">铁甲战士</div>' +
+    '</div>';
   arena.appendChild(hero);
 
-  // Enemies Floor-standing Column
-  const enemiesCol = document.createElement("div");
-  enemiesCol.className = "enemies-column";
+  // Enemies Floor-Standing at Authentic Original STS Coordinates:
+  // drawX = 1920 * 0.75 + offsetX, drawY = floorY + offsetY
+  const totalEnemies = bt.m ? bt.m.length : 1;
 
   bt.m.forEach((m, idx) => {
     const unit = document.createElement("div");
@@ -6349,29 +7071,37 @@ function renderCombatStage(st) {
       (!isAlive && !m.st.halfDead ? " dead" : "");
     unit.setAttribute("data-enemy-idx", String(idx));
 
-    const intent = isAlive ? getMonsterIntentInfo(st, bt, m) : { cls: "def", text: m.st.halfDead ? "🌑 重生中" : "💀 已击败", tip: "" };
-    const mPws = Object.keys(m.pw || {}).map(k => {
-      const meta = POWERS_META[k] || { name: k, icon: "✨" };
-      return '<span class="pw-chip ' + (meta.debuff ? "debuff" : "") + '" title="' + meta.name + '：' + (meta.desc || "") + '">' +
-        spIcon("powers", k, 15, meta.icon) + bt.m[idx].pw[k] + '</span>';
-    }).join("");
+    const posVars = getMonsterStageCssVars(st, bt, m, idx);
+    unit.style.setProperty("--unit-x", posVars.leftPct);
+    unit.style.setProperty("--unit-off-y", posVars.offYPct);
+    unit.style.zIndex = String(posVars.zIdx);
+
+    const intent = isAlive ? getMonsterIntentInfo(st, bt, m) : { cls: "def", text: m.st.halfDead ? "🌑 重生中" : "", tip: "" };
+    const mPws = renderPowerChipsHtml(m.pw, m);
+    const mSpriteKey = getMonsterStateSpriteKey(m);
+    const mSpec = getMonsterVisualSpec(mSpriteKey, m.id, totalEnemies);
+    const mIntangible = ((m.pw && m.pw.Intangible) || 0) > 0;
+    const mHalfDead = Boolean(m.st && m.st.halfDead);
 
     unit.innerHTML =
       '<div class="sts-intent ' + intent.cls + '" title="' + (intent.tip || "") + '">' + intent.text + '</div>' +
-      '<div class="sprite-stage-box">' +
-        '<div class="unit-shadow"></div>' +
-        spMonster(m.id, 108) +
+      '<div class="sprite-stage-box' + (mSpec.fly ? ' is-flying' : '') + (mIntangible ? ' is-intangible' : '') + (mHalfDead ? ' is-half-dead' : '') + '" style="width:' + mSpec.size + 'px;height:' + mSpec.size + 'px">' +
+        '<div class="unit-shadow" style="width:' + mSpec.shadowW + 'px"></div>' +
+        spMonster(mSpriteKey, mSpec.size) +
+        renderHexaghostOrbsHtml(m) +
         (isAlive ? renderReticleCorners() : '') +
       '</div>' +
-      '<div class="sts-hp-wrap">' +
-        (m.b > 0 ? '<div class="sts-block-badge">' + spIcon("hud", "block", 26, "🛡️") + '<span class="blk-num">' + m.b + '</span></div>' : '') +
-        '<div class="hp-bar-outer">' +
-          '<div class="hp-bar-inner ' + (m.b > 0 ? "block-on" : "") + '" style="width:' + Math.max(0, Math.min(100, (m.hp / m.mhp) * 100)) + '%"></div>' +
-          '<div class="hp-bar-text">' + m.hp + '/' + m.mhp + '</div>' +
+      '<div class="sts-under-foot">' +
+        '<div class="sts-hp-wrap" style="width:' + mSpec.hpW + 'px">' +
+          (m.b > 0 ? '<div class="sts-block-badge">' + spIcon("hud", "block", 26, "🛡️") + '<span class="blk-num">' + m.b + '</span></div>' : '') +
+          '<div class="hp-bar-outer">' +
+            '<div class="hp-bar-inner ' + (m.b > 0 ? "block-on" : "") + '" style="width:' + Math.max(0, Math.min(100, (m.hp / m.mhp) * 100)) + '%"></div>' +
+            '<div class="hp-bar-text">' + m.hp + '/' + m.mhp + '</div>' +
+          '</div>' +
         '</div>' +
-      '</div>' +
-      '<div class="power-row">' + mPws + '</div>' +
-      '<div class="unit-name">' + m.name + '</div>';
+        '<div class="power-row">' + mPws + '</div>' +
+        '<div class="unit-name">' + m.name + '</div>' +
+      '</div>';
 
     if (isAlive) {
       unit.addEventListener("click", (ev) => {
@@ -6390,27 +7120,26 @@ function renderCombatStage(st) {
         }
       });
     }
-    enemiesCol.appendChild(unit);
+    arena.appendChild(unit);
   });
-  arena.appendChild(enemiesCol);
   layout.appendChild(arena);
 
   // 2. Original STS Bottom Dock (Left: Energy Orb + Draw Pile | Center: Fanned Hand | Right: End Turn + Discard/Exhaust Piles)
   const dock = document.createElement("div");
   dock.className = "combat-bottom-dock";
+  const countCircleHtml = spIcon("hud", "countCircle", 24, "");
 
   // Left Dock: Energy Orb + Draw Pile
   const leftDock = document.createElement("div");
   leftDock.className = "dock-side";
   leftDock.innerHTML =
     '<div class="sts-energy-orb ' + (bt.e <= 0 ? "empty-energy" : "") + '" title="当前能量 ' + bt.e + ' / ' + bt.me + '">' +
-      spIcon("hud", "energyRed", 58, "⚡") +
+      spIcon("hud", "energyRed", 68, "⚡") +
       '<div class="sts-energy-text">' + bt.e + '/' + bt.me + '</div>' +
     '</div>' +
     '<button class="sts-pile-btn" id="btn-draw-pile" title="点击查看抽牌堆（已打乱顺序）">' +
-      spIcon("hud", "drawPile", 46, "📘") +
-      '<span class="sts-pile-count">' + (bt.dr ? bt.dr.length : 0) + '</span>' +
-      '<span class="sts-pile-label">抽牌堆</span>' +
+      spIcon("hud", "drawPile", 50, "📘") +
+      '<span class="sts-pile-count">' + countCircleHtml + '<span class="cnt-txt">' + (bt.dr ? bt.dr.length : 0) + '</span></span>' +
     '</button>';
   leftDock.querySelector("#btn-draw-pile").addEventListener("click", () => {
     openCardPickerModal("📘 抽牌堆（共 " + (bt.dr ? bt.dr.length : 0) + " 张，顺序已打乱）", (bt.dr || []).slice().sort(), st, null);
@@ -6472,20 +7201,19 @@ function renderCombatStage(st) {
   // Right Dock: End Turn Button + Exhaust Pile + Discard Pile
   const rightDock = document.createElement("div");
   rightDock.className = "dock-side";
+  const endTurnStyle = uiPanelBgStyle(bt.e <= 0 ? "endTurnHover" : "endTurnBtn");
   rightDock.innerHTML =
-    '<button class="end-turn-btn" id="btn-end-turn">结束回合 (' + bt.t + ')</button>' +
+    '<button class="end-turn-btn" id="btn-end-turn" title="当前第 ' + bt.t + ' 回合，点击结束回合" style="' + endTurnStyle + '">结束回合</button>' +
     '<div style="display:flex;align-items:flex-end;gap:8px">' +
       (bt.ex && bt.ex.length > 0
-        ? '<button class="sts-pile-btn" id="btn-exhaust-pile" title="点击查看消耗堆" style="width:38px;height:38px">' +
-            spIcon("powers", "DarkEmbrace", 34, "💀") +
-            '<span class="sts-pile-count" style="background:#581c87;border-color:#c084fc">' + bt.ex.length + '</span>' +
-            '<span class="sts-pile-label">消耗</span>' +
+        ? '<button class="sts-pile-btn" id="btn-exhaust-pile" title="点击查看消耗堆" style="width:42px;height:42px">' +
+            spIcon("powers", "DarkEmbrace", 36, "💀") +
+            '<span class="sts-pile-count">' + countCircleHtml + '<span class="cnt-txt">' + bt.ex.length + '</span></span>' +
           '</button>'
         : '') +
       '<button class="sts-pile-btn" id="btn-discard-pile" title="点击查看弃牌堆">' +
-        spIcon("hud", "discardPile", 46, "📕") +
-        '<span class="sts-pile-count">' + (bt.di ? bt.di.length : 0) + '</span>' +
-        '<span class="sts-pile-label">弃牌堆</span>' +
+        spIcon("hud", "discardPile", 50, "📕") +
+        '<span class="sts-pile-count">' + countCircleHtml + '<span class="cnt-txt">' + (bt.di ? bt.di.length : 0) + '</span></span>' +
       '</button>' +
     '</div>';
 
@@ -6526,19 +7254,7 @@ function renderEventStage(st) {
 
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-event-stage";
-
-  // Full-stage Scene Backdrop & Vignette
-  const actSceneKey = st.a === 2 ? "TheCity" : (st.a >= 3 ? "TheBeyond" : "Exordium");
-  const sceneIdx = SPRITE_MANIFEST.events[actSceneKey] || 0;
-  const sCol = sceneIdx % 5, sRow = Math.floor(sceneIdx / 5);
-  const bgDecor = document.createElement("div");
-  bgDecor.className = "arena-bg-decor";
-  bgDecor.style.backgroundPosition = ((sCol / 4) * 100).toFixed(2) + "% " + ((sRow / 3) * 100).toFixed(2) + "%";
-  stageWrap.appendChild(bgDecor);
-
-  const vignette = document.createElement("div");
-  vignette.className = "arena-vignette";
-  stageWrap.appendChild(vignette);
+  appendStageSceneBackdrop(stageWrap, st);
 
   // Authentic STS Event Dialog Panel (images/ui/event/panel.png)
   const dialog = document.createElement("div");
@@ -6585,11 +7301,9 @@ let rewardCardModalOpen = false;
 
 function appendStageSceneBackdrop(container, st) {
   const actSceneKey = st.a === 2 ? "TheCity" : (st.a >= 3 ? "TheBeyond" : "Exordium");
-  const sceneIdx = SPRITE_MANIFEST.events[actSceneKey] || 0;
-  const sCol = sceneIdx % 5, sRow = Math.floor(sceneIdx / 5);
   const bgDecor = document.createElement("div");
   bgDecor.className = "arena-bg-decor";
-  bgDecor.style.backgroundPosition = ((sCol / 4) * 100).toFixed(2) + "% " + ((sRow / 3) * 100).toFixed(2) + "%";
+  bgDecor.setAttribute("style", combatBgStyle(actSceneKey));
   container.appendChild(bgDecor);
 
   const vignette = document.createElement("div");
@@ -6611,18 +7325,21 @@ function renderRewardStage(st) {
   stageWrap.className = "sts-reward-stage";
   appendStageSceneBackdrop(stageWrap, st);
 
-  // Ironclad standing in background on the left (just like original CombatRewardScreen)
+  // Ironclad standing at exact same floor coordinate (left: 25%, bottom: var(--sts-floor-y)) during CombatRewardScreen
   const heroBg = document.createElement("div");
   heroBg.className = "sts-stage-hero-bg";
+  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
   heroBg.innerHTML =
-    '<div class="sprite-stage-box">' +
-      '<div class="unit-shadow"></div>' +
-      spMonster("Ironclad", 112) +
+    '<div class="sprite-stage-box" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
+      '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
+      spMonster("Ironclad", heroSpec.size) +
     '</div>' +
-    '<div class="sts-hp-wrap" style="width:128px">' +
-      '<div class="hp-bar-outer">' +
-        '<div class="hp-bar-inner" style="width:' + Math.max(0, Math.min(100, (st.hp / st.mhp) * 100)) + '%"></div>' +
-        '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
+    '<div class="sts-under-foot">' +
+      '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
+        '<div class="hp-bar-outer">' +
+          '<div class="hp-bar-inner" style="width:' + Math.max(0, Math.min(100, (st.hp / st.mhp) * 100)) + '%"></div>' +
+          '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
+        '</div>' +
       '</div>' +
     '</div>';
   stageWrap.appendChild(heroBg);
@@ -6960,6 +7677,7 @@ function renderShopStage(st) {
 function renderRestStage(st) {
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-campfire-stage";
+  appendStageSceneBackdrop(stageWrap, st);
 
   // Flickering firelight + Ironclad resting shoulder silhouette (shoulder2.png)
   const glow = document.createElement("div");
@@ -7154,7 +7872,7 @@ function renderSettlementStage(st) {
         '<div style="display:flex;justify-content:space-between"><span>击败精英 / 首领</span><b>' + (st.ek || 0) + ' 精英 / ' + (st.bk || 0) + ' 首领</b></div>' +
         '<div style="display:flex;justify-content:space-between"><span>收集遗物 / 主牌组</span><b>' + (st.rel ? st.rel.length : 1) + ' 遗物 / ' + (st.dk ? st.dk.length : 10) + ' 张牌</b></div>' +
       '</div>' +
-      '<button class="end-turn-btn" id="btn-restart-run" style="width:100%">🔄 重新开启新一局尖塔</button>' +
+      '<button class="end-turn-btn" id="btn-restart-run" style="width:100%;' + uiPanelBgStyle("endTurnBtn") + '">🔄 重新开启新一局尖塔</button>' +
     '</div>';
 
   center.querySelector("#btn-restart-run").addEventListener("click", () => resetLocalRun());
@@ -7172,6 +7890,7 @@ function renderApp() {
   // 1. Original STS Top Bar
   const top = document.createElement("div");
   top.className = "top-hud";
+  top.setAttribute("style", uiPanelBgStyle("topBar"));
   const actInfo = ACT_INFO[st.a] || ACT_INFO[1];
   const yuan = ((st.pd || 0) / 100).toFixed(2);
 
@@ -7348,6 +8067,9 @@ try {
       localPlayerState = parsed.localPlayerState || parsed.currentData;
       localPending = parsed.localPending || 0;
       currentData = parsed.currentData;
+      if (Array.isArray(parsed.pendingActionsQueue)) {
+        pendingActionsQueue = parsed.pendingActionsQueue;
+      }
     }
   }
 } catch {}
@@ -7357,6 +8079,19 @@ if (!currentData) {
 }
 renderApp();
 
+function applyServerViewData(serverData) {
+  if (!serverData) return;
+  currentData = serverData;
+  localPlayerState = serverData;
+  localPending = serverData.pd || 0;
+  if (pendingActionsQueue.length > 0) {
+    runLocalJudge({ type: "batch", actions: pendingActionsQueue }, true);
+  } else {
+    persistSessionState();
+  }
+  renderApp();
+}
+
 if (window.hb) {
   if (typeof window.hb.ready === "function") {
     window.hb.ready().then(() => { hbConnected = true; }).catch(() => {});
@@ -7364,10 +8099,7 @@ if (window.hb) {
   window.hb.on("myView", (v) => {
     hbConnected = true;
     if (v && v.data) {
-      currentData = v.data;
-      localPlayerState = v.data;
-      localPending = v.data.pd || 0;
-      renderApp();
+      applyServerViewData(v.data);
     }
   });
   window.hb.on("view", (v) => {
@@ -7383,10 +8115,7 @@ if (window.hb) {
       const myV = await window.hb.myView();
       hbConnected = true;
       if (myV && myV.data) {
-        currentData = myV.data;
-        localPlayerState = myV.data;
-        localPending = myV.data.pd || 0;
-        renderApp();
+        applyServerViewData(myV.data);
         return;
       }
       const pubV = await window.hb.view();
