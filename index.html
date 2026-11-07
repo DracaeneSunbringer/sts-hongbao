@@ -838,52 +838,102 @@
     z-index: 8;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   }
-  /* Character Selection Bar in Neow Room */
-  .sts-char-select-bar {
-    position: absolute;
-    top: 12px; left: 16px;
-    z-index: 32;
-    display: flex; flex-direction: column; gap: 6px;
-    background: rgba(9, 13, 22, 0.86);
-    border: 1.5px solid rgba(245, 196, 81, 0.42);
+  /* ==================== ORIGINAL STS CHARACTER SELECT SCREEN (CharacterSelectScreen / CharacterOption) ==================== */
+  .sts-key-triangle {
+    position: relative; width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: help; flex-shrink: 0;
+  }
+  .sts-key-triangle .sp-icon {
+    position: absolute; inset: 0;
+  }
+  .sts-char-select-stage {
+    position: relative; width: 100%; height: 100%; min-height: 0;
+    overflow: hidden;
+  }
+  .sts-char-splash-bg {
+    position: absolute; inset: 0; z-index: 1;
+    transition: opacity 0.25s ease;
+  }
+  .sts-char-splash-vignette {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(6, 9, 16, 0.88) 0%, rgba(6, 9, 16, 0.58) 38%, rgba(6, 9, 16, 0.08) 72%, rgba(6, 9, 16, 0.45) 100%),
+      linear-gradient(180deg, rgba(6, 9, 16, 0.45) 0%, transparent 25%, transparent 68%, rgba(6, 9, 16, 0.88) 100%);
+  }
+  .sts-char-info-panel {
+    position: absolute; left: 6%; top: 13%; z-index: 10;
+    max-width: 430px;
+    display: flex; flex-direction: column; gap: 12px;
+    pointer-events: auto;
+  }
+  .sts-char-title {
+    font-size: 42px; font-weight: 900; color: #f5d08a;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.95), -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+  }
+  .sts-char-stats-row {
+    display: flex; align-items: center; gap: 22px;
+    font-size: 16px; font-weight: 900;
+    text-shadow: 0 2px 6px #000, -1px -1px 0 #000, 1px 1px 0 #000;
+  }
+  .sts-char-stat-item {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .sts-char-flavor {
+    font-size: 15px; line-height: 1.65; color: #e2e8f0;
+    text-shadow: 0 2px 6px #000, -1px -1px 0 #000, 1px 1px 0 #000;
+  }
+  .sts-char-relic-box {
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-top: 4px; padding: 10px 14px;
+    background: rgba(9, 13, 22, 0.68);
+    border: 1px solid rgba(245, 196, 81, 0.35);
     border-radius: 10px;
-    padding: 8px 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.85);
     backdrop-filter: blur(4px);
-    max-width: 390px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.65);
   }
-  .sts-char-select-head {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 11.5px; font-weight: 900; color: #fde047;
-    letter-spacing: 0.5px;
+  .sts-char-relic-info {
+    display: flex; flex-direction: column; gap: 3px;
   }
-  .sts-char-select-row {
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  .sts-char-relic-name {
+    font-size: 15px; font-weight: 900; color: #fde047;
+    text-shadow: 0 1px 3px #000;
   }
-  .sts-char-select-btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 9px 4px 5px;
-    border-radius: 8px;
-    background: rgba(30, 41, 59, 0.78);
-    border: 1.5px solid rgba(148, 163, 184, 0.32);
-    color: #cbd5e1;
-    font-size: 12px; font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.14s, border-color 0.14s, background 0.14s, box-shadow 0.14s;
+  .sts-char-relic-desc {
+    font-size: 13px; line-height: 1.48; color: #cbd5e1;
+    text-shadow: 0 1px 2px #000;
   }
-  .sts-char-select-btn:hover {
-    transform: translateY(-1px);
-    border-color: rgba(245, 196, 81, 0.75);
-    color: #fff;
+  .sts-char-options-dock {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 15;
+    display: flex; align-items: center; gap: 22px;
   }
-  .sts-char-select-btn.active {
-    background: linear-gradient(180deg, rgba(245, 196, 81, 0.28) 0%, rgba(180, 83, 9, 0.35) 100%);
-    border-color: #f5c451;
-    color: #fef08a;
-    box-shadow: 0 0 12px rgba(245, 196, 81, 0.45);
+  .sts-char-opt-btn {
+    position: relative; width: 84px; height: 84px;
+    border: none; background-color: transparent; padding: 0;
+    cursor: pointer; border-radius: 10px;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.85));
+    transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.16s;
   }
-  .sts-char-select-desc {
-    font-size: 11px; color: #94a3b8; line-height: 1.38;
+  .sts-char-opt-btn:hover {
+    transform: scale(1.08);
+    filter: brightness(1.15) drop-shadow(0 8px 18px rgba(0,0,0,0.9));
+  }
+  .sts-char-opt-btn.active {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.65));
+  }
+  .sts-char-opt-art {
+    position: absolute; inset: 4px; border-radius: 8px; z-index: 2;
+  }
+  @keyframes stsCharHiPulse {
+    0%, 100% { transform: scale(1.06); opacity: 0.92; }
+    50% { transform: scale(1.13); opacity: 1; }
+  }
+  .sts-char-opt-hi {
+    position: absolute; inset: -10px; pointer-events: none; z-index: 1;
+    animation: stsCharHiPulse 1.8s ease-in-out infinite;
   }
 
   /* Defect Orb Slots Arc & Watcher Stance Aura */
@@ -1569,9 +1619,15 @@
     .sts-neow-speech-txt { font-size: 12px; }
     .sts-neow-choices-dock { right: 3%; left: 3%; width: 94%; bottom: 2.5%; gap: 5px; }
     .sts-neow-choices-dock .sts-event-opt-btn { min-height: 36px; padding: 5px 12px; font-size: 11.5px; }
-    .sts-char-select-bar { top: 6px; left: 6px; right: 6px; max-width: none; padding: 6px 8px; }
-    .sts-char-select-btn { padding: 3px 6px 3px 4px; font-size: 11px; }
-    .sts-char-select-desc { display: none; }
+    .sts-char-info-panel { left: 4%; right: 4%; top: 6%; max-width: none; gap: 6px; }
+    .sts-char-title { font-size: 26px; }
+    .sts-char-stats-row { font-size: 13.5px; gap: 14px; }
+    .sts-char-flavor { font-size: 12.5px; line-height: 1.45; }
+    .sts-char-relic-box { padding: 8px 10px; gap: 8px; }
+    .sts-char-relic-name { font-size: 13px; }
+    .sts-char-relic-desc { font-size: 11.5px; }
+    .sts-char-options-dock { bottom: 14px; left: 4%; transform: none; gap: 10px; }
+    .sts-char-opt-btn { width: 56px; height: 56px; }
   }
 </style>
 </head>
@@ -1582,7 +1638,7 @@
 <div id="sts-vfx-layer"></div>
 
 <script>
-const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123,"A Thousand Cuts":124,"Accuracy":125,"Acrobatics":126,"Adrenaline":127,"After Image":128,"Venomology":129,"All Out Attack":130,"Backflip":131,"Backstab":132,"Bane":133,"Blade Dance":134,"Blur":135,"Bouncing Flask":136,"Bullet Time":137,"Burst":138,"Calculated Gamble":139,"Caltrops":140,"Catalyst":141,"Choke":142,"Cloak And Dagger":143,"Concentrate":144,"Corpse Explosion":145,"Crippling Poison":146,"Dagger Spray":147,"Dagger Throw":148,"Dash":149,"Deadly Poison":150,"Defend_G":151,"Deflect":152,"Die Die Die":153,"Distraction":154,"Dodge and Roll":155,"Doppelganger":156,"Endless Agony":157,"Envenom":158,"Escape Plan":159,"Eviscerate":160,"Expertise":161,"Finisher":162,"Flechettes":163,"Flying Knee":164,"Footwork":165,"Glass Knife":166,"Grand Finale":167,"Heel Hook":168,"Infinite Blades":169,"Leg Sweep":170,"Malaise":171,"Masterful Stab":172,"Neutralize":173,"Night Terror":174,"Noxious Fumes":175,"Outmaneuver":176,"Phantasmal Killer":177,"PiercingWail":178,"Poisoned Stab":179,"Predator":180,"Prepared":181,"Quick Slash":182,"Reflex":183,"Riddle With Holes":184,"Setup":185,"Skewer":186,"Slice":187,"Underhanded Strike":188,"Storm of Steel":189,"Strike_G":190,"Sucker Punch":191,"Survivor":192,"Tactician":193,"Terror":194,"Tools of the Trade":195,"Unload":196,"Well Laid Plans":197,"Wraith Form v2":198,"Aggregate":199,"All For One":200,"Amplify":201,"Auto Shields":202,"Ball Lightning":203,"Barrage":204,"Beam Cell":205,"Biased Cognition":206,"Blizzard":207,"BootSequence":208,"Buffer":209,"Capacitor":210,"Chaos":211,"Chill":212,"Gash":213,"Cold Snap":214,"Compile Driver":215,"Conserve Battery":216,"Consume":217,"Coolheaded":218,"Core Surge":219,"Creative AI":220,"Darkness":221,"Defend_B":222,"Defragment":223,"Doom and Gloom":224,"Double Energy":225,"Dualcast":226,"Echo Form":227,"Electrodynamics":228,"Undo":229,"FTL":230,"Fission":231,"Force Field":232,"Fusion":233,"Genetic Algorithm":234,"Glacier":235,"Go for the Eyes":236,"Heatsinks":237,"Hello World":238,"Hologram":239,"Hyperbeam":240,"Leap":241,"Lockon":242,"Loop":243,"Machine Learning":244,"Melter":245,"Meteor Strike":246,"Multi-Cast":247,"Steam Power":248,"Rainbow":249,"Reboot":250,"Rebound":251,"Redo":252,"Recycle":253,"Reinforced Body":254,"Reprogram":255,"Rip and Tear":256,"Scrape":257,"Seek":258,"Self Repair":259,"Skim":260,"Stack":261,"Static Discharge":262,"Steam":263,"Storm":264,"Streamline":265,"Strike_B":266,"Sunder":267,"Sweeping Beam":268,"Tempest":269,"Thunder Strike":270,"Turbo":271,"White Noise":272,"Zap":273,"Alpha":274,"BattleHymn":275,"Blasphemy":276,"BowlingBash":277,"Brilliance":278,"CarveReality":279,"Collect":280,"Conclude":281,"ConjureBlade":282,"Consecrate":283,"Crescendo":284,"CrushJoints":285,"CutThroughFate":286,"DeceiveReality":287,"Defend_P":288,"DeusExMachina":289,"DevaForm":290,"Devotion":291,"EmptyBody":292,"EmptyFist":293,"EmptyMind":294,"Eruption":295,"Establishment":296,"Evaluate":297,"Fasting2":298,"FearNoEvil":299,"FlurryOfBlows":300,"FlyingSleeves":301,"FollowUp":302,"ForeignInfluence":303,"Wireheading":304,"Halt":305,"Indignation":306,"InnerPeace":307,"Judgement":308,"JustLucky":309,"LessonLearned":310,"LikeWater":311,"MasterReality":312,"Meditate":313,"MentalFortress":314,"Nirvana":315,"Omniscience":316,"Perseverance":317,"Pray":318,"PathToVictory":319,"Prostrate":320,"Protect":321,"Ragnarok":322,"ReachHeaven":323,"Adaptation":324,"Sanctity":325,"SandsOfTime":326,"SashWhip":327,"Scrawl":328,"SignatureMove":329,"Vengeance":330,"SpiritShield":331,"Strike_P":332,"Study":333,"Swivel":334,"TalkToTheHand":335,"Tantrum":336,"ThirdEye":337,"ClearTheMind":338,"Vault":339,"Vigilance":340,"Wallop":341,"WaveOfTheHand":342,"Weave":343,"WheelKick":344,"WindmillStrike":345,"Wish":346,"Worship":347,"WreathOfFlame":348,"Beta":349,"Expunger":350,"Insight":351,"Miracle":352,"Omega":353,"Safety":354,"Shiv":355,"Smite":356,"ThroughViolence":357},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"TheSilent":74,"Defect":75,"Watcher":76,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118,"Ring of the Snake":119,"Ring of the Serpent":120,"Snecko Skull":121,"Ninja Scroll":122,"Paper Krane":123,"Tough Bandages":124,"Tingsha":125,"TwistedFunnel":126,"WristBlade":127,"Cracked Core":128,"FrozenCore":129,"DataDisk":130,"Symbiotic Virus":131,"Cables":132,"Emotion Chip":133,"Runic Capacitor":134,"Inserter":135,"Nuclear Battery":136,"PureWater":137,"HolyWater":138,"Damaru":139,"TeardropLocket":140,"Yang":141,"CloakClasp":142,"GoldenEye":143,"VioletLotus":144},"powers":{"Strength":145,"Dexterity":146,"Vulnerable":147,"Weak":148,"Frail":149,"Ritual":150,"CurlUp":151,"SporeCloud":152,"Metallicize":153,"PlatedArmor":154,"Artifact":155,"Anger":156,"Thievery":157,"ModeShift":158,"SharpHide":159,"Split":160,"Flight":161,"Malleable":162,"Confusion":163,"Entangled":164,"Hex":165,"NoDraw":166,"NoBlock":167,"DrawReduction":168,"Constricted":169,"LoseStrength":170,"LoseDexterity":171,"Shackled":172,"NextTurnBlock":173,"FlameBarrier":174,"Rage":156,"DoubleTap":175,"Duplication":176,"Combust":177,"DarkEmbrace":178,"Evolve":179,"FeelNoPain":180,"FireBreathing":181,"Rupture":182,"Barricade":183,"Berserk":184,"Brutality":185,"Corruption":186,"DemonForm":187,"Juggernaut":188,"Mayhem":189,"Panache":190,"Sadistic":191,"TheBomb":192,"Regen":193,"Intangible":194,"Buffer":195,"Thorns":196,"PainfulStabs":197,"Minion":198,"Regrow":199,"Slow":200,"Explosive":201,"Fading":202,"Shifting":203,"Reactive":204,"RegenerateMonster":193,"Curiosity":205,"Unawakened":206,"TimeWarp":207,"GenericStrengthUp":145,"Poison":208,"Accuracy":209,"AfterImage":210,"AThousandCuts":211,"Burst":212,"CorpseExplosion":213,"Choke":214,"Envenom":215,"InfiniteBlades":216,"NoxiousFumes":217,"Phantasmal":218,"DoubleDamage":219,"ToolsOfTheTrade":220,"WellLaidPlans":221,"WraithForm":222,"Blur":223,"NextTurnEnergy":224,"DrawCardNextTurn":225,"Nightmare":226,"Focus":227,"Bias":171,"CreativeAI":228,"EchoForm":229,"Electrodynamics":230,"Heatsinks":231,"HelloWorld":232,"Loop":233,"MachineLearning":234,"SelfRepair":235,"StaticDischarge":236,"Storm":237,"LockOn":238,"Amplify":176,"Rebound":239,"Equilibrium":221,"Mantra":240,"BattleHymn":241,"DevaForm":242,"Devotion":243,"Establishment":244,"Fasting":245,"Foresight":246,"LikeWater":247,"MasterReality":248,"MentalFortress":249,"Nirvana":250,"Rushdown":251,"Study":252,"WaveOfTheHand":253,"Vigor":254,"FreeAttackPower":255,"Mark":256,"BlockReturn":257,"SimmeringFury":156,"Collect":258,"EndTurnDeath":259,"Omega":260},"potions":{"Block Potion":261,"Fire Potion":262,"Explosive Potion":263,"FearPotion":264,"Weak Potion":265,"Strength Potion":266,"Dexterity Potion":267,"SpeedPotion":268,"SteroidPotion":269,"Swift Potion":270,"Energy Potion":271,"BloodPotion":272,"BlessingOfTheForge":273,"AttackPotion":274,"SkillPotion":275,"PowerPotion":276,"Regen Potion":277,"Ancient Potion":278,"EssenceOfSteel":279,"LiquidBronze":280,"DuplicationPotion":281,"CultistPotion":282,"Fruit Juice":283,"FairyPotion":284},"intents":{"attack_1":285,"attack_2":286,"attack_3":287,"attack_4":288,"attack_5":289,"attack_6":290,"attack_7":291,"defend":292,"defend_buff":293,"buff":294,"debuff1":295,"debuff2":296,"magic":297,"sleep":298,"stun":299,"unknown":300,"escape":301},"map":{"M":302,"E":303,"?":304,"R":305,"$":306,"T":307,"TheGuardian":308,"Hexaghost":309,"SlimeBoss":310,"BronzeAutomaton":311,"TheCollector":312,"Champ":313,"AwakenedOne":314,"TimeEater":315,"Donu and Deca":316},"hud":{"heart":317,"gold":318,"floor":319,"deck":320,"map":321,"block":322,"energyRed":323,"energyGreen":324,"energyBlue":325,"energyPurple":326,"orb_lightning":327,"orb_frost":328,"orb_dark":329,"orb_plasma":330,"orb_empty":331,"char_ironclad":332,"char_silent":333,"char_defect":334,"char_watcher":335,"drawPile":336,"discardPile":337,"reticleCorner":338,"reticleArrow":339,"endTurn":340,"endTurnGlow":341,"proceed":342,"potionSlot":343,"countCircle":344},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11,"attack_common_G":12,"attack_uncommon_G":13,"attack_rare_G":14,"skill_common_G":15,"skill_uncommon_G":16,"skill_rare_G":17,"power_common_G":18,"power_uncommon_G":19,"power_rare_G":20,"attack_common_B":21,"attack_uncommon_B":22,"attack_rare_B":23,"skill_common_B":24,"skill_uncommon_B":25,"skill_rare_B":26,"power_common_B":27,"power_uncommon_B":28,"power_rare_B":29,"attack_common_P":30,"attack_uncommon_P":31,"attack_rare_P":32,"skill_common_P":33,"skill_uncommon_P":34,"skill_rare_P":35,"power_common_P":36,"power_uncommon_P":37,"power_rare_P":38},"uiPanels":{"sheetW":1032,"sheetH":2900,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"silentShoulder":{"x":0,"y":2732,"w":204,"h":164},"defectShoulder":{"x":208,"y":2732,"w":204,"h":164},"watcherShoulder":{"x":416,"y":2732,"w":204,"h":164},"silentCorpse":{"x":628,"y":2732,"w":184,"h":52},"defectCorpse":{"x":628,"y":2788,"w":184,"h":52},"watcherCorpse":{"x":628,"y":2844,"w":184,"h":52},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":2480,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560}}};
+const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123,"A Thousand Cuts":124,"Accuracy":125,"Acrobatics":126,"Adrenaline":127,"After Image":128,"Venomology":129,"All Out Attack":130,"Backflip":131,"Backstab":132,"Bane":133,"Blade Dance":134,"Blur":135,"Bouncing Flask":136,"Bullet Time":137,"Burst":138,"Calculated Gamble":139,"Caltrops":140,"Catalyst":141,"Choke":142,"Cloak And Dagger":143,"Concentrate":144,"Corpse Explosion":145,"Crippling Poison":146,"Dagger Spray":147,"Dagger Throw":148,"Dash":149,"Deadly Poison":150,"Defend_G":151,"Deflect":152,"Die Die Die":153,"Distraction":154,"Dodge and Roll":155,"Doppelganger":156,"Endless Agony":157,"Envenom":158,"Escape Plan":159,"Eviscerate":160,"Expertise":161,"Finisher":162,"Flechettes":163,"Flying Knee":164,"Footwork":165,"Glass Knife":166,"Grand Finale":167,"Heel Hook":168,"Infinite Blades":169,"Leg Sweep":170,"Malaise":171,"Masterful Stab":172,"Neutralize":173,"Night Terror":174,"Noxious Fumes":175,"Outmaneuver":176,"Phantasmal Killer":177,"PiercingWail":178,"Poisoned Stab":179,"Predator":180,"Prepared":181,"Quick Slash":182,"Reflex":183,"Riddle With Holes":184,"Setup":185,"Skewer":186,"Slice":187,"Underhanded Strike":188,"Storm of Steel":189,"Strike_G":190,"Sucker Punch":191,"Survivor":192,"Tactician":193,"Terror":194,"Tools of the Trade":195,"Unload":196,"Well Laid Plans":197,"Wraith Form v2":198,"Aggregate":199,"All For One":200,"Amplify":201,"Auto Shields":202,"Ball Lightning":203,"Barrage":204,"Beam Cell":205,"Biased Cognition":206,"Blizzard":207,"BootSequence":208,"Buffer":209,"Capacitor":210,"Chaos":211,"Chill":212,"Gash":213,"Cold Snap":214,"Compile Driver":215,"Conserve Battery":216,"Consume":217,"Coolheaded":218,"Core Surge":219,"Creative AI":220,"Darkness":221,"Defend_B":222,"Defragment":223,"Doom and Gloom":224,"Double Energy":225,"Dualcast":226,"Echo Form":227,"Electrodynamics":228,"Undo":229,"FTL":230,"Fission":231,"Force Field":232,"Fusion":233,"Genetic Algorithm":234,"Glacier":235,"Go for the Eyes":236,"Heatsinks":237,"Hello World":238,"Hologram":239,"Hyperbeam":240,"Leap":241,"Lockon":242,"Loop":243,"Machine Learning":244,"Melter":245,"Meteor Strike":246,"Multi-Cast":247,"Steam Power":248,"Rainbow":249,"Reboot":250,"Rebound":251,"Redo":252,"Recycle":253,"Reinforced Body":254,"Reprogram":255,"Rip and Tear":256,"Scrape":257,"Seek":258,"Self Repair":259,"Skim":260,"Stack":261,"Static Discharge":262,"Steam":263,"Storm":264,"Streamline":265,"Strike_B":266,"Sunder":267,"Sweeping Beam":268,"Tempest":269,"Thunder Strike":270,"Turbo":271,"White Noise":272,"Zap":273,"Alpha":274,"BattleHymn":275,"Blasphemy":276,"BowlingBash":277,"Brilliance":278,"CarveReality":279,"Collect":280,"Conclude":281,"ConjureBlade":282,"Consecrate":283,"Crescendo":284,"CrushJoints":285,"CutThroughFate":286,"DeceiveReality":287,"Defend_P":288,"DeusExMachina":289,"DevaForm":290,"Devotion":291,"EmptyBody":292,"EmptyFist":293,"EmptyMind":294,"Eruption":295,"Establishment":296,"Evaluate":297,"Fasting2":298,"FearNoEvil":299,"FlurryOfBlows":300,"FlyingSleeves":301,"FollowUp":302,"ForeignInfluence":303,"Wireheading":304,"Halt":305,"Indignation":306,"InnerPeace":307,"Judgement":308,"JustLucky":309,"LessonLearned":310,"LikeWater":311,"MasterReality":312,"Meditate":313,"MentalFortress":314,"Nirvana":315,"Omniscience":316,"Perseverance":317,"Pray":318,"PathToVictory":319,"Prostrate":320,"Protect":321,"Ragnarok":322,"ReachHeaven":323,"Adaptation":324,"Sanctity":325,"SandsOfTime":326,"SashWhip":327,"Scrawl":328,"SignatureMove":329,"Vengeance":330,"SpiritShield":331,"Strike_P":332,"Study":333,"Swivel":334,"TalkToTheHand":335,"Tantrum":336,"ThirdEye":337,"ClearTheMind":338,"Vault":339,"Vigilance":340,"Wallop":341,"WaveOfTheHand":342,"Weave":343,"WheelKick":344,"WindmillStrike":345,"Wish":346,"Worship":347,"WreathOfFlame":348,"Beta":349,"Expunger":350,"Insight":351,"Miracle":352,"Omega":353,"Safety":354,"Shiv":355,"Smite":356,"ThroughViolence":357},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"TheSilent":74,"Defect":75,"Watcher":76,"SpireShield":77,"SpireSpear":78,"CorruptHeart":79,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118,"Ring of the Snake":119,"Ring of the Serpent":120,"Snecko Skull":121,"Ninja Scroll":122,"Paper Krane":123,"Tough Bandages":124,"Tingsha":125,"TwistedFunnel":126,"WristBlade":127,"Cracked Core":128,"FrozenCore":129,"DataDisk":130,"Symbiotic Virus":131,"Cables":132,"Emotion Chip":133,"Runic Capacitor":134,"Inserter":135,"Nuclear Battery":136,"PureWater":137,"HolyWater":138,"Damaru":139,"TeardropLocket":140,"Yang":141,"CloakClasp":142,"GoldenEye":143,"VioletLotus":144},"powers":{"Strength":145,"Dexterity":146,"Vulnerable":147,"Weak":148,"Frail":149,"Ritual":150,"CurlUp":151,"SporeCloud":152,"Metallicize":153,"PlatedArmor":154,"Artifact":155,"Anger":156,"Thievery":157,"ModeShift":158,"SharpHide":159,"Split":160,"Flight":161,"Malleable":162,"Confusion":163,"Entangled":164,"Hex":165,"NoDraw":166,"NoBlock":167,"DrawReduction":168,"Constricted":169,"LoseStrength":170,"LoseDexterity":171,"Shackled":172,"NextTurnBlock":173,"FlameBarrier":174,"Rage":156,"DoubleTap":175,"Duplication":176,"Combust":177,"DarkEmbrace":178,"Evolve":179,"FeelNoPain":180,"FireBreathing":181,"Rupture":182,"Barricade":183,"Berserk":184,"Brutality":185,"Corruption":186,"DemonForm":187,"Juggernaut":188,"Mayhem":189,"Panache":190,"Sadistic":191,"TheBomb":192,"Regen":193,"Intangible":194,"Buffer":195,"Thorns":196,"PainfulStabs":197,"Minion":198,"Regrow":199,"Slow":200,"Explosive":201,"Fading":202,"Shifting":203,"Reactive":204,"RegenerateMonster":193,"Curiosity":205,"Unawakened":206,"TimeWarp":207,"GenericStrengthUp":145,"Poison":208,"Accuracy":209,"AfterImage":210,"AThousandCuts":211,"Burst":212,"CorpseExplosion":213,"Choke":214,"Envenom":215,"InfiniteBlades":216,"NoxiousFumes":217,"Phantasmal":218,"DoubleDamage":219,"ToolsOfTheTrade":220,"WellLaidPlans":221,"WraithForm":222,"Blur":223,"NextTurnEnergy":224,"DrawCardNextTurn":225,"Nightmare":226,"Focus":227,"Bias":171,"CreativeAI":228,"EchoForm":229,"Electrodynamics":230,"Heatsinks":231,"HelloWorld":232,"Loop":233,"MachineLearning":234,"SelfRepair":235,"StaticDischarge":236,"Storm":237,"LockOn":238,"Amplify":176,"Rebound":239,"Equilibrium":221,"Mantra":240,"BattleHymn":241,"DevaForm":242,"Devotion":243,"Establishment":244,"Fasting":245,"Foresight":246,"LikeWater":247,"MasterReality":248,"MentalFortress":249,"Nirvana":250,"Rushdown":251,"Study":252,"WaveOfTheHand":253,"Vigor":254,"FreeAttackPower":255,"Mark":256,"BlockReturn":257,"SimmeringFury":156,"Collect":258,"EndTurnDeath":259,"Omega":260,"BeatOfDeath":261,"Invincible":262,"Surrounded":263,"BackAttack":264},"potions":{"Block Potion":265,"Fire Potion":266,"Explosive Potion":267,"FearPotion":268,"Weak Potion":269,"Strength Potion":270,"Dexterity Potion":271,"SpeedPotion":272,"SteroidPotion":273,"Swift Potion":274,"Energy Potion":275,"BloodPotion":276,"BlessingOfTheForge":277,"AttackPotion":278,"SkillPotion":279,"PowerPotion":280,"Regen Potion":281,"Ancient Potion":282,"EssenceOfSteel":283,"LiquidBronze":284,"DuplicationPotion":285,"CultistPotion":286,"Fruit Juice":287,"FairyPotion":288},"intents":{"attack_1":289,"attack_2":290,"attack_3":291,"attack_4":292,"attack_5":293,"attack_6":294,"attack_7":295,"defend":296,"defend_buff":297,"buff":298,"debuff1":299,"debuff2":300,"magic":301,"sleep":302,"stun":303,"unknown":304,"escape":305},"map":{"M":306,"E":307,"?":308,"R":309,"$":310,"T":311,"TheGuardian":312,"Hexaghost":313,"SlimeBoss":314,"BronzeAutomaton":315,"TheCollector":316,"Champ":317,"AwakenedOne":318,"TimeEater":319,"Donu and Deca":320,"CorruptHeart":321},"hud":{"heart":322,"gold":323,"floor":324,"deck":325,"map":326,"block":327,"energyRed":328,"energyGreen":329,"energyBlue":330,"energyPurple":331,"orb_lightning":332,"orb_frost":333,"orb_dark":334,"orb_plasma":335,"orb_empty":336,"char_ironclad":337,"char_silent":338,"char_defect":339,"char_watcher":340,"drawPile":341,"discardPile":342,"reticleCorner":343,"reticleArrow":344,"endTurn":345,"endTurnGlow":346,"proceed":347,"potionSlot":348,"countCircle":349,"key_slots":350,"key_red":351,"key_green":352,"key_blue":353,"ruby_key":354,"emerald_key":355,"sapphire_key":356},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11,"attack_common_G":12,"attack_uncommon_G":13,"attack_rare_G":14,"skill_common_G":15,"skill_uncommon_G":16,"skill_rare_G":17,"power_common_G":18,"power_uncommon_G":19,"power_rare_G":20,"attack_common_B":21,"attack_uncommon_B":22,"attack_rare_B":23,"skill_common_B":24,"skill_uncommon_B":25,"skill_rare_B":26,"power_common_B":27,"power_uncommon_B":28,"power_rare_B":29,"attack_common_P":30,"attack_uncommon_P":31,"attack_rare_P":32,"skill_common_P":33,"skill_uncommon_P":34,"skill_rare_P":35,"power_common_P":36,"power_uncommon_P":37,"power_rare_P":38},"uiPanels":{"sheetW":1032,"sheetH":2900,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"silentShoulder":{"x":0,"y":2732,"w":204,"h":164},"defectShoulder":{"x":208,"y":2732,"w":204,"h":164},"watcherShoulder":{"x":416,"y":2732,"w":204,"h":164},"silentCorpse":{"x":628,"y":2732,"w":184,"h":52},"defectCorpse":{"x":628,"y":2788,"w":184,"h":52},"watcherCorpse":{"x":628,"y":2844,"w":184,"h":52},"camp_recall":{"x":816,"y":2732,"w":144,"h":96},"charBtn_IRONCLAD":{"x":520,"y":2512,"w":96,"h":96},"charBtn_THE_SILENT":{"x":620,"y":2512,"w":96,"h":96},"charBtn_DEFECT":{"x":720,"y":2512,"w":96,"h":96},"charBtn_WATCHER":{"x":820,"y":2512,"w":96,"h":96},"charBtn_highlight":{"x":920,"y":2512,"w":96,"h":96},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74},"boss_CorruptHeart":{"x":924,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":3664,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560},"TheEnding":{"x":0,"y":2480,"w":1000,"h":560},"portrait_IRONCLAD":{"x":0,"y":3040,"w":500,"h":312},"portrait_THE_SILENT":{"x":500,"y":3040,"w":500,"h":312},"portrait_DEFECT":{"x":0,"y":3352,"w":500,"h":312},"portrait_WATCHER":{"x":500,"y":3352,"w":500,"h":312}}};
 
 // ==================== 1. Deterministic PRNG ====================
 function Rng(seed) {
@@ -1633,6 +1689,14 @@ function hashStr(str) {
 
 // ==================== 2. Authentic 15x7 MapGenerator + RoomTypeAssigner ====================
 function generateActMap(seed, act) {
+  if (act === 4) {
+    const rows4 = [];
+    for (let y = 0; y < 15; y++) rows4.push([]);
+    rows4[0] = [{ x: 3, y: 0, t: "R", e: [3] }];
+    rows4[1] = [{ x: 3, y: 1, t: "$", e: [3] }];
+    rows4[2] = [{ x: 3, y: 2, t: "E", e: [3] }];
+    return rows4;
+  }
   const rng = Rng((seed ^ Math.imul(act || 1, 0x9E3779B9)) >>> 0);
   const H = 15, W = 7, density = 6;
   const grid = [];
@@ -1759,14 +1823,25 @@ function generateActMap(seed, act) {
   }
 
   const rows = [];
+  const eliteNodes = [];
   for (let y = 0; y < H; y++) {
     const r = [];
     for (let x = 0; x < W; x++) {
       const n = grid[y][x];
       const active = y === 0 ? n.edges.length > 0 : n.parents.length > 0;
-      if (active) r.push({ x, y, t: n.type || "M", e: n.edges });
+      if (active) {
+        const item = { x, y, t: n.type || "M", e: n.edges };
+        if (item.t === "E") eliteNodes.push(item);
+        r.push(item);
+      }
     }
     rows.push(r);
+  }
+  if (eliteNodes.length > 0) {
+    rng.pick(eliteNodes).be = 1;
+  } else if (rows[6] && rows[6][0]) {
+    rows[6][0].t = "E";
+    rows[6][0].be = 1;
   }
   return rows;
 }
@@ -1774,7 +1849,8 @@ function generateActMap(seed, act) {
 const ACT_INFO = {
   1: { id: "Exordium", name: "第一幕 · 塔底", sub: "Exordium", bosses: ["TheGuardian", "Hexaghost", "SlimeBoss"] },
   2: { id: "TheCity", name: "第二幕 · 城市", sub: "The City", bosses: ["BronzeAutomaton", "TheCollector", "Champ"] },
-  3: { id: "TheBeyond", name: "第三幕 · 高塔深处", sub: "The Beyond", bosses: ["AwakenedOne", "TimeEater", "Donu and Deca"] }
+  3: { id: "TheBeyond", name: "第三幕 · 高塔深处", sub: "The Beyond", bosses: ["AwakenedOne", "TimeEater", "Donu and Deca"] },
+  4: { id: "TheEnding", name: "第四幕 · 终局", sub: "The Ending", bosses: ["CorruptHeart", "CorruptHeart", "CorruptHeart"] }
 };
 
 const CHAR_META = {
@@ -2609,7 +2685,11 @@ const POWERS_META = {
   "SimmeringFury": { name: "怒火中烧", icon: "💢", desc: "下回合开始时进入【愤怒】并抽 !A! 张牌。" },
   "Collect": { name: "收集", icon: "💎", desc: "接下来 !A! 回合开始时，将一张【奇迹+】加入手牌。" },
   "EndTurnDeath": { name: "渎神", icon: "💀", debuff: true, desc: "在下回合开始时死亡。" },
-  "Omega": { name: "欧米伽", icon: "Ω", desc: "每回合结束时，对所有敌人造成 !A! 点伤害。" }
+  "Omega": { name: "欧米伽", icon: "Ω", desc: "每回合结束时，对所有敌人造成 !A! 点伤害。" },
+  "BeatOfDeath": { name: "死亡律动", icon: "💓", desc: "你每打出一张牌，受到 !A! 点伤害。" },
+  "Invincible": { name: "坚不可摧", icon: "🛡️", desc: "本回合内最多还能失去 !A! 点生命。" },
+  "Surrounded": { name: "夹击", icon: "⚠️", debuff: true, desc: "被高塔之盾与高塔之矛前后夹击。" },
+  "BackAttack": { name: "后方攻击", icon: "🗡️", desc: "从后方发动攻击，造成的伤害增加 50%。" }
 };
 
 const MONSTER_META = {
@@ -2675,7 +2755,10 @@ const MONSTER_META = {
   "Donu and Deca": "甜圈与八体",
   "BanditPointy": "尖尖",
   "BanditRomeo": "罗密欧",
-  "BanditBear": "熊"
+  "BanditBear": "熊",
+  "SpireShield": "高塔之盾",
+  "SpireSpear": "高塔之矛",
+  "CorruptHeart": "腐化之心"
 };
 
 
@@ -2708,6 +2791,12 @@ const ACT_POOLS = {
     ],
     elites: ["Giant Head", "Nemesis", "Reptomancer"],
     bosses: ["AwakenedOne", "TimeEater", "Donu and Deca"]
+  },
+  4: {
+    weak: ["Shield and Spear"],
+    strong: ["Shield and Spear"],
+    elites: ["Shield and Spear"],
+    bosses: ["CorruptHeart", "CorruptHeart", "CorruptHeart"]
   }
 };
 
@@ -2845,6 +2934,24 @@ function makeMonster(id, rng, state, arg) {
     case "BanditPointy": hp = 30; break;
     case "BanditRomeo": hp = rng.int(35, 39); break;
     case "BanditBear": hp = rng.int(38, 42); break;
+    // Act 4: The Ending
+    case "SpireShield":
+      hp = 110;
+      pw.Artifact = 1;
+      st.tc = 0;
+      break;
+    case "SpireSpear":
+      hp = 160;
+      pw.Artifact = 1;
+      st.tc = 0;
+      break;
+    case "CorruptHeart":
+      hp = 750;
+      pw.Invincible = 300;
+      pw.BeatOfDeath = 1;
+      st.tc = 0;
+      st.buffs = 0;
+      break;
   }
   if (arg && arg.minion) pw.Minion = 1;
   return {
@@ -2966,6 +3073,10 @@ function spawnEncounter(encId, rng, state) {
     case "AwakenedOne": add("Cultist"); add("Cultist"); add("AwakenedOne"); break;
     case "TimeEater": add("TimeEater"); break;
     case "Donu and Deca": add("Deca"); add("Donu"); break;
+    // Act 4 Elites & Boss
+    case "Shield and Spear": add("SpireShield"); add("SpireSpear"); break;
+    case "CorruptHeart":
+    case "The Heart": add("CorruptHeart"); break;
     default: add("Cultist"); break;
   }
   return list;
@@ -3397,6 +3508,52 @@ function rollMonsterMove(m, bt, state, rng) {
       else if (!lastMove(m, 3)) setIntent(m, 3, "ATTACK_DEFEND", 9);
       else setIntent(m, 1, "ATTACK", 18);
       break;
+    // Act 4: Spire Shield, Spire Spear & Corrupt Heart
+    case "SpireShield": {
+      const cyc = (m.st.tc || 0) % 3;
+      m.st.tc = (m.st.tc || 0) + 1;
+      if (cyc === 0) {
+        if (num < 50) setIntent(m, 2, "DEFEND");
+        else setIntent(m, 1, "ATTACK_DEBUFF", 12);
+      } else if (cyc === 1) {
+        if (!lastMove(m, 1)) setIntent(m, 1, "ATTACK_DEBUFF", 12);
+        else setIntent(m, 2, "DEFEND");
+      } else {
+        setIntent(m, 3, "ATTACK_DEFEND", 34);
+      }
+      break;
+    }
+    case "SpireSpear": {
+      const cyc = (m.st.tc || 0) % 3;
+      m.st.tc = (m.st.tc || 0) + 1;
+      if (cyc === 0) {
+        if (f || num < 50) setIntent(m, 1, "ATTACK_DEBUFF", 5, 2);
+        else setIntent(m, 2, "BUFF");
+      } else if (cyc === 1) {
+        setIntent(m, 3, "ATTACK", 10, 3);
+      } else {
+        if (!lastMove(m, 2)) setIntent(m, 2, "BUFF");
+        else setIntent(m, 1, "ATTACK_DEBUFF", 5, 2);
+      }
+      break;
+    }
+    case "CorruptHeart":
+      if (f) {
+        setIntent(m, 3, "STRONG_DEBUFF");
+      } else {
+        const cyc = (m.st.tc || 0) % 3;
+        m.st.tc = (m.st.tc || 0) + 1;
+        if (cyc === 0) {
+          if (num < 50) setIntent(m, 1, "ATTACK", 2, 12);
+          else setIntent(m, 2, "ATTACK", 40);
+        } else if (cyc === 1) {
+          if (!lastMove(m, 2)) setIntent(m, 2, "ATTACK", 40);
+          else setIntent(m, 1, "ATTACK", 2, 12);
+        } else {
+          setIntent(m, 4, "BUFF");
+        }
+      }
+      break;
     default:
       setIntent(m, 1, "ATTACK", 8);
   }
@@ -3723,6 +3880,12 @@ function damageMonster(state, bt, m, rawDmg, type, rng) {
   }
   if (type === "NORMAL" && unblocked > 0 && (bt.pw.Envenom || 0) > 0) {
     applyMonsterPower(state, bt, m, "Poison", bt.pw.Envenom);
+  }
+
+  if (unblocked > 0 && m.pw.Invincible !== undefined) {
+    const cap = Math.max(0, m.pw.Invincible);
+    if (unblocked > cap) unblocked = cap;
+    m.pw.Invincible = Math.max(0, cap - unblocked);
   }
 
   if (unblocked > 0) {
@@ -4616,6 +4779,55 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       else if (mv === 3) { monsterAttackPlayer(state, bt, m, 9, 1, rng); m.b += 9; }
       else monsterAttackPlayer(state, bt, m, 18, 1, rng);
       break;
+    // Act 4: Spire Shield, Spire Spear & Corrupt Heart
+    case "SpireShield":
+      if (mv === 1) {
+        monsterAttackPlayer(state, bt, m, 12, 1, rng);
+        if ((bt.maxOrbs || 0) > 0 && rng.bool(0.5)) applyPlayerPower(state, bt, "Focus", -1);
+        else applyPlayerPower(state, bt, "Strength", -1);
+      } else if (mv === 2) {
+        for (const a of bt.m) { if (a.hp > 0) a.b += 30; }
+      } else {
+        monsterAttackPlayer(state, bt, m, 34, 1, rng);
+        m.b += 34;
+      }
+      break;
+    case "SpireSpear":
+      if (mv === 1) {
+        monsterAttackPlayer(state, bt, m, 5, 2, rng);
+        bt.di.push("Burn", "Burn");
+      } else if (mv === 2) {
+        for (const a of bt.m) { if (a.hp > 0) applyMonsterPower(state, bt, a, "Strength", 2); }
+      } else {
+        monsterAttackPlayer(state, bt, m, 10, 3, rng);
+      }
+      break;
+    case "CorruptHeart":
+      if (mv === 3) {
+        applyPlayerPower(state, bt, "Vulnerable", 2);
+        applyPlayerPower(state, bt, "Weak", 2);
+        applyPlayerPower(state, bt, "Frail", 2);
+        for (const sc of ["Dazed", "Slimed", "Wound", "Burn", "Void"]) {
+          const ins = bt.dr.length > 0 ? rng.int(0, bt.dr.length) : 0;
+          bt.dr.splice(ins, 0, sc);
+        }
+        addLog(state, "💔 腐化之心施放【衰败】！施加易伤/虚弱/脆弱并将 5 张状态牌洗入抽牌堆！");
+      } else if (mv === 1) {
+        monsterAttackPlayer(state, bt, m, 2, 12, rng);
+      } else if (mv === 2) {
+        monsterAttackPlayer(state, bt, m, 40, 1, rng);
+      } else if (mv === 4) {
+        if ((m.pw.Strength || 0) < 0) delete m.pw.Strength;
+        applyMonsterPower(state, bt, m, "Strength", 2);
+        m.st.buffs = (m.st.buffs || 0) + 1;
+        if (m.st.buffs === 1) m.pw.Artifact = (m.pw.Artifact || 0) + 2;
+        else if (m.st.buffs === 2) m.pw.BeatOfDeath = (m.pw.BeatOfDeath || 0) + 1;
+        else if (m.st.buffs === 3) m.pw.PainfulStabs = (m.pw.PainfulStabs || 0) + 1;
+        else if (m.st.buffs === 4) applyMonsterPower(state, bt, m, "Strength", 10);
+        else applyMonsterPower(state, bt, m, "Strength", 50);
+        addLog(state, "💔 腐化之心强化了自身！");
+      }
+      break;
     default:
       monsterAttackPlayer(state, bt, m, m.dmg || 8, m.hits || 1, rng);
   }
@@ -4641,6 +4853,16 @@ function startCombat(state, encId, roomType, rng) {
   if (roomType === "E" && hasRelic(state, "PreservedInsect")) {
     for (const m of monsters) {
       m.hp = Math.max(1, Math.floor(m.mhp * 0.75));
+    }
+  }
+  // Burning Elite (Emerald Key guardian) buff
+  if (roomType === "E" && state.be) {
+    const buffIdx = ((state.s || 0) + (state.a || 1)) % 4;
+    for (const m of monsters) {
+      if (buffIdx === 0) m.pw.Strength = (m.pw.Strength || 0) + 2;
+      else if (buffIdx === 1) { m.mhp = Math.floor(m.mhp * 1.25); m.hp = m.mhp; }
+      else if (buffIdx === 2) m.pw.Metallicize = (m.pw.Metallicize || 0) + 4;
+      else m.pw.RegenerateMonster = (m.pw.RegenerateMonster || 0) + 3;
     }
   }
   // Neow's Lament (first 3 combats enemies have 1 current HP, preserving mhp)
@@ -4746,6 +4968,9 @@ function startCombat(state, encId, roomType, rng) {
   }
   if (hasRelic(state, "Snecko Eye")) {
     bt.pw.Confusion = 1;
+  }
+  if (encId === "Shield and Spear") {
+    bt.pw.Surrounded = 1;
   }
   if (hasRelic(state, "Mercury Hourglass")) {
     for (const m of monsters) damageMonster(state, bt, m, 3, "THORNS", rng);
@@ -6294,6 +6519,16 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
 
   addLog(state, "打出【" + def.name + "】");
 
+  // Corrupt Heart Beat of Death check
+  for (const m of bt.m) {
+    if (m.hp > 0 && (m.pw.BeatOfDeath || 0) > 0 && state.hp > 0 && !isCombatWon(bt)) {
+      const beat = m.pw.BeatOfDeath;
+      const b = Math.min(bt.b, beat);
+      bt.b -= b;
+      if (beat - b > 0) losePlayerHp(state, bt, beat - b, false, rng);
+    }
+  }
+
   // Time Eater Time Warp check (every 12 cards played ends turn)
   for (const m of bt.m) {
     if (m.hp > 0 && m.pw.TimeWarp !== undefined) {
@@ -6560,6 +6795,7 @@ function endPlayerTurn(state, rng, skipMonsters = false) {
     for (const m of bt.m) {
       if (m.hp > 0 && !m.pw.Barricade) m.b = 0;
       if (m.pw.Slow !== undefined) m.pw.Slow = 0;
+      if (m.hp > 0 && m.pw.Invincible !== undefined) m.pw.Invincible = 300;
     }
 
     const mCopy = bt.m.slice();
@@ -6960,8 +7196,14 @@ function onCombatVictory(state, rng) {
   if (state.rt === "E") state.ek = (state.ek || 0) + 1;
   if (state.rt === "B") state.bk = (state.bk || 0) + 1;
 
-  // Act 3 Boss victory -> Full 3-Act Spire Cleared!
-  if (state.rt === "B" && state.a >= 3) {
+  // Act 4 Boss (Corrupt Heart) or Act 3 Boss victory without all 3 Keys
+  const hasAllKeys = Boolean(state.keys && state.keys.r && state.keys.g && state.keys.b);
+  if (state.rt === "B" && state.a >= 4) {
+    state.ph = "VICTORY";
+    addLog(state, "👑 恭喜！你击败了【腐化之心】，达成杀戮尖塔真结局完美登顶！");
+    return;
+  }
+  if (state.rt === "B" && state.a === 3 && !hasAllKeys) {
     state.ph = "VICTORY";
     addLog(state, "🎉 恭喜！你击败了第三幕终极首领，成功登顶杀戮尖塔！");
     return;
@@ -6987,8 +7229,10 @@ function onCombatVictory(state, rng) {
     }
   }
 
+  const keyG = (state.rt === "E" && state.be && !(state.keys && state.keys.g)) ? 1 : 0;
+  state.be = 0;
   const cards = rollCardRewards(state, rng, state.rt);
-  state.rw = { g: gold, pot, rel: rels, cards, cp: false };
+  state.rw = { g: gold, pot, rel: rels, cards, cp: false, keyG };
   state.ph = "REWARD";
   addLog(state, "战斗胜利！清点战利品。");
 }
@@ -7517,6 +7761,13 @@ function handleRestAction(state, act, rng) {
       addLog(state, "抽起【宁静烟斗】，移除了【" + d.name + "】");
       state.ph = "MAP";
     }
+  } else if (type === "rest_recall") {
+    if (!state.keys) state.keys = {};
+    if (!state.keys.r) {
+      state.keys.r = 1;
+      addLog(state, "🔥 在营火旁回忆起使命，获得了【红宝石钥匙】！");
+      state.ph = "MAP";
+    }
   } else if (type === "cash_out" || type === "rest_retreat") {
     state.ph = "RETREAT";
     addLog(state, "💰 你在营火旁选择见好就收，携带当前战利品安全撤离尖塔！");
@@ -7538,7 +7789,8 @@ function handleTreasureAction(state, act, rng) {
       addCardToMasterDeck(state, rng.pick(curses), rng);
     }
     const gold = rng.next() < 0.5 ? rng.range(25, 55) : 0;
-    state.rw = { g: gold, pot: "", rel: rels, cards: [], cp: true };
+    const keyB = !(state.keys && state.keys.b) ? 1 : 0;
+    state.rw = { g: gold, pot: "", rel: rels, cards: [], cp: true, keyB };
     state.ph = "REWARD";
     addLog(state, "打开宝箱！");
   } else if (act.type === "leave_treasure") {
@@ -7549,9 +7801,16 @@ function handleTreasureAction(state, act, rng) {
 function proceedAfterReward(state, rng) {
   state.rw = null;
   if (state.rt === "B") {
-    if (state.a >= 3) {
+    if (state.a >= 4) {
       state.ph = "VICTORY";
-      addLog(state, "🎉 恭喜登顶杀戮尖塔！");
+      addLog(state, "👑 恭喜击败【腐化之心】，达成杀戮尖塔真结局完美登顶！");
+    } else if (state.a === 3) {
+      if (state.keys && state.keys.r && state.keys.g && state.keys.b) {
+        advanceToNextAct(state, rng);
+      } else {
+        state.ph = "VICTORY";
+        addLog(state, "🎉 恭喜登顶杀戮尖塔！");
+      }
     } else {
       // Roll 3 Boss Relics
       const curChar = state.ch || "IRONCLAD";
@@ -7594,6 +7853,19 @@ function handleRewardAction(state, act, rng) {
   } else if (type === "claim_reward_relic" && rw.rel && rw.rel.length > 0) {
     const rId = rw.rel.splice(idx >= 0 && idx < rw.rel.length ? idx : 0, 1)[0];
     if (rId) obtainRelic(state, rId, rng);
+    if (rw.keyB && rw.rel.length === 0) rw.keyB = 0;
+  } else if (type === "claim_reward_key") {
+    if (!state.keys) state.keys = {};
+    if (act.key === "b" && rw.keyB) {
+      state.keys.b = 1;
+      rw.keyB = 0;
+      rw.rel = [];
+      addLog(state, "💠 放弃宝箱遗物，获得了【蓝宝石钥匙】！");
+    } else if (act.key === "g" && rw.keyG) {
+      state.keys.g = 1;
+      rw.keyG = 0;
+      addLog(state, "💚 从强化精英战利品中获得了【绿宝石钥匙】！");
+    }
   } else if (type === "pick_reward_card" && !rw.cp && rw.cards && rw.cards[idx]) {
     const picked = rw.cards[idx];
     rw.cp = true;
@@ -7607,9 +7879,16 @@ function handleRewardAction(state, act, rng) {
   } else if (type === "proceed_from_reward") {
     // Auto-claim gold & relics if player clicks proceed directly
     if (rw.g > 0) { addGold(state, rw.g); rw.g = 0; }
+    if (rw.keyG) {
+      if (!state.keys) state.keys = {};
+      state.keys.g = 1;
+      rw.keyG = 0;
+      addLog(state, "💚 获得了【绿宝石钥匙】！");
+    }
     while (rw.rel && rw.rel.length > 0) {
       obtainRelic(state, rw.rel.shift(), rng);
     }
+    rw.keyB = 0;
     proceedAfterReward(state, rng);
   }
 }
@@ -7647,11 +7926,11 @@ function enterMapNode(state, x, y, rng) {
   if (state.ph !== "MAP") return false;
   const map = generateActMap(state.s, state.a);
   const nextRow = state.r + 1;
-  if (y !== nextRow) return false;
+  const preBossRow = state.a === 4 ? 2 : 14;
 
-  // Row 15 is the Act Boss
-  if (y === 15) {
-    if (state.r !== 14) return false;
+  // Row 15 (or Row 3 in Act 4) is the Act Boss
+  if (y === 15 || (state.a === 4 && y === 3)) {
+    if (state.r !== preBossRow) return false;
     state.r = 15;
     state.c = 3;
     state.p.push([3, 15]);
@@ -7662,6 +7941,7 @@ function enterMapNode(state, x, y, rng) {
     return true;
   }
 
+  if (y !== nextRow) return false;
   if (y < 0 || y >= 15 || x < 0 || x >= 7) return false;
   const targetNode = map[y] && map[y].find(n => n.x === x);
   if (!targetNode || !targetNode.t) return false;
@@ -7681,6 +7961,7 @@ function enterMapNode(state, x, y, rng) {
 
   let rType = targetNode.t;
   state.rt = rType;
+  state.be = (rType === "E" && targetNode.be && !(state.keys && state.keys.g)) ? 1 : 0;
 
   // Juzu Bracelet prevents monster encounters in ? rooms
   if (rType === "?") {
@@ -8619,6 +8900,9 @@ const MONSTER_VISUAL_SPEC = {
   TimeEater: { size: 228, hpW: 192, shadowW: 172 },
   Deca: { size: 188, hpW: 156, shadowW: 136 },
   Donu: { size: 188, hpW: 156, shadowW: 136 },
+  SpireShield: { size: 196, hpW: 156, shadowW: 142 },
+  SpireSpear: { size: 196, hpW: 156, shadowW: 136 },
+  CorruptHeart: { size: 256, hpW: 204, shadowW: 176, fly: true },
 };
 
 function getMonsterVisualSpec(spriteKey, baseId, totalEnemies = 1) {
@@ -8701,6 +8985,8 @@ const STS_ENCOUNTER_OFFSETS = {
   "AwakenedOne": [[-590, 10], [-298, -10], [100, 15]],
   "TimeEater": [[-50, 30]],
   "Donu and Deca": [[-350, 30], [100, 20]],
+  "Shield and Spear": [[-300, 15], [100, 15]],
+  "CorruptHeart": [[0, 20]],
 };
 
 function getOriginalMonsterOffset(st, bt, m, idx) {
@@ -9283,6 +9569,7 @@ window.addEventListener("keydown", (e) => {
 
 let pendingActionsQueue = [];
 let isFlushingBatch = false;
+let charSelectConfirmed = false;
 
 function persistSessionState() {
   try {
@@ -9291,6 +9578,7 @@ function persistSessionState() {
       localPending,
       currentData,
       pendingActionsQueue,
+      charSelectConfirmed,
     }));
   } catch {}
 }
@@ -9322,6 +9610,7 @@ function resetLocalRun(charId) {
   localPlayerState = fresh;
   localPending = 0;
   pendingActionsQueue = [];
+  charSelectConfirmed = false;
   currentData = Object.assign({}, fresh, { mr: 1000, pd: 0 });
   persistSessionState();
   renderApp();
@@ -9991,13 +10280,14 @@ function renderMapStage(st) {
   svgBox.className = "map-svg-container";
 
   const rows = generateActMap(st.s, st.a);
+  const numRows = rows.length;
   const visitedSet = new Set((st.p || []).map(([px, py]) => px + "," + py));
   const nextRow = st.r + 1;
-  const curNode = (st.r >= 0 && st.r < 15 && rows[st.r]) ? rows[st.r].find(n => n.x === st.c) : null;
+  const curNode = (st.r >= 0 && st.r < numRows && rows[st.r]) ? rows[st.r].find(n => n.x === st.c) : null;
 
   const isReachable = (x, y) => {
+    if (y === 15) return st.r === numRows - 1;
     if (y !== nextRow) return false;
-    if (y === 15) return st.r === 14;
     if (st.r === -1) return y === 0;
     if (hasRelic(st, "WingedGreaves")) return true;
     return Boolean(curNode && curNode.e && curNode.e.indexOf(x) !== -1);
@@ -10005,15 +10295,15 @@ function renderMapStage(st) {
 
   const W = 500, H = 740;
   const colX = x => 76 + x * 58;
-  const rowY = y => y === 15 ? 62 : (696 - y * 39); // y=0 at 696, y=14 at 150, Boss y=15 at 62
+  const rowY = y => y === 15 ? (st.a === 4 ? 140 : 62) : (st.a === 4 ? (560 - y * 135) : (696 - y * 39));
 
   let edgesSvg = "";
-  for (let y = 0; y < 15; y++) {
+  for (let y = 0; y < numRows; y++) {
     for (const n of rows[y]) {
       const x1 = colX(n.x), y1 = rowY(y);
-      if (y === 14) {
-        const activeEdge = visitedSet.has(n.x + ",14") && visitedSet.has("3,15");
-        const canWalk = (st.r === 14 && st.c === n.x);
+      if (y === numRows - 1) {
+        const activeEdge = visitedSet.has(n.x + "," + y) && visitedSet.has("3,15");
+        const canWalk = (st.r === numRows - 1 && st.c === n.x);
         edgesSvg += '<line x1="' + x1 + '" y1="' + (y1 - 14) + '" x2="' + colX(3) + '" y2="' + (rowY(15) + 42) + '" stroke="' + (activeEdge ? "#231c18" : (canWalk ? "#8b1e1e" : "rgba(74, 58, 42, 0.55)")) + '" stroke-width="' + (activeEdge || canWalk ? 2.8 : 2) + '" stroke-dasharray="' + (activeEdge ? "none" : "5,6") + '" stroke-linecap="round"/>';
       } else {
         for (const nx of n.e) {
@@ -10040,18 +10330,22 @@ function renderMapStage(st) {
       '<text x="' + colX(3) + '" y="' + (rowY(15) + 52) + '" text-anchor="middle" fill="#261e18" font-size="12" font-weight="900">' + (MONSTER_META[bossId] || bossId) + '</text>' +
     '</g>';
 
-  for (let y = 0; y < 15; y++) {
-    nodesSvg += '<text x="28" y="' + (rowY(y) + 4) + '" fill="rgba(68, 52, 38, 0.55)" font-size="10" font-weight="800">' + ((st.a - 1) * 16 + y + 1) + 'F</text>';
+  for (let y = 0; y < numRows; y++) {
+    const floorNum = st.a === 4 ? (48 + y + 1) : ((st.a - 1) * 16 + y + 1);
+    nodesSvg += '<text x="28" y="' + (rowY(y) + 4) + '" fill="rgba(68, 52, 38, 0.55)" font-size="10" font-weight="800">' + floorNum + 'F</text>';
     for (const n of rows[y]) {
       const cx = colX(n.x), cy = rowY(y);
       const reach = isReachable(n.x, y);
       const visited = visitedSet.has(n.x + "," + y);
       const isCur = (st.r === y && st.c === n.x);
+      const isBurning = Boolean(n.be && !(st.keys && st.keys.g));
       const stateCls = reach ? "reachable" : (isCur ? "current" : (visited ? "visited" : "unvisited"));
       nodesSvg +=
-        '<g class="map-node ' + stateCls + '" data-x="' + n.x + '" data-y="' + y + '" data-node-type="' + n.t + '">' +
+        '<g class="map-node ' + stateCls + (isBurning ? " burning-elite" : "") + '" data-x="' + n.x + '" data-y="' + y + '" data-node-type="' + n.t + '">' +
           '<circle cx="' + cx + '" cy="' + cy + '" r="18" fill="transparent"/>' +
+          (isBurning ? '<circle cx="' + cx + '" cy="' + cy + '" r="20" fill="rgba(16, 185, 129, 0.22)" stroke="#10b981" stroke-width="2" stroke-dasharray="3,2"/>' : '') +
           svgMapIcon(n.t, cx, cy, reach ? 32 : 29) +
+          (isBurning ? '<text x="' + (cx + 12) + '" y="' + (cy - 9) + '" font-size="12" text-anchor="middle">🔥</text>' : '') +
           (visited || isCur ? svgMapCircle(cx, cy, 44) : '') +
           (reach ? svgMapCircle(cx, cy, 44, "hover-circle") : '') +
         '</g>';
@@ -10130,7 +10424,7 @@ function renderCombatStage(st) {
   }
 
   // Full-stage Widescreen Scene Backdrop & Vignette
-  const actSceneKey = st.a === 2 ? "TheCity" : (st.a >= 3 ? "TheBeyond" : "Exordium");
+  const actSceneKey = st.a === 4 ? "TheEnding" : (st.a === 3 ? "TheBeyond" : (st.a === 2 ? "TheCity" : "Exordium"));
   const bgDecor = document.createElement("div");
   bgDecor.className = "arena-bg-decor";
   bgDecor.setAttribute("style", combatBgStyle(actSceneKey));
@@ -10229,10 +10523,13 @@ function renderCombatStage(st) {
     const mSpec = getMonsterVisualSpec(mSpriteKey, m.id, totalEnemies);
     const mIntangible = ((m.pw && m.pw.Intangible) || 0) > 0;
     const mHalfDead = Boolean(m.st && m.st.halfDead);
+    const heartMask = m.id === "CorruptHeart"
+      ? ";-webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.45) 8%,#000 18%);mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,0.45) 8%,#000 18%)"
+      : "";
 
     unit.innerHTML =
       '<div class="sts-intent ' + intent.cls + '" title="' + (intent.tip || "") + '">' + intent.text + '</div>' +
-      '<div class="sprite-stage-box' + (mSpec.fly ? ' is-flying' : '') + (mIntangible ? ' is-intangible' : '') + (mHalfDead ? ' is-half-dead' : '') + '" style="width:' + mSpec.size + 'px;height:' + mSpec.size + 'px">' +
+      '<div class="sprite-stage-box' + (mSpec.fly ? ' is-flying' : '') + (mIntangible ? ' is-intangible' : '') + (mHalfDead ? ' is-half-dead' : '') + '" style="width:' + mSpec.size + 'px;height:' + mSpec.size + 'px' + heartMask + '">' +
         '<div class="unit-shadow" style="width:' + mSpec.shadowW + 'px"></div>' +
         spMonster(mSpriteKey, mSpec.size, idx + 1) +
         renderHexaghostOrbsHtml(m) +
@@ -10401,6 +10698,84 @@ function renderWavySpeechText(str) {
   ).join("");
 }
 
+function renderCharSelectStage(st) {
+  const hm = getHeroMeta(st);
+  const startRelicDef = RELICS[hm.relic] || { name: hm.relic, desc: "" };
+  const stageWrap = document.createElement("div");
+  stageWrap.className = "sts-char-select-stage";
+
+  // 1. Full-Bleed Character Splash Portrait (images/ui/charSelect/*Portrait.jpg)
+  const splash = document.createElement("div");
+  splash.className = "sts-char-splash-bg";
+  splash.setAttribute("style", combatBgStyle("portrait_" + hm.id) + "background-size:100% 100%;");
+  // Wait: combatBgStyle uses sprite-sheet percentage background-size & background-position, so we must NOT overwrite background-size!
+  splash.setAttribute("style", combatBgStyle("portrait_" + hm.id));
+  stageWrap.appendChild(splash);
+
+  const vignette = document.createElement("div");
+  vignette.className = "sts-char-splash-vignette";
+  stageWrap.appendChild(vignette);
+
+  // 2. Left Character Info Overlay (Original STS CharacterOption.renderInfo)
+  const infoPanel = document.createElement("div");
+  infoPanel.className = "sts-char-info-panel";
+  infoPanel.innerHTML =
+    '<div class="sts-char-title">' + hm.name + '</div>' +
+    '<div class="sts-char-stats-row">' +
+      '<span class="sts-char-stat-item" style="color:#f87171">' + spIcon("hud", "heart", 22, "❤️") + ' 生命：' + hm.hp + '/' + hm.hp + '</span>' +
+      '<span class="sts-char-stat-item" style="color:#fbbf24">' + spIcon("hud", "gold", 22, "💰") + ' 金币：99</span>' +
+    '</div>' +
+    '<div class="sts-char-flavor">' + (hm.desc || "") + '</div>' +
+    '<div class="sts-char-relic-box">' +
+      '<div style="flex-shrink:0">' + spIcon("relics", hm.relic, 44, "👑") + '</div>' +
+      '<div class="sts-char-relic-info">' +
+        '<div class="sts-char-relic-name">' + startRelicDef.name + '</div>' +
+        '<div class="sts-char-relic-desc">' + (startRelicDef.desc || "").replace(/\[(?:R|G|B|W|E)\]/g, "⚡") + '</div>' +
+      '</div>' +
+    '</div>';
+  stageWrap.appendChild(infoPanel);
+
+  // 3. Bottom-Center Row of 4 CharacterOption Portrait Buttons
+  const dock = document.createElement("div");
+  dock.className = "sts-char-options-dock";
+  dock.id = "char-select-dock";
+  const charKeys = ["IRONCLAD", "THE_SILENT", "DEFECT", "WATCHER"];
+  const hiStyle = uiPanelBgStyle("charBtn_highlight");
+  charKeys.forEach(cKey => {
+    const cm = getHeroMeta({ ch: cKey });
+    const isSel = hm.id === cKey;
+    const btn = document.createElement("button");
+    btn.className = "sts-char-opt-btn" + (isSel ? " active" : "");
+    btn.setAttribute("data-char-id", cKey);
+    btn.title = cm.name + "（初始生命 " + cm.hp + "）";
+    btn.innerHTML =
+      '<div class="sts-char-opt-art" style="' + uiPanelBgStyle("charBtn_" + cKey) + '"></div>' +
+      (isSel ? '<div class="sts-char-opt-hi" style="' + hiStyle + '"></div>' : '');
+    btn.addEventListener("click", () => {
+      if (hm.id !== cKey) {
+        sendAction({ type: "select_char", char: cKey });
+      }
+    });
+    dock.appendChild(btn);
+  });
+  stageWrap.appendChild(dock);
+
+  // 4. Bottom-Right Embark ("启程") Button
+  const embarkBtn = document.createElement("button");
+  embarkBtn.className = "sts-proceed-btn";
+  embarkBtn.id = "btn-char-embark";
+  embarkBtn.setAttribute("style", uiPanelBgStyle("proceedBtn"));
+  embarkBtn.textContent = "启程";
+  embarkBtn.addEventListener("click", () => {
+    charSelectConfirmed = true;
+    persistSessionState();
+    renderApp();
+  });
+  stageWrap.appendChild(embarkBtn);
+
+  return stageWrap;
+}
+
 function renderNeowRoomStage(st) {
   const def = UI_EVENTS_DEF.NEOW;
   const hm = getHeroMeta(st);
@@ -10419,34 +10794,6 @@ function renderNeowRoomStage(st) {
   const ambient = document.createElement("div");
   ambient.className = "sts-neow-ambient";
   stageWrap.appendChild(ambient);
-
-  // Top-Left: Character Selector Bar (Ironclad / The Silent / Defect / Watcher)
-  const charBar = document.createElement("div");
-  charBar.className = "sts-char-select-bar";
-  const charKeys = ["IRONCLAD", "THE_SILENT", "DEFECT", "WATCHER"];
-  const startRelicDef = RELICS[hm.relic] || { name: hm.relic, desc: "" };
-  charBar.innerHTML =
-    '<div class="sts-char-select-head">' +
-      '<span>⚔️ 选择攀塔角色</span>' +
-      '<span style="color:#94a3b8;font-weight:700">初始生命 ' + hm.hp + ' · ' + startRelicDef.name + '</span>' +
-    '</div>' +
-    '<div class="sts-char-select-row" id="neow-char-row"></div>' +
-    '<div class="sts-char-select-desc">' + (hm.desc || "") + '</div>';
-  const charRow = charBar.querySelector("#neow-char-row");
-  charKeys.forEach(cKey => {
-    const cm = getHeroMeta({ ch: cKey });
-    const btn = document.createElement("button");
-    btn.className = "sts-char-select-btn" + (hm.id === cKey ? " active" : "");
-    btn.setAttribute("data-char-id", cKey);
-    btn.innerHTML = spIcon("hud", cm.charIcon, 26, "") + '<span>' + cm.name + '</span>';
-    btn.addEventListener("click", () => {
-      if (hm.id !== cKey) {
-        sendAction({ type: "select_char", char: cKey });
-      }
-    });
-    charRow.appendChild(btn);
-  });
-  stageWrap.appendChild(charBar);
 
   // Left: Selected Hero standing on the Exordium floor (drawX = 25%, drawY = floorY)
   const hero = document.createElement("div");
@@ -10484,6 +10831,19 @@ function renderNeowRoomStage(st) {
     '</div>';
   stageWrap.appendChild(neowBoss);
 
+  // Bottom-Left: Back to Character Select Screen button
+  const backCharBtn = document.createElement("button");
+  backCharBtn.className = "sts-cancel-btn";
+  backCharBtn.id = "btn-neow-back-char";
+  backCharBtn.setAttribute("style", uiPanelBgStyle("cancelBtn"));
+  backCharBtn.textContent = "更换角色";
+  backCharBtn.addEventListener("click", () => {
+    charSelectConfirmed = false;
+    persistSessionState();
+    renderApp();
+  });
+  stageWrap.appendChild(backCharBtn);
+
   // Bottom-Right RoomEventDialog Option Buttons
   const dock = document.createElement("div");
   dock.className = "sts-neow-choices-dock";
@@ -10506,6 +10866,9 @@ function renderNeowRoomStage(st) {
 
 function renderEventStage(st) {
   if (st.ph === "NEOW") {
+    if (!charSelectConfirmed) {
+      return renderCharSelectStage(st);
+    }
     return renderNeowRoomStage(st);
   }
   const evId = (st.ev && st.ev.id) ? st.ev.id : "BigFish";
@@ -10559,7 +10922,7 @@ function renderEventStage(st) {
 let rewardCardModalOpen = false;
 
 function appendStageSceneBackdrop(container, st) {
-  const actSceneKey = st.a === 2 ? "TheCity" : (st.a >= 3 ? "TheBeyond" : "Exordium");
+  const actSceneKey = st.a === 4 ? "TheEnding" : (st.a === 3 ? "TheBeyond" : (st.a === 2 ? "TheCity" : "Exordium"));
   const bgDecor = document.createElement("div");
   bgDecor.className = "arena-bg-decor";
   bgDecor.setAttribute("style", combatBgStyle(actSceneKey));
@@ -10710,6 +11073,38 @@ function renderRewardStage(st) {
     b.addEventListener("click", () => sendAction({ type: "claim_reward_relic", index: rIdx }));
     scroll.appendChild(b);
   });
+
+  if (rw.keyG) {
+    itemCount++;
+    const b = document.createElement("button");
+    b.className = "sts-reward-item";
+    b.id = "btn-claim-key-g";
+    b.setAttribute("style", itemBg);
+    b.innerHTML =
+      '<div class="sts-reward-item-icon">' + spIcon("hud", "emerald_key", 32, "🟢") + '</div>' +
+      '<div class="sts-reward-item-text">' +
+        '<div style="color:#6ee7b7">绿宝石钥匙</div>' +
+        '<div class="sts-reward-item-sub">强化精英战利品 · 通往终幕的碎片</div>' +
+      '</div>';
+    b.addEventListener("click", () => sendAction({ type: "claim_reward_key", key: "g" }));
+    scroll.appendChild(b);
+  }
+
+  if (rw.keyB) {
+    itemCount++;
+    const b = document.createElement("button");
+    b.className = "sts-reward-item";
+    b.id = "btn-claim-key-b";
+    b.setAttribute("style", itemBg);
+    b.innerHTML =
+      '<div class="sts-reward-item-icon">' + spIcon("hud", "sapphire_key", 32, "🔵") + '</div>' +
+      '<div class="sts-reward-item-text">' +
+        '<div style="color:#93c5fd">蓝宝石钥匙</div>' +
+        '<div class="sts-reward-item-sub" style="color:#fca5a5">与宝箱遗物二选一 · 通往终幕的碎片</div>' +
+      '</div>';
+    b.addEventListener("click", () => sendAction({ type: "claim_reward_key", key: "b" }));
+    scroll.appendChild(b);
+  }
 
   if (!rw.cp && rw.cards && rw.cards.length > 0) {
     itemCount++;
@@ -11034,6 +11429,16 @@ function renderRestStage(st) {
     );
   }
 
+  if (!(st.keys && st.keys.r) && st.a <= 3) {
+    addCampOption(
+      "btn-camp-recall",
+      "camp_recall",
+      "回忆",
+      "获得红宝石钥匙碎片",
+      () => sendAction({ type: "rest_recall" })
+    );
+  }
+
   // Campfire-exclusive Cash Out ("见好就收") Option Plaque
   const yuan = ((st.pd || 0) / 100).toFixed(2);
   const retreatBtn = document.createElement("button");
@@ -11107,8 +11512,9 @@ function renderSettlementStage(st) {
   const hm = getHeroMeta(st);
   const isWin = st.ph === "VICTORY";
   const isRetreat = st.ph === "RETREAT";
-  const bannerTitle = isWin ? "胜利！" : (isRetreat ? "见好就收" : "败北……");
+  const bannerTitle = isWin ? (st.a === 4 ? "真结局！" : "胜利！") : (isRetreat ? "见好就收" : "败北……");
   const yuan = ((st.pd || 0) / 100).toFixed(2);
+  const maxFl = st.a === 4 || (st.fl || 0) > 48 ? 52 : 48;
 
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-reward-stage";
@@ -11124,14 +11530,14 @@ function renderSettlementStage(st) {
           ? spMonster(hm.spine, 84)
           : '<div style="width:184px;height:62px;margin:14px 0;' + uiPanelBgStyle(hm.corpse) + '"></div>') +
         '<div style="font-size:15px;font-weight:900;color:#fef08a;text-align:center;text-shadow:0 2px 4px #000">' +
-          (isWin ? "三大幕高塔全部通关！" : (isRetreat ? "成功携带赏金安全撤离！" : "倒在了攀登高塔的途中")) +
+          (isWin ? (st.a === 4 ? "成功弑杀腐化之心 · 终幕真结局通关！" : "三大幕高塔全部通关！") : (isRetreat ? "成功携带赏金安全撤离！" : "倒在了攀登高塔的途中")) +
         '</div>' +
         '<div style="font-size:14px;font-weight:900;color:#6ee7b7;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.45);padding:4px 12px;border-radius:12px">' +
           '🧧 结算赏金：' + yuan +
         '</div>' +
       '</div>' +
       '<div style="width:100%;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#e2e8f0;background:rgba(9,13,22,0.55);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">' +
-        '<div style="display:flex;justify-content:space-between"><span>攀登进度</span><b>第 ' + st.a + ' 幕 · ' + (st.fl || 0) + ' / 48 层</b></div>' +
+        '<div style="display:flex;justify-content:space-between"><span>攀登进度</span><b>第 ' + st.a + ' 幕 · ' + (st.fl || 0) + ' / ' + maxFl + ' 层</b></div>' +
         '<div style="display:flex;justify-content:space-between"><span>击败精英 / 首领</span><b>' + (st.ek || 0) + ' 精英 / ' + (st.bk || 0) + ' 首领</b></div>' +
         '<div style="display:flex;justify-content:space-between"><span>收集遗物 / 主牌组</span><b>' + (st.rel ? st.rel.length : 1) + ' 遗物 / ' + (st.dk ? st.dk.length : 10) + ' 张牌</b></div>' +
       '</div>' +
@@ -11148,6 +11554,9 @@ function renderApp() {
   const root = document.getElementById("app");
   if (!root || !currentData) return;
   const st = currentData;
+  if (st.ph !== "NEOW" || (st.fl || 0) > 0) {
+    charSelectConfirmed = true;
+  }
   const hm = getHeroMeta(st);
   root.innerHTML = "";
 
@@ -11157,17 +11566,30 @@ function renderApp() {
   top.setAttribute("style", uiPanelBgStyle("topBar"));
   const actInfo = ACT_INFO[st.a] || ACT_INFO[1];
   const yuan = ((st.pd || 0) / 100).toFixed(2);
+  const maxFl = st.a === 4 || (st.fl || 0) > 48 ? 52 : 48;
+  const ks = st.keys || { r: 0, g: 0, b: 0 };
+  const keyTip = "【终幕钥匙碎片】红宝石钥匙(篝火回忆)：" + (ks.r ? "已获得" : "未获得") +
+    " | 绿宝石钥匙(强化精英)：" + (ks.g ? "已获得" : "未获得") +
+    " | 蓝宝石钥匙(非首领宝箱)：" + (ks.b ? "已获得" : "未获得");
+  const keyTriHtml =
+    '<span class="sts-key-triangle" title="' + keyTip + '">' +
+      spIcon("hud", "key_slots", 24, "") +
+      (ks.r ? spIcon("hud", "key_red", 24, "") : "") +
+      (ks.g ? spIcon("hud", "key_green", 24, "") : "") +
+      (ks.b ? spIcon("hud", "key_blue", 24, "") : "") +
+    '</span>';
 
   top.innerHTML =
     '<div class="hud-left">' +
+      keyTriHtml +
       '<span class="sts-stat hero-stat">' + spIcon("hud", hm.charIcon, 22, "") + ' ' + hm.name + '</span>' +
       '<span class="sts-stat hp-stat" title="生命值">' + spIcon("hud", "heart", 22, "❤️") + ' ' + st.hp + '/' + st.mhp + '</span>' +
       '<span class="sts-stat gold-stat" title="持有金币">' + spIcon("hud", "gold", 22, "💰") + ' ' + st.g + '</span>' +
       '<div class="potion-belt" id="hud-potions" title="药水栏（战斗中点击饮用或投掷）"></div>' +
     '</div>' +
     '<div class="hud-center">' +
-      '<span class="sts-stat floor-stat" title="当前攀登层数">' + spIcon("hud", "floor", 22, "🏰") + ' ' + actInfo.name + ' · ' + (st.fl || 0) + '/48层</span>' +
-      '<span class="sts-stat bounty-stat" title="随着攀爬层数、击败精英和首领不断累积（仅可在篝火休息处主动撤离或通关三幕带走100%）">🧧 赏金 ' + yuan + '</span>' +
+      '<span class="sts-stat floor-stat" title="当前攀登层数">' + spIcon("hud", "floor", 22, "🏰") + ' ' + actInfo.name + ' · ' + (st.fl || 0) + '/' + maxFl + '层</span>' +
+      '<span class="sts-stat bounty-stat" title="随着攀爬层数、击败精英和首领不断累积（仅可在篝火休息处主动撤离或通关带走100%）">🧧 赏金 ' + yuan + '</span>' +
     '</div>' +
     '<div class="hud-right">' +
       (st.ph !== "MAP" ? '<button class="hud-icon-btn" id="btn-toggle-map" title="随时打开/关闭高塔地图">' + spIcon("hud", "map", 20, "🗺️") + ' ' + (mapOverlayOpen ? "返回房间" : "地图") + '</button>' : '') +
@@ -11348,6 +11770,9 @@ try {
       localPlayerState = parsed.localPlayerState || parsed.currentData;
       localPending = parsed.localPending || 0;
       currentData = parsed.currentData;
+      if (parsed.charSelectConfirmed !== undefined) {
+        charSelectConfirmed = Boolean(parsed.charSelectConfirmed);
+      }
       if (Array.isArray(parsed.pendingActionsQueue)) {
         pendingActionsQueue = parsed.pendingActionsQueue;
       }
