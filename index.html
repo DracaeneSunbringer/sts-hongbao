@@ -42,7 +42,7 @@
     display: inline-block; vertical-align: middle; flex-shrink: 0;
     background-image: url("assets/icons.webp");
     background-repeat: no-repeat;
-    background-size: 1600% 1600%;
+    background-size: 2000% 2000%;
   }
   .sp-monster-wrap {
     position: relative; display: inline-flex; align-items: flex-end; justify-content: center;
@@ -686,7 +686,7 @@
     background-color: #141824;
     background-image: url("assets/cards.webp");
     background-repeat: no-repeat;
-    background-size: 1200% 1100%;
+    background-size: 1900% 1900%;
     z-index: 1;
     overflow: hidden;
   }
@@ -700,7 +700,7 @@
     position: absolute; inset: 0;
     background-image: url("assets/ui.webp");
     background-repeat: no-repeat;
-    background-size: 600% 729.73%;
+    background-size: 600% 1306.306%;
     z-index: 2; pointer-events: none;
   }
   .card-cost {
@@ -837,6 +837,137 @@
     transform: translateX(-50%);
     z-index: 8;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  }
+  /* Character Selection Bar in Neow Room */
+  .sts-char-select-bar {
+    position: absolute;
+    top: 12px; left: 16px;
+    z-index: 32;
+    display: flex; flex-direction: column; gap: 6px;
+    background: rgba(9, 13, 22, 0.86);
+    border: 1.5px solid rgba(245, 196, 81, 0.42);
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+    backdrop-filter: blur(4px);
+    max-width: 390px;
+  }
+  .sts-char-select-head {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11.5px; font-weight: 900; color: #fde047;
+    letter-spacing: 0.5px;
+  }
+  .sts-char-select-row {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .sts-char-select-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 9px 4px 5px;
+    border-radius: 8px;
+    background: rgba(30, 41, 59, 0.78);
+    border: 1.5px solid rgba(148, 163, 184, 0.32);
+    color: #cbd5e1;
+    font-size: 12px; font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.14s, border-color 0.14s, background 0.14s, box-shadow 0.14s;
+  }
+  .sts-char-select-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(245, 196, 81, 0.75);
+    color: #fff;
+  }
+  .sts-char-select-btn.active {
+    background: linear-gradient(180deg, rgba(245, 196, 81, 0.28) 0%, rgba(180, 83, 9, 0.35) 100%);
+    border-color: #f5c451;
+    color: #fef08a;
+    box-shadow: 0 0 12px rgba(245, 196, 81, 0.45);
+  }
+  .sts-char-select-desc {
+    font-size: 11px; color: #94a3b8; line-height: 1.38;
+  }
+
+  /* Defect Orb Slots Arc & Watcher Stance Aura */
+  @keyframes stsOrbFloat {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+    50% { transform: translate(-50%, -50%) translateY(-4px); }
+  }
+  .sts-orb-arc {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+  }
+  .sts-orb-slot {
+    position: absolute;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: auto; cursor: help;
+    animation: stsOrbFloat 2.6s ease-in-out infinite;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.88));
+  }
+  .sts-orb-slot.next-evoke::after {
+    content: "";
+    position: absolute; inset: -2px;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(253, 224, 71, 0.75);
+    pointer-events: none;
+  }
+  .sts-orb-val {
+    position: absolute; right: -4px; bottom: -4px;
+    font-size: 11px; font-weight: 900; color: #fff;
+    text-shadow: -1.2px -1.2px 0 #000, 1.2px -1.2px 0 #000, -1.2px 1.2px 0 #000, 1.2px 1.2px 0 #000, 0 0 4px #38bdf8;
+    pointer-events: none;
+  }
+  .sts-orb-val.dark-evoke {
+    left: -4px; right: auto; top: -4px; bottom: auto;
+    color: #d8b4fe;
+    font-size: 10px;
+  }
+  @keyframes stsStancePulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.72; }
+    50% { transform: translate(-50%, -50%) scale(1.06); opacity: 0.96; }
+  }
+  .sts-stance-aura {
+    position: absolute;
+    left: 50%; top: 52%;
+    width: 136px; height: 136px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: stsStancePulse 2.1s ease-in-out infinite;
+  }
+  .sts-stance-aura.stance-Calm {
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.42) 0%, rgba(14, 165, 233, 0.16) 52%, transparent 74%);
+    box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
+  }
+  .sts-stance-aura.stance-Wrath {
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.48) 0%, rgba(220, 38, 38, 0.2) 52%, transparent 74%);
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.55);
+  }
+  .sts-stance-aura.stance-Divinity {
+    background: radial-gradient(circle, rgba(216, 180, 254, 0.52) 0%, rgba(245, 196, 81, 0.26) 54%, transparent 76%);
+    box-shadow: 0 0 32px rgba(192, 132, 252, 0.68);
+  }
+  .sts-stance-badge {
+    position: absolute;
+    top: -22px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10.5px; font-weight: 900;
+    z-index: 16;
+    text-shadow: 0 1px 2px #000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.85);
+    pointer-events: auto; cursor: help;
+  }
+  .sts-stance-badge.stance-Calm {
+    background: rgba(12, 74, 110, 0.9); border: 1px solid #38bdf8; color: #bae6fd;
+  }
+  .sts-stance-badge.stance-Wrath {
+    background: rgba(127, 29, 29, 0.92); border: 1px solid #f87171; color: #fecaca;
+  }
+  .sts-stance-badge.stance-Divinity {
+    background: rgba(88, 28, 135, 0.92); border: 1px solid #fde047; color: #fef08a;
   }
   .sts-neow-boss {
     position: absolute;
@@ -1438,6 +1569,9 @@
     .sts-neow-speech-txt { font-size: 12px; }
     .sts-neow-choices-dock { right: 3%; left: 3%; width: 94%; bottom: 2.5%; gap: 5px; }
     .sts-neow-choices-dock .sts-event-opt-btn { min-height: 36px; padding: 5px 12px; font-size: 11.5px; }
+    .sts-char-select-bar { top: 6px; left: 6px; right: 6px; max-width: none; padding: 6px 8px; }
+    .sts-char-select-btn { padding: 3px 6px 3px 4px; font-size: 11px; }
+    .sts-char-select-desc { display: none; }
   }
 </style>
 </head>
@@ -1448,7 +1582,7 @@
 <div id="sts-vfx-layer"></div>
 
 <script>
-const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118},"powers":{"Strength":119,"Dexterity":120,"Vulnerable":121,"Weak":122,"Frail":123,"Ritual":124,"CurlUp":125,"SporeCloud":126,"Metallicize":127,"PlatedArmor":128,"Artifact":129,"Anger":130,"Thievery":131,"ModeShift":132,"SharpHide":133,"Split":134,"Flight":135,"Malleable":136,"Confusion":137,"Entangled":138,"Hex":139,"NoDraw":140,"NoBlock":141,"DrawReduction":142,"Constricted":143,"LoseStrength":144,"LoseDexterity":145,"Shackled":146,"NextTurnBlock":147,"FlameBarrier":148,"Rage":130,"DoubleTap":149,"Duplication":150,"Combust":151,"DarkEmbrace":152,"Evolve":153,"FeelNoPain":154,"FireBreathing":155,"Rupture":156,"Barricade":157,"Berserk":158,"Brutality":159,"Corruption":160,"DemonForm":161,"Juggernaut":162,"Mayhem":163,"Panache":164,"Sadistic":165,"TheBomb":166,"Regen":167,"Intangible":168,"Buffer":169,"Thorns":170,"PainfulStabs":171,"Minion":172,"Regrow":173,"Slow":174,"Explosive":175,"Fading":176,"Shifting":177,"Reactive":178,"RegenerateMonster":167,"Curiosity":179,"Unawakened":180,"TimeWarp":181,"GenericStrengthUp":119},"potions":{"Block Potion":182,"Fire Potion":183,"Explosive Potion":184,"FearPotion":185,"Weak Potion":186,"Strength Potion":187,"Dexterity Potion":188,"SpeedPotion":189,"SteroidPotion":190,"Swift Potion":191,"Energy Potion":192,"BloodPotion":193,"BlessingOfTheForge":194,"AttackPotion":195,"SkillPotion":196,"PowerPotion":197,"Regen Potion":198,"Ancient Potion":199,"EssenceOfSteel":200,"LiquidBronze":201,"DuplicationPotion":202,"CultistPotion":203,"Fruit Juice":204,"FairyPotion":205},"intents":{"attack_1":206,"attack_2":207,"attack_3":208,"attack_4":209,"attack_5":210,"attack_6":211,"attack_7":212,"defend":213,"defend_buff":214,"buff":215,"debuff1":216,"debuff2":217,"magic":218,"sleep":219,"stun":220,"unknown":221,"escape":222},"map":{"M":223,"E":224,"?":225,"R":226,"$":227,"T":228,"TheGuardian":229,"Hexaghost":230,"SlimeBoss":231,"BronzeAutomaton":232,"TheCollector":233,"Champ":234,"AwakenedOne":235,"TimeEater":236,"Donu and Deca":237},"hud":{"heart":238,"gold":239,"floor":240,"deck":241,"map":242,"block":243,"energyRed":244,"drawPile":245,"discardPile":246,"reticleCorner":247,"reticleArrow":248,"endTurn":249,"endTurnGlow":250,"proceed":251,"potionSlot":252,"countCircle":253},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11},"uiPanels":{"sheetW":1032,"sheetH":1620,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":2480,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560}}};
+const SPRITE_MANIFEST = {"cards":{"Strike_R":0,"Defend_R":1,"Bash":2,"Anger":3,"Body Slam":4,"Clash":5,"Cleave":6,"Clothesline":7,"Headbutt":8,"Heavy Blade":9,"Iron Wave":10,"Perfected Strike":11,"Pommel Strike":12,"Sword Boomerang":13,"Thunderclap":14,"Twin Strike":15,"Wild Strike":16,"Armaments":17,"Flex":18,"Havoc":19,"Shrug It Off":20,"True Grit":21,"Warcry":22,"Blood for Blood":23,"Carnage":24,"Dropkick":25,"Hemokinesis":26,"Pummel":27,"Rampage":28,"Reckless Charge":29,"Searing Blow":30,"Sever Soul":31,"Uppercut":32,"Whirlwind":33,"Battle Trance":34,"Bloodletting":35,"Burning Pact":36,"Disarm":37,"Dual Wield":38,"Entrench":39,"Flame Barrier":40,"Ghostly Armor":41,"Infernal Blade":42,"Intimidate":43,"Power Through":44,"Rage":45,"Second Wind":46,"Seeing Red":47,"Sentinel":48,"Shockwave":49,"Spot Weakness":50,"Combust":51,"Dark Embrace":52,"Evolve":53,"Feel No Pain":54,"Fire Breathing":55,"Inflame":56,"Metallicize":57,"Rupture":58,"Bludgeon":59,"Feed":60,"Fiend Fire":61,"Immolate":62,"Reaper":63,"Double Tap":64,"Exhume":65,"Impervious":66,"Limit Break":67,"Offering":68,"Barricade":69,"Berserk":70,"Brutality":71,"Corruption":72,"Demon Form":73,"Juggernaut":74,"Apotheosis":75,"Bandage Up":76,"Blind":77,"Dark Shackles":78,"Deep Breath":79,"Discovery":80,"Dramatic Entrance":81,"Finesse":82,"Flash of Steel":83,"Good Instincts":84,"HandOfGreed":85,"Impatience":86,"J.A.X.":87,"Madness":88,"Master of Strategy":89,"Mayhem":90,"Mind Blast":91,"Panacea":92,"Panache":93,"PanicButton":94,"Purity":95,"Sadistic Nature":96,"Secret Technique":97,"Secret Weapon":98,"Swift Strike":99,"The Bomb":100,"Thinking Ahead":101,"Trip":102,"Violence":103,"Bite":104,"Ghostly":105,"RitualDagger":106,"Slimed":107,"Wound":108,"Dazed":109,"Burn":110,"Void":111,"AscendersBane":112,"Clumsy":113,"CurseOfTheBell":114,"Decay":115,"Doubt":116,"Injury":117,"Normality":118,"Pain":119,"Parasite":120,"Regret":121,"Shame":122,"Writhe":123,"A Thousand Cuts":124,"Accuracy":125,"Acrobatics":126,"Adrenaline":127,"After Image":128,"Venomology":129,"All Out Attack":130,"Backflip":131,"Backstab":132,"Bane":133,"Blade Dance":134,"Blur":135,"Bouncing Flask":136,"Bullet Time":137,"Burst":138,"Calculated Gamble":139,"Caltrops":140,"Catalyst":141,"Choke":142,"Cloak And Dagger":143,"Concentrate":144,"Corpse Explosion":145,"Crippling Poison":146,"Dagger Spray":147,"Dagger Throw":148,"Dash":149,"Deadly Poison":150,"Defend_G":151,"Deflect":152,"Die Die Die":153,"Distraction":154,"Dodge and Roll":155,"Doppelganger":156,"Endless Agony":157,"Envenom":158,"Escape Plan":159,"Eviscerate":160,"Expertise":161,"Finisher":162,"Flechettes":163,"Flying Knee":164,"Footwork":165,"Glass Knife":166,"Grand Finale":167,"Heel Hook":168,"Infinite Blades":169,"Leg Sweep":170,"Malaise":171,"Masterful Stab":172,"Neutralize":173,"Night Terror":174,"Noxious Fumes":175,"Outmaneuver":176,"Phantasmal Killer":177,"PiercingWail":178,"Poisoned Stab":179,"Predator":180,"Prepared":181,"Quick Slash":182,"Reflex":183,"Riddle With Holes":184,"Setup":185,"Skewer":186,"Slice":187,"Underhanded Strike":188,"Storm of Steel":189,"Strike_G":190,"Sucker Punch":191,"Survivor":192,"Tactician":193,"Terror":194,"Tools of the Trade":195,"Unload":196,"Well Laid Plans":197,"Wraith Form v2":198,"Aggregate":199,"All For One":200,"Amplify":201,"Auto Shields":202,"Ball Lightning":203,"Barrage":204,"Beam Cell":205,"Biased Cognition":206,"Blizzard":207,"BootSequence":208,"Buffer":209,"Capacitor":210,"Chaos":211,"Chill":212,"Gash":213,"Cold Snap":214,"Compile Driver":215,"Conserve Battery":216,"Consume":217,"Coolheaded":218,"Core Surge":219,"Creative AI":220,"Darkness":221,"Defend_B":222,"Defragment":223,"Doom and Gloom":224,"Double Energy":225,"Dualcast":226,"Echo Form":227,"Electrodynamics":228,"Undo":229,"FTL":230,"Fission":231,"Force Field":232,"Fusion":233,"Genetic Algorithm":234,"Glacier":235,"Go for the Eyes":236,"Heatsinks":237,"Hello World":238,"Hologram":239,"Hyperbeam":240,"Leap":241,"Lockon":242,"Loop":243,"Machine Learning":244,"Melter":245,"Meteor Strike":246,"Multi-Cast":247,"Steam Power":248,"Rainbow":249,"Reboot":250,"Rebound":251,"Redo":252,"Recycle":253,"Reinforced Body":254,"Reprogram":255,"Rip and Tear":256,"Scrape":257,"Seek":258,"Self Repair":259,"Skim":260,"Stack":261,"Static Discharge":262,"Steam":263,"Storm":264,"Streamline":265,"Strike_B":266,"Sunder":267,"Sweeping Beam":268,"Tempest":269,"Thunder Strike":270,"Turbo":271,"White Noise":272,"Zap":273,"Alpha":274,"BattleHymn":275,"Blasphemy":276,"BowlingBash":277,"Brilliance":278,"CarveReality":279,"Collect":280,"Conclude":281,"ConjureBlade":282,"Consecrate":283,"Crescendo":284,"CrushJoints":285,"CutThroughFate":286,"DeceiveReality":287,"Defend_P":288,"DeusExMachina":289,"DevaForm":290,"Devotion":291,"EmptyBody":292,"EmptyFist":293,"EmptyMind":294,"Eruption":295,"Establishment":296,"Evaluate":297,"Fasting2":298,"FearNoEvil":299,"FlurryOfBlows":300,"FlyingSleeves":301,"FollowUp":302,"ForeignInfluence":303,"Wireheading":304,"Halt":305,"Indignation":306,"InnerPeace":307,"Judgement":308,"JustLucky":309,"LessonLearned":310,"LikeWater":311,"MasterReality":312,"Meditate":313,"MentalFortress":314,"Nirvana":315,"Omniscience":316,"Perseverance":317,"Pray":318,"PathToVictory":319,"Prostrate":320,"Protect":321,"Ragnarok":322,"ReachHeaven":323,"Adaptation":324,"Sanctity":325,"SandsOfTime":326,"SashWhip":327,"Scrawl":328,"SignatureMove":329,"Vengeance":330,"SpiritShield":331,"Strike_P":332,"Study":333,"Swivel":334,"TalkToTheHand":335,"Tantrum":336,"ThirdEye":337,"ClearTheMind":338,"Vault":339,"Vigilance":340,"Wallop":341,"WaveOfTheHand":342,"Weave":343,"WheelKick":344,"WindmillStrike":345,"Wish":346,"Worship":347,"WreathOfFlame":348,"Beta":349,"Expunger":350,"Insight":351,"Miracle":352,"Omega":353,"Safety":354,"Shiv":355,"Smite":356,"ThroughViolence":357},"monsters":{"Ironclad":0,"Cultist":1,"JawWorm":2,"FuzzyLouseNormal":3,"FuzzyLouseDefensive":4,"AcidSlime_S":5,"AcidSlime_M":6,"AcidSlime_L":7,"SpikeSlime_S":8,"SpikeSlime_M":9,"SpikeSlime_L":10,"SlaverBlue":11,"SlaverRed":12,"Looter":13,"FungiBeast":14,"GremlinWarrior":15,"GremlinThief":16,"GremlinFat":17,"GremlinTsundere":18,"GremlinWizard":19,"GremlinNob":20,"Lagavulin":21,"Sentry":22,"TheGuardian":23,"Hexaghost":24,"SlimeBoss":25,"SphericGuardian":26,"Chosen":27,"ShelledParasite":28,"Byrd":29,"Mugger":30,"SnakePlant":31,"Snecko":32,"Centurion":33,"Healer":34,"GremlinLeader":35,"Taskmaster":36,"BookOfStabbing":37,"BronzeAutomaton":38,"BronzeOrb":39,"TheCollector":40,"TorchHead":41,"Champ":42,"Darkling":43,"OrbWalker":44,"Repulsor":45,"Exploder":46,"Spiker":47,"SpireGrowth":48,"Transient":49,"Maw":50,"WrithingMass":51,"GiantHead":52,"Nemesis":53,"Reptomancer":54,"SnakeDagger":55,"AwakenedOne":56,"TimeEater":57,"Deca":58,"Donu":59,"BanditPointy":60,"BanditRomeo":61,"BanditBear":62,"Neow":63,"Merchant":64,"Chest":65,"Lagavulin_sleep":66,"TheGuardian_def":67,"FuzzyLouseNormal_curl":68,"FuzzyLouseDefensive_curl":69,"Byrd_grounded":70,"AwakenedOne_p2":71,"GiantHead_closed":72,"Hexaghost_dormant":73,"TheSilent":74,"Defect":75,"Watcher":76,"Donu and Deca":59},"relics":{"Burning Blood":0,"Anchor":1,"Ancient Tea Set":2,"Art of War":3,"Bag of Marbles":4,"Bag of Preparation":5,"Blood Vial":6,"Bronze Scales":7,"Centennial Puzzle":8,"CeramicFish":9,"Akabeko":10,"Happy Flower":11,"Lantern":12,"Nunchaku":13,"Oddly Smooth Stone":14,"Omamori":15,"Orichalcum":16,"Pen Nib":17,"Potion Belt":18,"PreservedInsect":19,"Red Skull":20,"Regal Pillow":21,"Smiling Mask":22,"Strawberry":23,"Toy Ornithopter":24,"Vajra":25,"War Paint":26,"Whetstone":27,"Blue Candle":28,"Champion Belt":29,"Charon's Ashes":30,"Eternal Feather":31,"Gremlin Horn":32,"HornCleat":33,"Kunai":34,"Letter Opener":35,"Meat on the Bone":36,"Mercury Hourglass":37,"Molten Egg 2":38,"Mummified Hand":39,"Ornamental Fan":40,"Pantograph":41,"Paper Frog":42,"Pear":43,"Question Card":44,"Self Forming Clay":45,"Shuriken":46,"Singing Bowl":47,"StrikeDummy":48,"Toxic Egg 2":49,"White Beast Statue":50,"Bird Faced Urn":51,"Calipers":52,"CaptainsWheel":53,"Dead Branch":54,"Du-Vu Doll":55,"FossilizedHelix":56,"Ginger":57,"Girya":58,"Ice Cream":59,"Incense Burner":60,"Lizard Tail":61,"Magic Flower":62,"Mango":63,"Old Coin":64,"Peace Pipe":65,"Pocketwatch":66,"Shovel":67,"StoneCalendar":68,"Thread and Needle":69,"Torii":70,"TungstenRod":71,"Turnip":72,"Chemical X":73,"ClockworkSouvenir":74,"Lee's Waffle":75,"MealTicket":76,"Medical Kit":77,"Membership Card":78,"OrangePellets":79,"Sling":80,"Black Blood":81,"Black Star":82,"Busted Crown":83,"Coffee Dripper":84,"Cursed Key":85,"Fusion Hammer":86,"Mark of Pain":87,"Philosopher's Stone":88,"Runic Pyramid":89,"SacredBark":90,"SlaversCollar":91,"Snecko Eye":92,"Sozu":93,"Velvet Choker":94,"NeowsBlessing":95,"NeowsLament":95,"Necronomicon":96,"Ectoplasm":97,"Calling Bell":98,"Pandora's Box":99,"Astrolabe":100,"Tiny House":101,"WingedGreaves":102,"Juzu Bracelet":103,"SSSerpentHead":104,"MawBank":105,"The Courier":106,"Cauldron":107,"Frozen Egg 2":108,"FaceOfCleric":109,"Matryoshka":110,"Dream Catcher":111,"Waffle":75,"Circlet":112,"Golden Idol":113,"Bloody Idol":114,"Odd Mushroom":115,"Red Mask":116,"MutagenicStrength":117,"Mark of the Bloom":118,"Ring of the Snake":119,"Ring of the Serpent":120,"Snecko Skull":121,"Ninja Scroll":122,"Paper Krane":123,"Tough Bandages":124,"Tingsha":125,"TwistedFunnel":126,"WristBlade":127,"Cracked Core":128,"FrozenCore":129,"DataDisk":130,"Symbiotic Virus":131,"Cables":132,"Emotion Chip":133,"Runic Capacitor":134,"Inserter":135,"Nuclear Battery":136,"PureWater":137,"HolyWater":138,"Damaru":139,"TeardropLocket":140,"Yang":141,"CloakClasp":142,"GoldenEye":143,"VioletLotus":144},"powers":{"Strength":145,"Dexterity":146,"Vulnerable":147,"Weak":148,"Frail":149,"Ritual":150,"CurlUp":151,"SporeCloud":152,"Metallicize":153,"PlatedArmor":154,"Artifact":155,"Anger":156,"Thievery":157,"ModeShift":158,"SharpHide":159,"Split":160,"Flight":161,"Malleable":162,"Confusion":163,"Entangled":164,"Hex":165,"NoDraw":166,"NoBlock":167,"DrawReduction":168,"Constricted":169,"LoseStrength":170,"LoseDexterity":171,"Shackled":172,"NextTurnBlock":173,"FlameBarrier":174,"Rage":156,"DoubleTap":175,"Duplication":176,"Combust":177,"DarkEmbrace":178,"Evolve":179,"FeelNoPain":180,"FireBreathing":181,"Rupture":182,"Barricade":183,"Berserk":184,"Brutality":185,"Corruption":186,"DemonForm":187,"Juggernaut":188,"Mayhem":189,"Panache":190,"Sadistic":191,"TheBomb":192,"Regen":193,"Intangible":194,"Buffer":195,"Thorns":196,"PainfulStabs":197,"Minion":198,"Regrow":199,"Slow":200,"Explosive":201,"Fading":202,"Shifting":203,"Reactive":204,"RegenerateMonster":193,"Curiosity":205,"Unawakened":206,"TimeWarp":207,"GenericStrengthUp":145,"Poison":208,"Accuracy":209,"AfterImage":210,"AThousandCuts":211,"Burst":212,"CorpseExplosion":213,"Choke":214,"Envenom":215,"InfiniteBlades":216,"NoxiousFumes":217,"Phantasmal":218,"DoubleDamage":219,"ToolsOfTheTrade":220,"WellLaidPlans":221,"WraithForm":222,"Blur":223,"NextTurnEnergy":224,"DrawCardNextTurn":225,"Nightmare":226,"Focus":227,"Bias":171,"CreativeAI":228,"EchoForm":229,"Electrodynamics":230,"Heatsinks":231,"HelloWorld":232,"Loop":233,"MachineLearning":234,"SelfRepair":235,"StaticDischarge":236,"Storm":237,"LockOn":238,"Amplify":176,"Rebound":239,"Equilibrium":221,"Mantra":240,"BattleHymn":241,"DevaForm":242,"Devotion":243,"Establishment":244,"Fasting":245,"Foresight":246,"LikeWater":247,"MasterReality":248,"MentalFortress":249,"Nirvana":250,"Rushdown":251,"Study":252,"WaveOfTheHand":253,"Vigor":254,"FreeAttackPower":255,"Mark":256,"BlockReturn":257,"SimmeringFury":156,"Collect":258,"EndTurnDeath":259,"Omega":260},"potions":{"Block Potion":261,"Fire Potion":262,"Explosive Potion":263,"FearPotion":264,"Weak Potion":265,"Strength Potion":266,"Dexterity Potion":267,"SpeedPotion":268,"SteroidPotion":269,"Swift Potion":270,"Energy Potion":271,"BloodPotion":272,"BlessingOfTheForge":273,"AttackPotion":274,"SkillPotion":275,"PowerPotion":276,"Regen Potion":277,"Ancient Potion":278,"EssenceOfSteel":279,"LiquidBronze":280,"DuplicationPotion":281,"CultistPotion":282,"Fruit Juice":283,"FairyPotion":284},"intents":{"attack_1":285,"attack_2":286,"attack_3":287,"attack_4":288,"attack_5":289,"attack_6":290,"attack_7":291,"defend":292,"defend_buff":293,"buff":294,"debuff1":295,"debuff2":296,"magic":297,"sleep":298,"stun":299,"unknown":300,"escape":301},"map":{"M":302,"E":303,"?":304,"R":305,"$":306,"T":307,"TheGuardian":308,"Hexaghost":309,"SlimeBoss":310,"BronzeAutomaton":311,"TheCollector":312,"Champ":313,"AwakenedOne":314,"TimeEater":315,"Donu and Deca":316},"hud":{"heart":317,"gold":318,"floor":319,"deck":320,"map":321,"block":322,"energyRed":323,"energyGreen":324,"energyBlue":325,"energyPurple":326,"orb_lightning":327,"orb_frost":328,"orb_dark":329,"orb_plasma":330,"orb_empty":331,"char_ironclad":332,"char_silent":333,"char_defect":334,"char_watcher":335,"drawPile":336,"discardPile":337,"reticleCorner":338,"reticleArrow":339,"endTurn":340,"endTurnGlow":341,"proceed":342,"potionSlot":343,"countCircle":344},"cardFrames":{"attack_common":0,"attack_uncommon":1,"attack_rare":2,"skill_common":3,"skill_uncommon":4,"skill_rare":5,"power_common":6,"power_uncommon":7,"power_rare":8,"colorless_uncommon":9,"colorless_rare":10,"status_curse":11,"attack_common_G":12,"attack_uncommon_G":13,"attack_rare_G":14,"skill_common_G":15,"skill_uncommon_G":16,"skill_rare_G":17,"power_common_G":18,"power_uncommon_G":19,"power_rare_G":20,"attack_common_B":21,"attack_uncommon_B":22,"attack_rare_B":23,"skill_common_B":24,"skill_uncommon_B":25,"skill_rare_B":26,"power_common_B":27,"power_uncommon_B":28,"power_rare_B":29,"attack_common_P":30,"attack_uncommon_P":31,"attack_rare_P":32,"skill_common_P":33,"skill_uncommon_P":34,"skill_rare_P":35,"power_common_P":36,"power_uncommon_P":37,"power_rare_P":38},"uiPanels":{"sheetW":1032,"sheetH":2900,"mapScroll":{"x":0,"y":444,"w":320,"h":600},"mapLegend":{"x":324,"y":444,"w":184,"h":240},"mapCircle":{"x":512,"y":444,"w":88,"h":88},"eventBtnEnabled":{"x":608,"y":444,"w":420,"h":38},"eventBtnDisabled":{"x":608,"y":486,"w":420,"h":38},"eventPanel":{"x":324,"y":690,"w":704,"h":330},"rewardSheet":{"x":0,"y":1044,"w":280,"h":350},"rewardItemPanel":{"x":0,"y":1398,"w":280,"h":54},"cardRewardIcon":{"x":284,"y":1398,"w":54,"h":54},"selectBanner":{"x":0,"y":1456,"w":356,"h":72},"proceedBtn":{"x":0,"y":1532,"w":164,"h":84},"cancelBtn":{"x":168,"y":1532,"w":188,"h":58},"camp_sleep":{"x":284,"y":1044,"w":144,"h":96},"camp_smith":{"x":432,"y":1044,"w":144,"h":96},"camp_lift":{"x":580,"y":1044,"w":144,"h":96},"camp_dig":{"x":728,"y":1044,"w":144,"h":96},"camp_toke":{"x":876,"y":1044,"w":144,"h":96},"shopRug":{"x":364,"y":1144,"w":480,"h":304},"shopPurge":{"x":848,"y":1144,"w":116,"h":164},"shopSaleTag":{"x":968,"y":1144,"w":60,"h":55},"bossChestClosed":{"x":848,"y":1312,"w":176,"h":100},"bossChestOpened":{"x":848,"y":1416,"w":176,"h":94},"ironcladShoulder":{"x":364,"y":1452,"w":204,"h":164},"ironcladCorpse":{"x":572,"y":1452,"w":184,"h":52},"endTurnBtn":{"x":572,"y":1508,"w":148,"h":68},"endTurnHover":{"x":724,"y":1508,"w":148,"h":68},"topBar":{"x":572,"y":1580,"w":456,"h":36},"silentShoulder":{"x":0,"y":2732,"w":204,"h":164},"defectShoulder":{"x":208,"y":2732,"w":204,"h":164},"watcherShoulder":{"x":416,"y":2732,"w":204,"h":164},"silentCorpse":{"x":628,"y":2732,"w":184,"h":52},"defectCorpse":{"x":628,"y":2788,"w":184,"h":52},"watcherCorpse":{"x":628,"y":2844,"w":184,"h":52},"boss_TheGuardian":{"x":516,"y":534,"w":96,"h":74},"boss_Hexaghost":{"x":618,"y":534,"w":96,"h":74},"boss_SlimeBoss":{"x":720,"y":534,"w":96,"h":74},"boss_BronzeAutomaton":{"x":822,"y":534,"w":96,"h":74},"boss_TheCollector":{"x":924,"y":534,"w":96,"h":74},"boss_Champ":{"x":516,"y":610,"w":96,"h":74},"boss_AwakenedOne":{"x":618,"y":610,"w":96,"h":74},"boss_TimeEater":{"x":720,"y":610,"w":96,"h":74},"boss_Donu and Deca":{"x":822,"y":610,"w":96,"h":74}},"events":{"Exordium":0,"TheCity":1,"TheBeyond":2,"NEOW":3,"BigFish":4,"TheCleric":5,"GoldenIdol":6,"ScrapOoze":7,"ShiningLight":8,"LivingWall":9,"Vampires":10,"Apparitions":11,"AncientWriting":12,"TheLibrary":13,"CursedTome":14,"MindBloom":15,"SensoryStone":16,"GoldenShrine":17,"Purifier":18,"UpgradeShrine":19},"combatBgs":{"sheetW":1000,"sheetH":2480,"Exordium":{"x":0,"y":800,"w":1000,"h":560},"TheCity":{"x":0,"y":1360,"w":1000,"h":560},"TheBeyond":{"x":0,"y":1920,"w":1000,"h":560}}};
 
 // ==================== 1. Deterministic PRNG ====================
 function Rng(seed) {
@@ -1643,6 +1777,65 @@ const ACT_INFO = {
   3: { id: "TheBeyond", name: "第三幕 · 高塔深处", sub: "The Beyond", bosses: ["AwakenedOne", "TimeEater", "Donu and Deca"] }
 };
 
+const CHAR_META = {
+  IRONCLAD: {
+    id: "IRONCLAD",
+    name: "铁甲战士",
+    color: "R",
+    hp: 80,
+    relic: "Burning Blood",
+    orbs: 0,
+    hb: [220, 290, -4, -16],
+    spine: "Ironclad",
+    shoulder: "ironcladShoulder",
+    corpse: "ironcladCorpse",
+    deck: ["Strike_R", "Strike_R", "Strike_R", "Strike_R", "Strike_R", "Defend_R", "Defend_R", "Defend_R", "Defend_R", "Bash"],
+    desc: "铁甲军团残留下的士兵。他出卖自己的灵魂，获得了恶魔的力量。"
+  },
+  THE_SILENT: {
+    id: "THE_SILENT",
+    name: "静默猎手",
+    color: "G",
+    hp: 70,
+    relic: "Ring of the Snake",
+    orbs: 0,
+    hb: [240, 240, -20, -24],
+    spine: "TheSilent",
+    shoulder: "silentShoulder",
+    corpse: "silentCorpse",
+    deck: ["Strike_G", "Strike_G", "Strike_G", "Strike_G", "Strike_G", "Defend_G", "Defend_G", "Defend_G", "Defend_G", "Defend_G", "Survivor", "Neutralize"],
+    desc: "来自雾霾之地的致命女猎手。使用匕首和下毒来消灭敌人。"
+  },
+  DEFECT: {
+    id: "DEFECT",
+    name: "故障机器人",
+    color: "B",
+    hp: 75,
+    relic: "Cracked Core",
+    orbs: 3,
+    hb: [240, 244, 5, -5],
+    spine: "Defect",
+    shoulder: "defectShoulder",
+    corpse: "defectCorpse",
+    deck: ["Strike_B", "Strike_B", "Strike_B", "Strike_B", "Defend_B", "Defend_B", "Defend_B", "Defend_B", "Zap", "Dualcast"],
+    desc: "一具产生了自我意识的战斗型机器人。它装载的远古科技让它可以操控充能球。"
+  },
+  WATCHER: {
+    id: "WATCHER",
+    name: "观者",
+    color: "P",
+    hp: 72,
+    relic: "PureWater",
+    orbs: 0,
+    hb: [240, 270, 0, -5],
+    spine: "Watcher",
+    shoulder: "watcherShoulder",
+    corpse: "watcherCorpse",
+    deck: ["Strike_P", "Strike_P", "Strike_P", "Strike_P", "Defend_P", "Defend_P", "Defend_P", "Defend_P", "Eruption", "Vigilance"],
+    desc: "一名目盲的修行者，前来“评估”高塔。掌握运用神圣“姿态”来战斗的方法。"
+  }
+};
+
 // ==================== 3. Complete Card Database (ZHS) ====================
 // Format: [name, type(A/S/P/ST/C), rarity(B/C/U/R/SP/CU), target(E/A/S), cost, upCost, dmg, upDmg, blk, upBlk, mag, upMag, flags, desc, upDesc]
 // flags bitmask: 1=exhaust, 2=upNoExhaust, 4=ethereal, 8=upNoEthereal, 16=innate, 32=upInnate, 64=strikeTag
@@ -1782,7 +1975,245 @@ const RAW_CARDS = {
   "Parasite": ["寄生", "C", "CU", "S", -2, -2, 0, 0, 0, 0, 3, 3, 0, "不能被打出 。 NL 若从牌组移除，失去 3 点最大生命。", ""],
   "Regret": ["悔恨", "C", "CU", "S", -2, -2, 0, 0, 0, 0, 1, 1, 0, "不能被打出 。 NL 在你的回合结束时，失去等同于手牌数量的生命。", ""],
   "Shame": ["羞耻", "C", "CU", "S", -2, -2, 0, 0, 0, 0, 1, 1, 0, "不能被打出 。 NL 在你的回合结束时，获得 1 层 脆弱 。", ""],
-  "Writhe": ["苦恼", "C", "CU", "S", -2, -2, 0, 0, 0, 0, 0, 0, 16, "不能被打出 。 NL 固有 。", ""]
+  "Writhe": ["苦恼", "C", "CU", "S", -2, -2, 0, 0, 0, 0, 0, 0, 16, "不能被打出 。 NL 固有 。", ""],
+  // === GREEN ===
+  "A Thousand Cuts": ["凌迟","P","R","S",2,2,0,0,0,0,1,2,0,"你每打出一张牌，就对所有敌人造成 !M! 点伤害。","","G"],
+  "Accuracy": ["精准","P","U","S",1,1,0,0,0,0,4,6,0,"小刀 造成的伤害增加 !M! 。","","G"],
+  "Acrobatics": ["杂技","S","C","S",1,1,0,0,0,0,3,4,0,"抽 !M! 张牌。 NL 丢弃 1 张牌。","","G"],
+  "Adrenaline": ["肾上腺素","S","R","S",0,0,0,0,0,0,1,2,1,"获得 [G] 。 NL 抽2张牌。 NL 消耗 。","获得 [G] [G] 。 NL NL 抽2张牌。 NL 消耗 。","G"],
+  "After Image": ["余像","P","R","S",1,1,0,0,0,0,1,1,32,"你每打出一张牌，都获得1点 格挡 。","固有 。 NL 你每打出一张牌，都获得1点 格挡 。","G"],
+  "Venomology": ["炼制药水","S","R","S",1,0,0,0,0,0,0,0,1,"获得一瓶随机药水。 NL 消耗 。","","G"],
+  "All Out Attack": ["全力攻击","A","U","A",1,1,10,14,0,0,0,0,0,"对所有敌人造成 !D! 点伤害。 NL 丢弃一张随机手牌。","","G"],
+  "Backflip": ["后空翻","S","C","S",1,1,0,0,5,8,2,2,0,"获得 !B! 点 格挡 。 NL 抽2张牌。","","G"],
+  "Backstab": ["背刺","A","U","E",0,0,11,15,0,0,0,0,17,"造成 !D! 点伤害。 NL 固有 。 NL 消耗 。","","G"],
+  "Bane": ["灾祸","A","C","E",1,1,7,10,0,0,0,0,0,"造成 !D! 点伤害。 NL 如果敌人有 中毒 状态 ，则再次造成 !D! 点伤害。","","G"],
+  "Blade Dance": ["刀刃之舞","S","C","S",1,1,0,0,0,0,3,4,0,"增加 !M! 张 小刀 到你的手牌。","","G"],
+  "Blur": ["残影","S","U","S",1,1,0,0,5,8,0,0,0,"获得 !B! 点 格挡 。 NL 你的下一回合开始时 格挡 不会消失。","","G"],
+  "Bouncing Flask": ["弹跳药瓶","S","U","A",2,2,0,0,0,0,3,4,0,"随机给予敌人3层 中毒 !M! 次。","","G"],
+  "Bullet Time": ["子弹时间","S","R","S",3,2,0,0,0,0,0,0,0,"你在本回合内不能再抽牌。你手牌中的所有牌在本回合的耗能变为0点。","","G"],
+  "Burst": ["爆发","S","R","S",1,1,0,0,0,0,1,2,0,"在这个回合，你打出的下一张技能牌会打出两次。","在这个回合，你打出的下 !M! 张技能牌会打出两次。","G"],
+  "Calculated Gamble": ["计算下注","S","U","S",0,0,0,0,0,0,0,0,3,"丢弃所有手牌。 NL 然后抽相同数量张牌。 NL 消耗 。","丢弃所有手牌。 NL 然后抽相同数量张牌。","G"],
+  "Caltrops": ["铁蒺藜","P","U","S",1,1,0,0,0,0,3,5,0,"每当你被攻击时，对攻击者造成 !M! 点伤害。","","G"],
+  "Catalyst": ["催化剂","S","U","E",1,1,0,0,0,0,2,3,1,"将一名敌人的 中毒 层数翻倍。 NL 消耗 。","将一名敌人的 中毒 层数变为三倍。 NL 消耗 。","G"],
+  "Choke": ["勒脖","A","U","E",2,2,12,12,0,0,3,5,0,"造成 !D! 点伤害。 NL 你在这个回合内每打出一张牌，该名敌人都会失去 !M! 点生命。","","G"],
+  "Cloak And Dagger": ["斗篷与匕首","S","C","S",1,1,0,0,6,6,1,2,0,"获得 !B! 点 格挡 。 NL 增加 !M! 张 小刀 到你的手牌。","","G"],
+  "Concentrate": ["全神贯注","S","U","S",0,0,0,0,0,0,3,2,0,"丢弃 !M! 张牌。 NL 获得 [G] [G] 。","","G"],
+  "Corpse Explosion": ["尸爆术","S","R","E",2,2,0,0,0,0,6,9,0,"给予 !M! 层 中毒 。 NL 当这名敌人死亡时，对所有敌人造成等于其最大生命值的伤害。","","G"],
+  "Crippling Poison": ["致残毒云","S","U","A",2,2,0,0,0,0,4,7,1,"给予所有敌人 !M! 层 中毒 和2层 虚弱 。 NL 消耗 。","","G"],
+  "Dagger Spray": ["匕首雨","A","C","A",1,1,4,6,0,0,2,2,0,"对所有敌人造成 !D! 点伤害两次。","","G"],
+  "Dagger Throw": ["投掷匕首","A","C","E",1,1,9,12,0,0,1,1,0,"造成 !D! 点伤害。 NL 抽一张牌。 NL 丢弃一张牌。","","G"],
+  "Dash": ["冲刺","A","U","E",2,2,10,13,10,13,0,0,0,"获得 !B! 点 格挡 。 NL 造成 !D! 点伤害。","","G"],
+  "Deadly Poison": ["致命毒药","S","C","E",1,1,0,0,0,0,5,7,0,"给予 !M! 层 中毒 。","","G"],
+  "Defend_G": ["防御","S","B","S",1,1,0,0,5,8,0,0,0,"获得 !B! 点 格挡 。","","G"],
+  "Deflect": ["偏折","S","C","S",0,0,0,0,4,7,0,0,0,"获得 !B! 点 格挡 。","","G"],
+  "Die Die Die": ["死吧死吧死吧","A","R","A",1,1,13,17,0,0,0,0,1,"对所有敌人造成 !D! 点伤害。 NL 消耗 。","","G"],
+  "Distraction": ["声东击西","S","U","S",1,0,0,0,0,0,0,0,1,"增加一张随机技能牌到你的手牌。 NL 这张牌在本回合耗能变为0。 NL 消耗 。","","G"],
+  "Dodge and Roll": ["闪躲翻滚","S","C","S",1,1,0,0,4,6,0,0,0,"获得 !B! 点 格挡 。 NL 在下一回合获得 !B! 点 格挡 。","","G"],
+  "Doppelganger": ["双重存在","S","R","S",-1,-1,0,0,0,0,0,0,1,"下一回合，抽X张牌，获得X [G] 。 NL 消耗 。","下一回合，抽X+1张牌，获得X+1 [G] 。 NL 消耗 。","G"],
+  "Endless Agony": ["无尽苦痛","A","U","E",0,0,4,6,0,0,0,0,1,"造成 !D! 点伤害。 NL 每当你抽到这张牌，都增加一张其复制品到你的手牌。 NL 消耗 。","","G"],
+  "Envenom": ["涂毒","P","R","S",2,1,0,0,0,0,1,1,0,"每有一次攻击造成未被格挡的伤害，就给予1层 中毒 。","","G"],
+  "Escape Plan": ["逃脱计划","S","U","S",0,0,0,0,3,5,1,1,0,"抽1张牌。 NL 如果抽到的是技能牌，获得 !B! 点 格挡 。","","G"],
+  "Eviscerate": ["内脏切除","A","U","E",3,3,7,9,0,0,3,3,0,"你在这个回合内每丢弃一张牌，耗能就减少1 [G] 。 NL 造成 !D! 点伤害三次。","","G"],
+  "Expertise": ["独门技术","S","U","S",1,1,0,0,0,0,6,7,0,"抽牌直到你的手牌有 !M! 张牌。","","G"],
+  "Finisher": ["终结技","A","U","E",1,1,6,8,0,0,0,0,0,"你在这个回合内每打出过一张攻击牌，就造成一次 !D! 点伤害。","","G"],
+  "Flechettes": ["飞镖","A","U","E",1,1,4,6,0,0,0,0,0,"手牌中每有一张技能牌，造成 !D! 点伤害。","","G"],
+  "Flying Knee": ["飞膝","A","C","E",1,1,8,11,0,0,1,1,0,"造成 !D! 点伤害。 NL 在下一回合获得 [G] 。","","G"],
+  "Footwork": ["灵动步法","P","U","S",1,1,0,0,0,0,2,3,0,"获得 !M! 点 敏捷 。","","G"],
+  "Glass Knife": ["玻璃刀刃","A","R","E",1,1,8,12,0,0,2,2,0,"造成 !D! 点伤害两次。 NL 这张牌每被打出一次，在本场战斗中其基础伤害减少2。","","G"],
+  "Grand Finale": ["华丽收场","A","R","A",0,0,50,60,0,0,0,0,0,"只有当抽牌堆中没有牌时才能打出。 NL 对所有敌人造成 !D! 点伤害。","我的抽牌堆必须是 空的。","G"],
+  "Heel Hook": ["足跟勾","A","U","E",1,1,5,8,0,0,1,1,0,"造成 !D! 点伤害。 NL 如果敌人有 虚弱 状态 ， NL 获得 [G] 并且 NL 抽1张牌。","","G"],
+  "Infinite Blades": ["无限刀刃","P","U","S",1,1,0,0,0,0,1,1,32,"在你的回合开始时，增加一张 小刀 到你的手牌。","固有 。 NL 在你的回合开始时，增加一张 小刀 到你的手牌。","G"],
+  "Leg Sweep": ["扫腿","S","U","E",2,2,0,0,11,14,2,3,0,"给予 !M! 层 虚弱 . NL 获得 !B! 点 格挡 。","","G"],
+  "Malaise": ["萎靡","S","R","E",-1,-1,0,0,0,0,0,0,1,"敌人失去X点 力量 ，给予X层 虚弱 。 NL 消耗 。","敌人失去X+1点 力量 ，给予X+1层 虚弱 。 NL 消耗 。","G"],
+  "Masterful Stab": ["精巧刺击","A","U","E",0,0,12,16,0,0,0,0,0,"造成 !D! 点伤害。 NL 你每次受到伤害，这张牌的耗能增加1。","","G"],
+  "Neutralize": ["中和","A","B","E",0,0,3,4,0,0,1,2,0,"造成 !D! 点伤害。 NL 给予 !M! 层 虚弱 。","","G"],
+  "Night Terror": ["夜魇","S","R","S",3,2,0,0,0,0,3,3,1,"选择一张牌， NL 在下一回合，将 !M! 份这张牌的复制品放入你的手牌中。 消耗 。","","G"],
+  "Noxious Fumes": ["毒雾","P","U","S",1,1,0,0,0,0,2,3,0,"在你的回合开始时，给予所有敌人 !M! 层 中毒 。","","G"],
+  "Outmaneuver": ["抢占先机","S","C","S",1,1,0,0,0,0,2,3,0,"下一回合 NL 获得 [G] [G] 。","下一回合 NL 获得 [G] [G] [G] 。","G"],
+  "Phantasmal Killer": ["幻影杀手","S","R","S",1,0,0,0,0,0,1,1,0,"在你的下个回合，你所有的攻击伤害翻倍。","","G"],
+  "PiercingWail": ["尖啸","S","C","A",1,1,0,0,0,0,6,8,1,"所有敌人失去 !M! 力量 1回合。 NL 消耗 。","","G"],
+  "Poisoned Stab": ["带毒刺击","A","C","E",1,1,6,8,0,0,3,4,0,"造成 !D! 点伤害。 NL 给予 !M! 层 中毒 。","","G"],
+  "Predator": ["猎杀者","A","U","E",2,2,15,20,0,0,2,2,0,"造成 !D! 点伤害。 NL 在下一回合多抽2张牌。","","G"],
+  "Prepared": ["早有准备","S","C","S",0,0,0,0,0,0,1,2,0,"抽 !M! 张牌。 NL 丢弃 !M! 张牌。","","G"],
+  "Quick Slash": ["快斩","A","C","E",1,1,8,12,0,0,1,1,0,"造成 !D! 点伤害。 NL 抽 1 张牌。","","G"],
+  "Reflex": ["本能反应","S","U","S",-2,-2,0,0,0,0,2,3,0,"不能被打出 。 NL 如果这张牌从你的手牌中被丢弃，抽 !M! 张牌。","","G"],
+  "Riddle With Holes": ["千穿百刺","A","U","E",2,2,3,4,0,0,5,5,0,"造成 !D! 点伤害5次。","","G"],
+  "Setup": ["部署","S","U","S",1,0,0,0,0,0,0,0,0,"将手牌中的一张牌放到抽牌堆的顶部。 NL 并且在其被打出之前，其耗能变为0。","","G"],
+  "Skewer": ["串刺","A","U","E",-1,-1,7,10,0,0,0,0,0,"造成 !D! 点伤害X次。","","G"],
+  "Slice": ["切割","A","C","E",0,0,6,9,0,0,0,0,0,"造成 !D! 点伤害。","","G"],
+  "Underhanded Strike": ["隐秘打击","A","C","E",2,2,12,16,0,0,2,2,64,"造成 !D! 点伤害。 NL 如果你在这回合丢弃过牌，获得 [G] [G] 。","","G"],
+  "Storm of Steel": ["钢铁风暴","S","R","S",1,1,0,0,0,0,0,0,0,"丢弃所有手牌。 NL 每丢弃一张牌，在你的手牌中增加一张 小刀 。","丢弃所有手牌。 NL 每丢弃一张牌，在你的手牌中增加一张 小刀+ 。","G"],
+  "Strike_G": ["打击","A","B","E",1,1,6,9,0,0,0,0,64,"造成 !D! 点伤害。","","G"],
+  "Sucker Punch": ["突然一拳","A","C","E",1,1,7,9,0,0,1,2,0,"造成 !D! 点伤害。 NL 给予 !M! 层 虚弱 。","","G"],
+  "Survivor": ["生存者","S","B","S",1,1,0,0,8,11,1,1,0,"获得 !B! 点 格挡 。 NL 丢弃一张牌。","","G"],
+  "Tactician": ["战术大师","S","U","S",-2,-2,0,0,0,0,1,2,0,"不能被打出 。 NL 如果这张牌从你的手牌中被丢弃，获得 [G] 。","不能被打出 。 NL 如果这张牌从你的手牌中被丢弃，获得 [G] [G] 。","G"],
+  "Terror": ["恐怖","S","U","E",1,0,0,0,0,0,99,99,1,"给予99层 易伤 。 NL 消耗 。","","G"],
+  "Tools of the Trade": ["必备工具","P","R","S",1,0,0,0,0,0,1,1,0,"在你的回合开始时，抽1张牌，丢弃1张牌。","","G"],
+  "Unload": ["乾坤一掷","A","R","E",1,1,14,18,0,0,0,0,0,"造成 !D! 点伤害。 NL 丢弃所有非攻击牌。","","G"],
+  "Well Laid Plans": ["计划妥当","P","U","S",1,1,0,0,0,0,1,2,0,"在你的回合结束时， 保留 最多 !M! 张牌。","","G"],
+  "Wraith Form v2": ["幽魂形态","P","R","S",3,3,0,0,0,0,2,3,0,"获得 !M! 层 无实体 。 NL 在每回合结束时失去1点 敏捷 。","","G"],
+  // === BLUE ===
+  "Aggregate": ["汇集","S","U","S",1,1,0,0,0,0,4,3,0,"你的抽牌堆中每有 !M! 张牌，获得一点 [B] 。","","B"],
+  "All For One": ["万物一心","A","R","E",2,2,10,14,0,0,0,0,0,"造成 !D! 点伤害。 NL 将弃牌堆中所有0耗能的牌放入你的手牌。","","B"],
+  "Amplify": ["增幅","S","R","S",1,1,0,0,0,0,1,2,0,"在这个回合，你的下一张 能力牌 会打出两次。","在这个回合，你的下 !M! 张 能力牌 会打出两次。","B"],
+  "Auto Shields": ["自动护盾","S","U","S",1,1,0,0,11,15,0,0,0,"如果你没有格挡，获得 !B! 点 格挡 。","","B"],
+  "Ball Lightning": ["球状闪电","A","C","E",1,1,7,10,0,0,1,1,0,"造成 !D! 点伤害。 生成 !M! 个 闪电 充能球。","","B"],
+  "Barrage": ["弹幕齐射","A","C","E",1,1,4,6,0,0,0,0,0,"你每拥有一个充能球，造成 !D! 点伤害。","","B"],
+  "Beam Cell": ["光束射线","A","C","E",0,0,3,4,0,0,1,2,0,"造成 !D! 点伤害。 NL 给予 !M! 层 易伤 。","","B"],
+  "Biased Cognition": ["偏差认知","P","R","S",1,1,0,0,0,0,4,5,0,"获得 !M! 点 集中。 NL 在每回合开始时，失去 1 点 集中 。","","B"],
+  "Blizzard": ["暴雪","A","U","A",1,1,0,0,0,0,2,3,0,"对所有敌人造成你在本场战斗中 生成 过的 冰霜 充能球总数 !M! 倍的伤害。","","B"],
+  "BootSequence": ["启动流程","S","U","S",0,0,0,0,10,13,0,0,17,"获得 !B! 点 格挡 。 NL 固有 。 NL 消耗 。","","B"],
+  "Buffer": ["缓冲","P","R","S",2,2,0,0,0,0,1,2,0,"阻止下一次你受到的生命值损伤。","阻止下 !M! 次你受到的生命值损伤。","B"],
+  "Capacitor": ["扩容","P","U","S",1,1,0,0,0,0,2,3,0,"获得 !M! 个充能球栏位。","","B"],
+  "Chaos": ["混沌","S","U","S",1,1,0,0,0,0,1,2,0,"生成 !M! 个随机充能球。","","B"],
+  "Chill": ["冰寒","S","U","S",0,0,0,0,0,0,1,1,33,"当前每有一名敌人，生成 !M! 个 冰霜 充能球。 NL 消耗 。","固有 。 NL 当前每有一名敌人，生成 !M! 个 冰霜 充能球。 NL 消耗 。","B"],
+  "Gash": ["爪击","A","C","E",0,0,3,5,0,0,2,2,0,"造成 !D! 点伤害。 NL 在本场战斗中所有 爪击 牌的伤害增加 !M! 。","","B"],
+  "Cold Snap": ["寒流","A","C","E",1,1,6,9,0,0,1,1,0,"造成 !D! 点伤害。 生成 !M! 个 冰霜 充能球。","","B"],
+  "Compile Driver": ["编译冲击","A","C","E",1,1,7,10,0,0,1,1,0,"造成 !D! 点伤害。 NL 你每有一种不同的 充能球 ，抽 !M! 张牌。","","B"],
+  "Conserve Battery": ["充电","S","C","S",1,1,0,0,7,10,1,1,0,"获得 !B! 点 格挡 。 NL 在下一回合获得 [B] 。","","B"],
+  "Consume": ["耗尽","S","U","S",2,2,0,0,0,0,2,3,0,"获得 !M! 点 集中 。 NL 失去 1 个充能球栏位。","","B"],
+  "Coolheaded": ["冷静头脑","S","C","S",1,1,0,0,0,0,1,2,0,"生成 1 个 冰霜 充能球。 NL 抽 !M! 张牌。","","B"],
+  "Core Surge": ["核心电涌","A","R","E",1,1,11,15,0,0,1,1,1,"造成 !D! 点伤害。 NL 获得 !M! 层 人工制品 。 NL 消耗 。","","B"],
+  "Creative AI": ["创造性AI","P","R","S",3,2,0,0,0,0,1,1,0,"在每回合开始时，增加一张随机 能力 牌到你的手牌。","","B"],
+  "Darkness": ["漆黑","S","U","S",1,1,0,0,0,0,1,1,0,"生成 !M! 个 黑暗 充能球。","生成 !M! 个 黑暗 充能球。 NL 使用所有 黑暗 充能球 的被动能力。","B"],
+  "Defend_B": ["防御","S","B","S",1,1,0,0,5,8,0,0,0,"获得 !B! 点 格挡 。","","B"],
+  "Defragment": ["碎片整理","P","U","S",1,1,0,0,0,0,1,2,0,"获得 !M! 点 集中 。","","B"],
+  "Doom and Gloom": ["愁云惨淡","A","U","A",2,2,10,14,0,0,1,1,0,"对所有敌人造成 !D! 点伤害。 NL 生成 !M! 个 黑暗 充能球。","","B"],
+  "Double Energy": ["双倍能量","S","U","S",1,0,0,0,0,0,0,0,1,"将你的 能量 翻倍。 NL 消耗 。","将你的 能量 翻倍。","B"],
+  "Dualcast": ["双重释放","S","B","S",1,0,0,0,0,0,2,2,0,"激发 你最右侧的充能球2次。","","B"],
+  "Echo Form": ["回响形态","P","R","S",3,3,0,0,0,0,1,1,12,"你每回合打出的第一张牌会打出两次。 NL 虚无 。","你每回合打出的第一张牌会打出两次。","B"],
+  "Electrodynamics": ["电动力学","P","R","S",2,2,0,0,0,0,2,3,0,"闪电 充能球现在会击中所有敌人。 NL 生成 !M! 个 闪电 充能球。","","B"],
+  "Undo": ["均衡","S","U","S",2,2,0,0,13,16,1,1,0,"获得 !B! 点 格挡 。 NL 在本回合 保留 你的手牌。","","B"],
+  "FTL": ["超越光速","A","U","E",0,0,5,6,0,0,3,4,0,"造成 !D! 点伤害。 NL 如果你在这回合打出的牌数少于 !M! 张，抽一张牌。","","B"],
+  "Fission": ["裂变","S","R","S",0,0,0,0,0,0,1,1,1,"移除所有 充能球 ，每移除一个充能球获得 [B] 并抽 !M! 张牌 。 NL 消耗 。","激发 所有 充能球 ，每激发一个充能球获得 [B] 并抽 !M! 张牌 。 NL 消耗 。","B"],
+  "Force Field": ["力场","S","U","S",4,4,0,0,12,16,0,0,0,"你在本场战斗中每打出一张能力牌，耗能就减少1 [B] 。 NL 获得 !B! 点 格挡 。","","B"],
+  "Fusion": ["聚变","S","U","S",2,1,0,0,0,0,1,1,0,"生成 !M! 个 等离子 充能球。","","B"],
+  "Genetic Algorithm": ["遗传算法","S","U","S",1,1,0,0,1,1,2,3,1,"获得 !B! 点 格挡 。 NL 每打出一次，这张牌在本局游戏中的格挡值永久性增加 !M! 。 NL 消耗 。","","B"],
+  "Glacier": ["冰川","S","U","S",2,2,0,0,7,10,2,2,0,"获得 !B! 点 格挡 。 NL 生成 !M! 个 冰霜 充能球。","","B"],
+  "Go for the Eyes": ["眼部攻击","A","C","E",0,0,3,4,0,0,1,2,0,"造成 !D! 点伤害。 NL 如果目标敌人的意图是攻击，则给予其 !M! 层 虚弱 。","","B"],
+  "Heatsinks": ["散热片","P","U","S",1,1,0,0,0,0,1,2,0,"你每打出一张能力牌，抽 !M! 张牌。","","B"],
+  "Hello World": ["你好，世界","P","U","S",1,1,0,0,0,0,1,1,32,"在你的回合开始时，增加一张随机普通牌到你的手牌。","固有 。 NL 在你的回合开始时，增加一张随机普通牌到你的手牌。","B"],
+  "Hologram": ["全息影像","S","C","S",1,1,0,0,3,5,0,0,3,"获得 !B! 点 格挡 。 NL 将弃牌堆中的一张牌放入你的手牌。 NL 消耗 。","获得 !B! 点 格挡 。 NL 将弃牌堆中的一张牌放入你的手牌。","B"],
+  "Hyperbeam": ["超能光束","A","R","A",2,2,26,34,0,0,3,3,0,"对所有敌人造成 !D! 点伤害。 NL 失去 !M! 点 集中 。","","B"],
+  "Leap": ["飞跃","S","C","S",1,1,0,0,9,12,0,0,0,"获得 !B! 点 格挡 。","","B"],
+  "Lockon": ["瞄准靶心","A","U","E",1,1,8,11,0,0,2,3,0,"造成 !D! 点伤害。 NL 给予敌人 !M! 回合 跟踪锁定 效果。","","B"],
+  "Loop": ["循环","P","U","S",1,1,0,0,0,0,1,2,0,"在你的回合开始时，使用你最右侧的1个充能球的被动能力。","在你的回合开始时，使用你最右侧的1个充能球的被动能力 !M! 次。","B"],
+  "Machine Learning": ["机器学习","P","R","S",1,1,0,0,0,0,1,1,32,"在每回合开始时额外抽 !M! 张牌。","固有 。 NL 在每回合开始时额外抽 !M! 张牌。","B"],
+  "Melter": ["熔化","A","U","E",1,1,10,14,0,0,0,0,0,"去除一名敌人的所有 格挡 值。 NL 造成 !D! 点伤害。","","B"],
+  "Meteor Strike": ["陨石打击","A","R","E",5,5,24,30,0,0,3,3,64,"造成 !D! 点伤害。 NL 生成 !M! 个 等离子 充能球。","","B"],
+  "Multi-Cast": ["多重释放","S","R","S",-1,-1,0,0,0,0,0,0,0,"激发 你最右侧的充能球X次。","激发 你最右侧的充能球X+1次。","B"],
+  "Steam Power": ["超频","S","U","S",0,0,0,0,0,0,2,3,0,"抽 !M! 张牌。 NL 将一张 灼伤 放入你的弃牌堆中。","","B"],
+  "Rainbow": ["彩虹","S","R","S",2,2,0,0,0,0,0,0,3,"生成 闪电 、 冰霜 、 黑暗 充能球各一个。 NL 消耗 。","生成 闪电 、 冰霜 、 黑暗 充能球各一个。","B"],
+  "Reboot": ["重启","S","R","S",0,0,0,0,0,0,4,6,1,"将你所有未消耗的牌重新洗牌放入抽牌堆。 NL 抽 !M! 张牌。 NL 消耗 。","","B"],
+  "Rebound": ["弹回","A","C","E",1,1,9,12,0,0,0,0,0,"造成 !D! 点伤害。 NL 你在这个回合打出的下一张牌将会被放置到抽牌堆的顶部。 （只限会移入弃牌堆的牌）","","B"],
+  "Redo": ["递归","S","C","S",1,0,0,0,0,0,0,0,0,"激发 你最右侧的充能球。 NL 然后 生成 一个刚才被 激发 的充能球。","","B"],
+  "Recycle": ["回收","S","U","S",1,0,0,0,0,0,0,0,0,"消耗 一张牌。 NL 获得与其耗能相等的 [B] 。","","B"],
+  "Reinforced Body": ["硬化机体","S","U","S",-1,-1,0,0,7,9,0,0,0,"获得 !B! 点 格挡 X 次。","","B"],
+  "Reprogram": ["重编程","S","U","S",1,1,0,0,0,0,1,2,0,"失去 !M! 点 集中 。 NL 获得!M!点 力量 。 NL 获得!M!点 敏捷 。","","B"],
+  "Rip and Tear": ["狂乱撕扯","A","U","A",1,1,7,9,0,0,2,2,0,"随机对敌人造成 !D! 点伤害 !M! 次。","","B"],
+  "Scrape": ["刮削","A","U","E",1,1,7,10,0,0,4,5,0,"造成 !D! 伤害。 NL 抽 !M! 张牌。 NL 丢弃抽到的牌中耗能不为0的牌。","","B"],
+  "Seek": ["搜寻","S","R","S",0,0,0,0,0,0,1,2,1,"从抽牌堆中选择 !M! 张牌放入你的手牌。 NL 消耗 。","","B"],
+  "Self Repair": ["自我修复","P","U","S",1,1,0,0,0,0,7,10,0,"在战斗结束时，回复 !M! 点生命。","","B"],
+  "Skim": ["快速检索","S","U","S",1,1,0,0,0,0,3,4,0,"抽 !M! 张牌。","","B"],
+  "Stack": ["堆栈","S","C","S",1,1,0,0,0,3,0,0,0,"获得与你当前弃牌堆中牌数相等的 格挡 值。","获得你当前弃牌堆中牌数+3的 格挡 值。","B"],
+  "Static Discharge": ["静电释放","P","U","S",1,1,0,0,0,0,1,2,0,"每当你受到未被格挡的攻击伤害时， 生成 !M! 个 闪电 充能球。","","B"],
+  "Steam": ["蒸汽护壁","S","C","S",0,0,0,0,6,8,0,0,0,"获得 !B! 点 格挡 。 NL 这张牌每被打出一次，它在本场战斗中的基础 格挡 下降1。","","B"],
+  "Storm": ["雷暴","P","U","S",1,1,0,0,0,0,1,1,32,"你每打出一张能力牌， 生成 1 个 闪电 充能球。","固有 。 NL 你每打出一张能力牌，生成 1 个 闪电 充能球。","B"],
+  "Streamline": ["精简改良","A","C","E",2,2,15,20,0,0,1,1,0,"造成 !D! 点伤害。 NL 这张牌每被打出一次，它在本场战斗中的耗能减少 !M! 。","","B"],
+  "Strike_B": ["打击","A","B","E",1,1,6,9,0,0,0,0,64,"造成 !D! 点伤害。","","B"],
+  "Sunder": ["分离","A","U","E",3,3,24,32,0,0,0,0,0,"造成 !D! 点伤害。 NL 如果这张牌杀死了敌人，则获得 [B] [B] [B] 。","","B"],
+  "Sweeping Beam": ["扫荡射线","A","C","A",1,1,6,9,0,0,1,1,0,"对所有敌人造成 !D! 点伤害。 NL 抽 !M! 张牌。","","B"],
+  "Tempest": ["暴风雨","S","U","S",-1,-1,0,0,0,0,0,0,1,"生成 X 个 闪电 充能球。 NL 消耗 。","生成 X+1 个 闪电 充能球。 NL 消耗 。","B"],
+  "Thunder Strike": ["雷霆打击","A","R","A",3,3,7,9,0,0,0,0,64,"你在本场战斗中每 生成 过 一个 闪电 充能球，随机造成一次 !D! 点伤害。","","B"],
+  "Turbo": ["内核加速","S","C","S",0,0,0,0,0,0,2,3,0,"获得 [B] [B] 。 NL 将一张 虚空 放入你的弃牌堆中。","获得 [B] [B] [B] 。 NL 将一张 虚空 放入你的弃牌堆中。","B"],
+  "White Noise": ["白噪声","S","U","S",1,0,0,0,0,0,0,0,1,"增加一张随机能力牌到你的手牌。 NL 这张牌在本回合耗能变为0。 NL 消耗 。","","B"],
+  "Zap": ["电击","S","B","S",1,0,0,0,0,0,1,1,0,"生成 !M! 个 闪电 充能球。","","B"],
+  // === PURPLE ===
+  "Alpha": ["阿尔法","S","R","S",1,1,0,0,0,0,0,0,33,"将一张 贝塔 放入你的抽牌堆中。 NL 消耗 。","固有 。 NL 将一张 贝塔 放入你的抽牌堆中。 NL 消耗 。","P"],
+  "BattleHymn": ["战歌","P","U","S",1,1,0,0,0,0,1,1,32,"在每回合开始时，将一张 惩恶 加入你的手牌。","固有 。 在每回合开始时，将一张 惩恶 加入你的手牌。","P"],
+  "Blasphemy": ["渎神","S","R","S",1,1,0,0,0,0,0,0,257,"进入 神格 。 NL 在下回合死亡。 NL 消耗 。","保留 。 NL 进入 神格 。 NL 在下回合死亡。 NL 消耗 。","P"],
+  "BowlingBash": ["碰撞连击","A","C","E",1,1,7,10,0,0,0,0,0,"当前每有一名敌人，造成 !D! 点伤害。","","P"],
+  "Brilliance": ["光辉","A","R","E",1,1,12,16,0,0,0,0,0,"造成 !D! 点伤害。 NL 额外造成本场战斗中获得的 真言 总层数的伤害。","","P"],
+  "CarveReality": ["改造现实","A","U","E",1,1,6,10,0,0,0,0,0,"造成 !D! 点伤害。 NL 将一张 惩恶 加入你的手牌。","造成 !D! 点伤害。 将一张 惩恶+ 加入你的手牌。","P"],
+  "Collect": ["收集","S","U","S",-1,-1,0,0,0,0,0,0,1,"在你的下X个回合开始时，增加一张 奇迹+ 到你的手牌。 NL 消耗 。","在你的下X+1个回合开始时，增加一张 奇迹+ 到你的手牌。 NL 消耗 。","P"],
+  "Conclude": ["结末","A","U","A",1,1,12,16,0,0,0,0,0,"对所有敌人造成 !D! 点伤害。 NL 结束你的回合。","","P"],
+  "ConjureBlade": ["聚能成刃","S","R","S",-1,-1,0,0,0,0,0,0,1,"将一张 灭除之刃 放入你的抽牌堆中。 NL 消耗 。","将一张X数值+1的 灭除之刃 放入你的抽牌堆中。 NL 消耗 。","P"],
+  "Consecrate": ["供奉","A","C","A",0,0,5,8,0,0,0,0,0,"对所有敌人造成 !D! 点伤害。","","P"],
+  "Crescendo": ["渐强","S","C","S",1,0,0,0,0,0,0,0,129,"保留 。 NL 进入 愤怒 。 NL 消耗 。","","P"],
+  "CrushJoints": ["粉碎关节","A","C","E",1,1,8,10,0,0,1,2,0,"造成 !D! 点伤害。 NL 如果本场战斗中打出的上一张牌是技能牌，给予 !M! 层 易伤 。","","P"],
+  "CutThroughFate": ["斩破命运","A","C","E",1,1,7,9,0,0,2,3,0,"造成 !D! 点伤害。 NL 预见 !M! 。 NL 抽1张牌。","","P"],
+  "DeceiveReality": ["欺瞒现实","S","U","S",1,1,0,0,4,7,0,0,0,"获得 !B! 点 格挡 。 NL 将一张 平安 加入你的手牌。","获得 !B! 点 格挡 。 将一张 平安+ 加入你的手牌。","P"],
+  "Defend_P": ["防御","S","B","S",1,1,0,0,5,8,0,0,0,"获得 !B! 点 格挡 。","","P"],
+  "DeusExMachina": ["机械降神","S","R","S",-2,-2,0,0,0,0,2,3,1,"不能被打出 。 NL 当你抽到这张牌时，在你的手牌中加入 !M! 张 奇迹 ，然后 消耗 。","","P"],
+  "DevaForm": ["天人形态","P","R","S",3,3,0,0,0,0,1,1,12,"虚无 。 NL 在你的回合开始时获得 [W] ，每回合增加 !M! 。","在你的回合开始时获得 [W] ，每回合增加 !M! 。","P"],
+  "Devotion": ["虔信","P","R","S",1,1,0,0,0,0,2,3,0,"在你的回合开始时，获得 !M! 层 真言 。","","P"],
+  "EmptyBody": ["化体为空","S","C","S",1,1,0,0,7,10,0,0,0,"获得 !B! 点 格挡 。 NL 退出当前 姿态 。","","P"],
+  "EmptyFist": ["化拳为空","A","C","E",1,1,9,14,0,0,0,0,0,"造成 !D! 点伤害。 NL 退出当前 姿态 。","","P"],
+  "EmptyMind": ["化智为空","S","U","S",1,1,0,0,0,0,2,3,0,"抽 !M! 张牌。 NL 退出当前 姿态 。","","P"],
+  "Eruption": ["暴怒","A","B","E",2,1,9,9,0,0,0,0,0,"造成 !D! 点伤害。 NL 进入 愤怒 。","","P"],
+  "Establishment": ["确立基础","P","R","S",1,1,0,0,0,0,1,1,32,"每当有卡牌被 保留 时，将其在本场战斗的耗能减少 !M! 。","固有 。 NL 每当有卡牌被 保留 时，将其在本场战斗的耗能减少 !M! 。","P"],
+  "Evaluate": ["评估","S","C","S",1,1,0,0,6,10,0,0,0,"获得 !B! 点 格挡 。 NL 在你的抽牌堆中加入一张 洞见 。","获得 !B! 点 格挡 。 NL 在你的抽牌堆中加入一张 洞见+ 。","P"],
+  "Fasting2": ["斋戒","P","U","S",2,2,0,0,0,0,3,4,0,"获得 !M! 点 力量 。 NL 获得 !M! 敏捷 。 NL 每回合开始时少获得1 [W] 。","","P"],
+  "FearNoEvil": ["不惧妖邪","A","U","E",1,1,8,11,0,0,0,0,0,"造成 !D! 点伤害。 NL 如果目标敌人的意图是攻击，则进入 平静 。","","P"],
+  "FlurryOfBlows": ["疾风连击","A","C","E",0,0,4,6,0,0,0,0,0,"造成 !D! 点伤害。 NL 你每次转换 姿态 时，将这张牌从弃牌堆放回你的手牌。","","P"],
+  "FlyingSleeves": ["流云飞袖","A","C","E",1,1,4,6,0,0,2,2,128,"保留 。 NL 造成 !D! 点伤害两次。","","P"],
+  "FollowUp": ["追击","A","C","E",1,1,7,11,0,0,0,0,0,"造成 !D! 点伤害。 NL 如果本场战斗中打出的上一张牌是攻击牌，获得 [W] 。","","P"],
+  "ForeignInfluence": ["他山之石","S","U","S",0,0,0,0,0,0,0,0,1,"从3张任意颜色的攻击牌中选择1张加入你的手牌。 NL 消耗 。","从3张任意颜色的攻击牌中选择1张加入你的手牌。 这张牌在本回合耗能变为0。 消耗 。","P"],
+  "Wireheading": ["先见之明","P","U","S",1,1,0,0,0,0,3,4,0,"在你的回合开始时， 预见 !M! 。","","P"],
+  "Halt": ["停顿","S","C","S",0,0,0,0,3,4,9,9,0,"获得 !B! 点 格挡 。 NL 愤怒 ：获得 !M! 点额外格挡。","","P"],
+  "Indignation": ["义愤填膺","S","U","S",1,1,0,0,0,0,3,5,0,"愤怒 ：给予所有敌人 !M! 层 易伤 。 NL 否则，进入 愤怒 。","","P"],
+  "InnerPeace": ["内心宁静","S","U","S",1,1,0,0,0,0,3,4,0,"平静 ： 抽 !M! 张牌。 NL 否则，进入 平静 。","","P"],
+  "Judgement": ["审判","S","R","E",1,1,0,0,0,0,30,40,0,"如果目标敌人的生命值小于等于 !M! 点， NL 则将其生命值变为0。","","P"],
+  "JustLucky": ["幸运一击","A","C","E",0,0,3,4,2,3,1,2,0,"预见 !M! 。 NL 获得 !B! 点 格挡 。 NL 造成 !D! 点伤害。","","P"],
+  "LessonLearned": ["勤学精进","A","R","E",2,2,10,13,0,0,0,0,1,"造成 !D! 点伤害。 NL 斩杀 时， 升级 你牌组中的一张随机牌。 消耗 。","","P"],
+  "LikeWater": ["如水","P","U","S",1,1,0,0,0,0,5,7,0,"在你的回合结束时，如果你处于 平静 ， 则获得 !M! 点 格挡 。","","P"],
+  "MasterReality": ["操控现实","P","R","S",1,0,0,0,0,0,1,1,0,"所有在战斗中临时增加的牌将被 升级 。","","P"],
+  "Meditate": ["冥想","S","U","S",1,1,0,0,0,0,1,2,0,"将弃牌堆中的一张牌放入你的手牌，并将其 保留 。 NL 进入 平静 。 NL 结束你的回合。","将弃牌堆中的2张牌放入你的手牌，并将它们 保留 。 NL 进入 平静 。 NL 结束你的回合。","P"],
+  "MentalFortress": ["心灵堡垒","P","U","S",1,1,0,0,0,0,4,6,0,"每当你转换 姿态 时，获得 !M! 点 格挡 。","","P"],
+  "Nirvana": ["涅槃","P","U","S",1,1,0,0,0,0,3,4,0,"你每次 预见 时，获得 !M! 点 格挡 。","","P"],
+  "Omniscience": ["通晓万物","S","R","S",4,3,0,0,0,0,2,2,1,"选择你抽牌堆中的一张牌。 将这张牌打出两次然后将其 消耗 。 NL 消耗 。","","P"],
+  "Perseverance": ["坚韧","S","U","S",1,1,0,0,5,7,2,3,128,"保留 。 NL 获得 !B! 点 格挡 。 NL 每当这张牌被 保留 时，将其在本场战斗的格挡增加 !M! 点。","","P"],
+  "Pray": ["祈祷","S","U","S",1,1,0,0,0,0,3,4,0,"获得 !M! 层 真言 。 NL 在你的抽牌堆中加入1张 洞见 。","获得 !M! 层 真言 。 NL 在你的抽牌堆中加入1张 洞见+ 。","P"],
+  "PathToVictory": ["点穴","S","C","E",1,1,0,0,0,0,8,11,0,"给予 !M! 层 印记 。 NL 所有拥有 印记 的敌人，失去与层数相等的生命。","","P"],
+  "Prostrate": ["五体投地","S","C","S",0,0,0,0,4,4,2,3,0,"获得 !M! 层 真言 。 NL 获得 !B! 点 格挡 。","","P"],
+  "Protect": ["护身","S","C","S",2,2,0,0,12,16,0,0,128,"保留 。 NL 获得 !B! 点 格挡 。","","P"],
+  "Ragnarok": ["诸神之黄昏","A","R","A",3,3,5,6,0,0,5,6,0,"随机对敌人造成 !D! 点伤害 !M! 次。","","P"],
+  "ReachHeaven": ["立地升天","A","U","E",2,2,10,15,0,0,0,0,0,"造成 !D! 点伤害。 在你的抽牌堆中加入1张 NL 以暴易暴 。","造成 !D! 点伤害。 在你的抽牌堆中加入1张 以暴易暴+ 。","P"],
+  "Adaptation": ["猛虎下山","P","U","S",1,0,0,0,0,0,2,2,0,"每当你进入 愤怒 时，抽 !M! 张牌。","","P"],
+  "Sanctity": ["圣洁","S","U","S",1,1,0,0,6,9,2,2,0,"获得 !B! 点 格挡 。 NL 如果本场战斗中打出的上一张牌是技能牌，抽 !M! 张牌。","","P"],
+  "SandsOfTime": ["时之沙","A","U","E",4,4,20,26,0,0,0,0,128,"保留 。 NL 造成 !D! 点伤害。 NL 每当这张牌被 保留 时，将其在本场战斗的耗能减少1。","","P"],
+  "SashWhip": ["腰带抽打","A","C","E",1,1,8,10,0,0,1,2,0,"造成 !D! 点伤害。 NL 如果本场战斗中打出的上一张牌是攻击牌，给予 !M! 层 虚弱 。","","P"],
+  "Scrawl": ["潦草急就","S","R","S",1,0,0,0,0,0,0,0,1,"抽牌直到将手牌抽满。 NL 消耗 。","","P"],
+  "SignatureMove": ["招牌技","A","U","E",2,2,30,40,0,0,0,0,0,"只有当这张牌是你手中唯一的一张攻击牌时才可以被打出。 造成 !D! 点伤害。","","P"],
+  "Vengeance": ["怒火中烧","S","U","S",1,1,0,0,0,0,2,3,0,"在你的下个回合开始时，进入 愤怒 并抽 !M! 张牌。","","P"],
+  "SpiritShield": ["精神护盾","S","R","S",2,2,0,0,0,0,3,4,0,"你每有一张手牌，获得 !M! 点 格挡 。","","P"],
+  "Strike_P": ["打击","A","B","E",1,1,6,9,0,0,0,0,64,"造成 !D! 点伤害。","","P"],
+  "Study": ["研习","P","U","S",2,1,0,0,0,0,1,1,0,"在你的回合结束时，在你的抽牌堆中加入一张 洞见 。","","P"],
+  "Swivel": ["旋身","S","U","S",2,2,0,0,8,11,0,0,0,"获得 !B! 点 格挡 。 NL 你打出的下一张攻击牌耗能变为0。","","P"],
+  "TalkToTheHand": ["以手拒之","A","U","E",1,1,5,7,0,0,2,3,1,"造成 !D! 点伤害。 NL 每当目标敌人受到攻击时，你获得 !M! 点格挡。 NL 消耗 。","","P"],
+  "Tantrum": ["发泄","A","U","E",1,1,3,3,0,0,3,4,0,"造成 !D! 点伤害 !M! 次。 NL 进入 愤怒 。 NL 将这张牌放入你的抽牌堆。","","P"],
+  "ThirdEye": ["天眼","S","C","S",1,1,0,0,7,9,3,5,0,"获得 !B! 点 格挡 。 NL 预见 !M! 。","","P"],
+  "ClearTheMind": ["安宁","S","C","S",1,0,0,0,0,0,0,0,129,"保留 。 进入 平静 。 NL 消耗 。","","P"],
+  "Vault": ["腾跃","S","R","A",3,2,0,0,0,0,0,0,1,"在本回合结束后，额外获得一回合。 NL 结束你的回合。 NL 消耗 。","","P"],
+  "Vigilance": ["警惕","S","B","S",2,2,0,0,8,12,0,0,0,"获得 !B! 点 格挡 。 NL 进入 平静 。","","P"],
+  "Wallop": ["当头棒喝","A","U","E",2,2,9,12,0,0,0,0,0,"造成 !D! 点伤害。 NL 获得与所造成的未被格挡的伤害相等的 格挡 。","","P"],
+  "WaveOfTheHand": ["摆手","S","U","S",1,1,0,0,0,0,1,2,0,"在本回合，你每次获得 格挡 时，给予所有敌人 !M! 层 虚弱 。","","P"],
+  "Weave": ["迂回","A","U","E",0,0,4,6,0,0,0,0,0,"造成 !D! 点伤害。 NL 你每次 预见 时，将这张牌从弃牌堆放回你的手牌。","","P"],
+  "WheelKick": ["回环踢","A","U","E",2,2,15,20,0,0,2,2,0,"造成 !D! 点伤害。 NL 抽 !M! 张牌。","","P"],
+  "WindmillStrike": ["旋转打击","A","U","E",2,2,7,10,0,0,4,5,192,"保留 。 NL 造成 !D! 点伤害。 NL 每当这张牌被 保留 时，将其在本场战斗的伤害增加 !M! 点。","","P"],
+  "Wish": ["许愿","S","R","S",3,3,3,4,6,8,25,30,1,"选择：获得 !B! 层 多层护甲 、 !D! 点 力量 、 或 !M! 金币 。 NL 消耗 。","","P"],
+  "Worship": ["敬拜","S","U","S",2,2,0,0,0,0,5,5,256,"获得 !M! 层 真言 。","保留 。 NL 获得 !M! 层 真言 。","P"],
+  "WreathOfFlame": ["火焰纹","S","U","S",1,1,0,0,0,0,5,8,0,"你的下一张攻击牌造成 !M! 点额外伤害。","","P"],
+  // === TEMPCARDS ===
+  "Beta": ["贝塔","S","SP","S",2,1,0,0,0,0,0,0,1,"将一张 欧米伽 放入你的抽牌堆中。 NL 消耗 。","","CL"],
+  "Expunger": ["灭除之刃","A","SP","E",1,1,9,15,0,0,0,0,0,"造成 !D! 点伤害 X 次。","","CL"],
+  "Insight": ["洞见","S","SP","S",0,0,0,0,0,0,2,3,129,"保留 。 NL 抽 !M! 张牌。 NL 消耗 。","","CL"],
+  "Miracle": ["奇迹","S","SP","S",0,0,0,0,0,0,1,2,129,"保留 。 NL 获得 [W] 。 NL 消耗 。","保留 。 NL 获得 [W] [W] 。 NL 消耗 。","CL"],
+  "Omega": ["欧米伽","P","SP","S",3,3,0,0,0,0,50,60,0,"在你的回合结束时，对所有敌人造成 !M! 点伤害。","","CL"],
+  "Safety": ["平安","S","SP","S",1,1,0,0,12,16,0,0,129,"保留 。 NL 获得 !B! 点 格挡 。 NL 消耗 。","","CL"],
+  "Shiv": ["小刀","A","SP","E",0,0,4,6,0,0,0,0,1,"造成 !D! 点伤害。 NL 消耗 。","","CL"],
+  "Smite": ["惩恶","A","SP","E",1,1,12,16,0,0,0,0,129,"保留 。 NL 造成 !D! 点伤害。 NL 消耗 。","","CL"],
+  "ThroughViolence": ["以暴易暴","A","SP","E",0,0,20,30,0,0,0,0,129,"保留 。 NL 造成 !D! 点伤害。 NL 消耗 。","","CL"],
 };
 
 const COLORLESS_CARDS = [
@@ -1792,7 +2223,18 @@ const COLORLESS_CARDS = [
   "Panache", "PanicButton", "Purity", "Sadistic Nature", "Secret Technique",
   "Secret Weapon", "Swift Strike", "The Bomb", "Thinking Ahead", "Trip", "Violence"
 ];
-const IRONCLAD_POOL = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1 && COLORLESS_CARDS.indexOf(k) === -1);
+const IRONCLAD_POOL = Object.keys(RAW_CARDS).filter(k => (!RAW_CARDS[k][15] || RAW_CARDS[k][15] === "R") && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1 && COLORLESS_CARDS.indexOf(k) === -1);
+const SILENT_POOL = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][15] === "G" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+const DEFECT_POOL = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][15] === "B" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+const WATCHER_POOL = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][15] === "P" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+
+function getCharCardPool(state) {
+  const ch = state && state.ch;
+  if (ch === "THE_SILENT") return SILENT_POOL;
+  if (ch === "DEFECT") return DEFECT_POOL;
+  if (ch === "WATCHER") return WATCHER_POOL;
+  return IRONCLAD_POOL;
+}
 
 function parseCard(cardStr) {
   const s = String(cardStr || "Strike_R");
@@ -1818,24 +2260,37 @@ function getCardDef(cardStr) {
     dmg = 12 + Math.floor((up * (up + 7)) / 2);
   }
   let cost = isUp ? r[5] : r[4];
-  if (mod !== "" && mod.startsWith("c")) {
-    cost = parseInt(mod.slice(1), 10);
-  } else if (mod !== "" && id === "Rampage") {
-    dmg += parseInt(mod, 10) || 0;
-  } else if (mod !== "" && id === "RitualDagger") {
-    dmg = parseInt(mod, 10) || dmg;
+  let blk = isUp ? r[9] : r[8];
+  let mag = isUp ? r[11] : r[10];
+  let extra = 0;
+  if (mod !== "") {
+    const cMatch = mod.match(/c(d+)/);
+    if (cMatch) cost = parseInt(cMatch[1], 10);
+    const nMatch = mod.replace(/cd+/g, "").match(/-?d+/);
+    if (nMatch) {
+      extra = parseInt(nMatch[0], 10) || 0;
+      if (id === "Rampage" || id === "Glass Knife" || id === "WindmillStrike") {
+        dmg = Math.max(0, dmg + extra);
+      } else if (id === "RitualDagger") {
+        dmg = extra || dmg;
+      } else if (id === "Genetic Algorithm" || id === "Steam" || id === "Perseverance") {
+        blk = Math.max(0, blk + extra);
+      } else if (id === "Expunger") {
+        mag = extra || 1;
+      }
+    }
   }
-  const blk = isUp ? r[9] : r[8];
-  const mag = isUp ? r[11] : r[10];
   const flags = r[12];
-  const exhaust = (flags & 1) ? !(isUp && (flags & 2)) : false;
+  const exhaust = Boolean(((flags & 1) && !(isUp && (flags & 2))) || (isUp && (flags & 512)));
   const ethereal = (flags & 4) ? !(isUp && (flags & 8)) : false;
   const innate = Boolean((flags & 16) || (isUp && (flags & 32)));
   const isStrike = Boolean(flags & 64);
+  const retain = Boolean((flags & 128) || (isUp && (flags & 256)));
   const name = r[0] + (up > 1 ? "+" + up : (isUp ? "+" : ""));
   const desc = (isUp && r[14]) ? r[14] : r[13];
   const target = (isUp && (id === "Blind" || id === "Trip")) ? "A" : r[3];
-  return { id, up, mod, name, type: r[1], rarity: r[2], target, cost, dmg, blk, mag, exhaust, ethereal, innate, isStrike, desc };
+  const color = r[15] || (r[1] === "ST" ? "ST" : (r[1] === "C" ? "CU" : (COLORLESS_CARDS.indexOf(id) !== -1 || r[2] === "SP" ? "CL" : "R")));
+  return { id, up, mod, extra, name, type: r[1], rarity: r[2], target, cost, dmg, blk, mag, exhaust, ethereal, innate, isStrike, retain, color, desc };
 }
 
 // ==================== 4. Complete Relic Database (ZHS) ====================
@@ -1967,7 +2422,36 @@ const RELICS = {
   "Odd Mushroom": { name: "奇怪蘑菇", tier: "SP", desc: "当你有 易伤 状态时，受到的额外伤害从 50% 降为 25% 。" },
   "Red Mask": { name: "红面具", tier: "SP", desc: "每场战斗开始时，给予所有敌人 1 层 虚弱 。" },
   "MutagenicStrength": { name: "突变之力", tier: "SP", desc: "每场战斗开始获得 3 点 力量 ，第一回合结束时失去 3 点 力量 。" },
-  "Mark of the Bloom": { name: "绽放印记", tier: "SP", desc: "你无法再回复任何生命。" }
+  "Mark of the Bloom": { name: "绽放印记", tier: "SP", desc: "你无法再回复任何生命。" },
+  // Silent Class Relics
+  "Ring of the Snake": { name: "蛇之戒指", tier: "S", char: "THE_SILENT", desc: "每场战斗开始时，额外抽 2 张牌。" },
+  "Ring of the Serpent": { name: "长蛇戒指", tier: "B", char: "THE_SILENT", desc: "替换 蛇之戒指 。在每回合开始时，额外抽 1 张牌。" },
+  "Snecko Skull": { name: "异蛇头骨", tier: "C", char: "THE_SILENT", desc: "每当你给予 中毒 时，额外给予 1 层 中毒 。" },
+  "Ninja Scroll": { name: "忍术卷轴", tier: "U", char: "THE_SILENT", desc: "每场战斗开始时，手牌中增加 3 张 小刀 。" },
+  "Paper Krane": { name: "纸鹤", tier: "U", char: "THE_SILENT", desc: "有 虚弱 状态的敌人造成的伤害减少 40% 而非 25% 。" },
+  "Tough Bandages": { name: "结实绷带", tier: "R", char: "THE_SILENT", desc: "你每在你的回合丢弃一张牌，获得 3 点 格挡 。" },
+  "Tingsha": { name: "铜钹", tier: "R", char: "THE_SILENT", desc: "你每在你的回合丢弃一张牌，对随机敌人造成 3 点伤害。" },
+  "TwistedFunnel": { name: "扭曲漏斗", tier: "SH", char: "THE_SILENT", desc: "每场战斗开始时，给予所有敌人 4 层 中毒 。" },
+  "WristBlade": { name: "袖剑", tier: "B", char: "THE_SILENT", desc: "耗能为 0 的攻击牌额外造成 4 点伤害。" },
+  // Defect Class Relics
+  "Cracked Core": { name: "破损核心", tier: "S", char: "DEFECT", desc: "每场战斗开始时，生成 1 个 闪电 充能球。" },
+  "FrozenCore": { name: "冻结核心", tier: "B", char: "DEFECT", desc: "替换 破损核心 。回合结束时若有空余栏位，生成 1 个 冰霜 充能球。" },
+  "DataDisk": { name: "数据磁盘", tier: "C", char: "DEFECT", desc: "每场战斗开始时，获得 1 点 集中 。" },
+  "Symbiotic Virus": { name: "共生病毒", tier: "U", char: "DEFECT", desc: "每场战斗开始时，生成 1 个 黑暗 充能球。" },
+  "Cables": { name: "镀金缆线", tier: "U", char: "DEFECT", desc: "你最右侧的充能球会额外触发一次被动效果。" },
+  "Emotion Chip": { name: "情感芯片", tier: "R", char: "DEFECT", desc: "若上一回合受到生命损伤，回合开始时触发所有充能球的被动效果。" },
+  "Runic Capacitor": { name: "符文电容器", tier: "SH", char: "DEFECT", desc: "每场战斗开始时，获得 3 个额外充能球栏位。" },
+  "Inserter": { name: "机械臂", tier: "B", char: "DEFECT", desc: "每 2 回合，获得 1 个充能球栏位。" },
+  "Nuclear Battery": { name: "核能电池", tier: "B", char: "DEFECT", desc: "每场战斗开始时，生成 1 个 等离子 充能球。" },
+  // Watcher Class Relics
+  "PureWater": { name: "至纯之水", tier: "S", char: "WATCHER", desc: "每场战斗开始时，将一张 奇迹 放入你的手牌。" },
+  "HolyWater": { name: "圣水", tier: "B", char: "WATCHER", desc: "替换 至纯之水 。每场战斗开始时，将 3 张 奇迹 放入你的手牌。" },
+  "Damaru": { name: "手摇鼓", tier: "C", char: "WATCHER", desc: "在你的回合开始时，获得 1 层 真言 。" },
+  "TeardropLocket": { name: "泪滴吊坠盒", tier: "U", char: "WATCHER", desc: "每场战斗开始时处于 平静 姿态。" },
+  "Yang": { name: "两仪", tier: "U", char: "WATCHER", desc: "每当你打出一张攻击牌，本回合获得 1 点临时 敏捷 。" },
+  "CloakClasp": { name: "斗篷扣", tier: "R", char: "WATCHER", desc: "在你的回合结束时，每有一张手牌获得 1 点 格挡 。" },
+  "GoldenEye": { name: "黄金眼", tier: "R", char: "WATCHER", desc: "你每次 预见 时，额外 预见 2 张牌。" },
+  "VioletLotus": { name: "紫色莲花", tier: "B", char: "WATCHER", desc: "每次你离开 平静 时，额外获得 1 点能量。" }
 };
 
 // ==================== 5. Complete Potion Database (ZHS) ====================
@@ -2065,7 +2549,67 @@ const POWERS_META = {
   "Curiosity": { name: "好奇", icon: "🪶", desc: "每当玩家打出一张能力牌，获得 !A! 点力量。" },
   "Unawakened": { name: "未觉醒", icon: "🐦‍⬛", desc: "倒下后将在下一回合满血觉醒重生为第二形态。" },
   "TimeWarp": { name: "时间扭曲", icon: "⏱️", desc: "玩家每累计打出 12 张牌（当前 !A!/12），强制结束回合并 +2 力量。" },
-  "GenericStrengthUp": { name: "成长", icon: "📈", desc: "每回合结束时获得 !A! 点力量。" }
+  "GenericStrengthUp": { name: "成长", icon: "📈", desc: "每回合结束时获得 !A! 点力量。" },
+  // Silent Powers
+  "Poison": { name: "中毒", icon: "☠️", debuff: true, desc: "在回合开始时失去 !A! 点生命，随后层数减 1。" },
+  "Accuracy": { name: "精准", icon: "🎯", desc: "【小刀】造成的伤害增加 !A! 点。" },
+  "AfterImage": { name: "余像", icon: "👤", desc: "你每打出一张牌，获得 !A! 点格挡。" },
+  "AThousandCuts": { name: "凌迟", icon: "🗡️", desc: "你每打出一张牌，对所有敌人造成 !A! 点伤害。" },
+  "Burst": { name: "爆发", icon: "💥", desc: "本回合你打出的下 !A! 张技能牌会打出两次。" },
+  "CorpseExplosion": { name: "尸爆", icon: "💀", debuff: true, desc: "死亡时对所有其他敌人造成等同于最大生命值 !A! 倍的伤害。" },
+  "Choke": { name: "勒脖", icon: "🪢", debuff: true, desc: "本回合玩家每打出一张牌，失去 !A! 点生命。" },
+  "Envenom": { name: "涂毒", icon: "🐍", desc: "每当攻击造成未被格挡的伤害时，给予 !A! 层中毒。" },
+  "InfiniteBlades": { name: "无限刀刃", icon: "🔪", desc: "每回合开始时，手牌中增加 !A! 张【小刀】。" },
+  "NoxiousFumes": { name: "毒雾", icon: "🧪", desc: "每回合开始时，给予所有敌人 !A! 层中毒。" },
+  "Phantasmal": { name: "幻影", icon: "👻", desc: "在你的下一回合，所有攻击伤害翻倍。" },
+  "DoubleDamage": { name: "双倍伤害", icon: "⚔️", desc: "本回合所有攻击造成双倍伤害。" },
+  "ToolsOfTheTrade": { name: "必备工具", icon: "🧰", desc: "每回合开始时，抽 !A! 张牌并丢弃 !A! 张牌。" },
+  "WellLaidPlans": { name: "计划妥当", icon: "📋", desc: "每回合结束时，保留最多 !A! 张手牌。" },
+  "WraithForm": { name: "幽魂形态", icon: "🌑", debuff: true, desc: "每回合结束时失去 !A! 点敏捷。" },
+  "Blur": { name: "残影", icon: "💨", desc: "接下来的 !A! 回合开始时，格挡不会消失。" },
+  "NextTurnEnergy": { name: "下回合能量", icon: "⚡", desc: "在下回合开始时获得 !A! 点能量。" },
+  "DrawCardNextTurn": { name: "下回合抽牌", icon: "🃏", desc: "在下回合开始时额外抽 !A! 张牌。" },
+  "Nightmare": { name: "夜魇", icon: "🦇", desc: "在下回合开始时，将 !A! 张复制牌加入手牌。" },
+  // Defect Powers
+  "Focus": { name: "集中", icon: "💠", desc: "充能球的效果提升 !A! 点。" },
+  "Bias": { name: "偏差", icon: "📉", debuff: true, desc: "每回合开始时失去 !A! 点集中。" },
+  "CreativeAI": { name: "创意AI", icon: "🧠", desc: "每回合开始时，随机增加 !A! 张能力牌到手牌。" },
+  "EchoForm": { name: "回响形态", icon: "🔊", desc: "每回合打出的前 !A! 张牌会打出两次。" },
+  "Electrodynamics": { name: "电动力学", icon: "⚡", desc: "闪电充能球现在会击中所有敌人。" },
+  "Heatsinks": { name: "散热片", icon: "♨️", desc: "每当你打出一张能力牌，抽 !A! 张牌。" },
+  "HelloWorld": { name: "你好世界", icon: "🌐", desc: "每回合开始时，增加 !A! 张随机普通牌到手牌。" },
+  "Loop": { name: "循环", icon: "🔄", desc: "每回合开始时，你最右侧的充能球触发 !A! 次被动。" },
+  "MachineLearning": { name: "机器学习", icon: "🤖", desc: "每回合开始时额外抽 !A! 张牌。" },
+  "SelfRepair": { name: "自我修复", icon: "🔧", desc: "战斗结束时回复 !A! 点生命。" },
+  "StaticDischarge": { name: "静电释放", icon: "🌩️", desc: "受到未被格挡的攻击伤害时，生成 !A! 个闪电充能球。" },
+  "Storm": { name: "雷暴", icon: "⛈️", desc: "每打出一张能力牌，生成 !A! 个闪电充能球。" },
+  "LockOn": { name: "跟踪锁定", icon: "🎯", debuff: true, desc: "受到充能球的伤害增加 50%，持续 !A! 回合。" },
+  "Amplify": { name: "增幅", icon: "📶", desc: "本回合你打出的下 !A! 张能力牌会打出两次。" },
+  "Rebound": { name: "弹回", icon: "🪃", desc: "本回合打出的下一张牌将放到抽牌堆顶部。" },
+  "Equilibrium": { name: "均衡", icon: "⚖️", desc: "在接下来的 !A! 回合结束时保留所有手牌。" },
+  // Watcher Powers
+  "Mantra": { name: "真言", icon: "📿", desc: "累计达到 10 层时进入【神格】姿态（获得 3 点能量，攻击造成 3 倍伤害）。" },
+  "BattleHymn": { name: "战歌", icon: "🎵", desc: "每回合开始时，将 !A! 张【惩恶】加入手牌。" },
+  "DevaForm": { name: "天人形态", icon: "🪷", desc: "每回合开始时额外获得 !A! 点能量并递增。" },
+  "Devotion": { name: "虔信", icon: "🙏", desc: "每回合开始时，获得 !A! 层真言。" },
+  "Establishment": { name: "确立基础", icon: "🏛️", desc: "每当有卡牌被保留时，其本场战斗耗能减少 !A! 。" },
+  "Fasting": { name: "斋戒", icon: "🥣", debuff: true, desc: "每回合开始时少获得 !A! 点能量。" },
+  "Foresight": { name: "先见之明", icon: "👁️", desc: "每回合开始时，预见 !A! 张牌。" },
+  "LikeWater": { name: "如水", icon: "💧", desc: "回合结束时若处于【平静】，获得 !A! 点格挡。" },
+  "MasterReality": { name: "操控现实", icon: "✨", desc: "战斗中临时创造的卡牌自动升级。" },
+  "MentalFortress": { name: "心灵堡垒", icon: "🏯", desc: "每当你转换姿态时，获得 !A! 点格挡。" },
+  "Nirvana": { name: "涅槃", icon: "🌸", desc: "每当你预见时，获得 !A! 点格挡。" },
+  "Rushdown": { name: "猛虎下山", icon: "🐅", desc: "每当你进入【愤怒】时，抽 !A! 张牌。" },
+  "Study": { name: "研习", icon: "📖", desc: "回合结束时，往抽牌堆洗入 !A! 张【洞见】。" },
+  "WaveOfTheHand": { name: "摆手", icon: "✋", desc: "本回合每当你获得格挡时，给予所有敌人 !A! 层虚弱。" },
+  "Vigor": { name: "活力", icon: "🔥", desc: "你的下一张攻击牌额外造成 !A! 点伤害。" },
+  "FreeAttackPower": { name: "旋身", icon: "🌀", desc: "你打出的下 !A! 张攻击牌耗能变为 0。" },
+  "Mark": { name: "点穴印记", icon: "☯️", debuff: true, desc: "打出【点穴】时，失去等同于印记层数（!A!）的生命。" },
+  "BlockReturn": { name: "以手拒之", icon: "✋", debuff: true, desc: "每当该敌人受到攻击时，你获得 !A! 点格挡。" },
+  "SimmeringFury": { name: "怒火中烧", icon: "💢", desc: "下回合开始时进入【愤怒】并抽 !A! 张牌。" },
+  "Collect": { name: "收集", icon: "💎", desc: "接下来 !A! 回合开始时，将一张【奇迹+】加入手牌。" },
+  "EndTurnDeath": { name: "渎神", icon: "💀", debuff: true, desc: "在下回合开始时死亡。" },
+  "Omega": { name: "欧米伽", icon: "Ω", desc: "每回合结束时，对所有敌人造成 !A! 点伤害。" }
 };
 
 const MONSTER_META = {
@@ -2951,6 +3495,7 @@ function applyPlayerPower(state, bt, pId, amt) {
 
 function applyMonsterPower(state, bt, m, pId, amt) {
   if (!m || (m.hp <= 0 && !m.st.halfDead) || !amt) return false;
+  if (pId === "Poison" && amt > 0 && hasRelic(state, "Snecko Skull")) amt += 1;
   const meta = POWERS_META[pId] || {};
   const isDebuff = Boolean(meta.debuff || (pId === "Strength" && amt < 0));
   if (isDebuff) {
@@ -2961,7 +3506,7 @@ function applyMonsterPower(state, bt, m, pId, amt) {
       return false;
     }
     if ((bt.pw.Sadistic || 0) > 0) {
-      damageMonster(state, bt, m, bt.pw.Sadistic, "THORNS", Rng(state.rs));
+      damageMonster(state, bt, m, bt.pw.Sadistic, "THORNS", new Rng(state.rs || 1));
     }
   }
   m.pw[pId] = (m.pw[pId] || 0) + amt;
@@ -2981,6 +3526,11 @@ function gainPlayerBlock(state, bt, amt, fromCard, rng) {
     if (alive.length > 0) {
       const t = rng ? rng.pick(alive) : alive[0];
       damageMonster(state, bt, t, bt.pw.Juggernaut, "THORNS", rng);
+    }
+  }
+  if ((bt.pw.WaveOfTheHand || 0) > 0) {
+    for (const m of bt.m) {
+      if (m.hp > 0) applyMonsterPower(state, bt, m, "Weak", bt.pw.WaveOfTheHand);
     }
   }
 }
@@ -3021,6 +3571,7 @@ function losePlayerHp(state, bt, amt, fromCard, rng) {
   }
   state.hp = Math.max(0, state.hp - v);
   bt.lh = (bt.lh || 0) + 1;
+  bt.lostHpTurn = true;
   syncRedSkull(state);
   if (fromCard && (bt.pw.Rupture || 0) > 0) {
     applyPlayerPower(state, bt, "Strength", bt.pw.Rupture);
@@ -3037,11 +3588,12 @@ function losePlayerHp(state, bt, amt, fromCard, rng) {
 
 function calcMonsterAttackDmg(state, bt, m, baseDmg) {
   let d = baseDmg + (m.pw.Strength || 0);
-  if ((m.pw.Weak || 0) > 0) d = Math.floor(d * 0.75);
+  if ((m.pw.Weak || 0) > 0) d = Math.floor(d * (hasRelic(state, "Paper Crane") ? 0.60 : 0.75));
   if ((bt.pw.Vulnerable || 0) > 0) {
     const mult = hasRelic(state, "Odd Mushroom") ? 1.25 : 1.5;
     d = Math.floor(d * mult);
   }
+  if (bt.st === "Wrath") d *= 2;
   if ((bt.pw.Intangible || 0) > 0 && d > 0) d = 1;
   return Math.max(0, d);
 }
@@ -3064,6 +3616,9 @@ function monsterAttackPlayer(state, bt, m, baseDmg, hits, rng) {
       if (lost > 0 && (bt.pw.PlatedArmor || 0) > 0) {
         bt.pw.PlatedArmor--;
         if (bt.pw.PlatedArmor <= 0) delete bt.pw.PlatedArmor;
+      }
+      if (lost > 0 && (bt.pw.StaticDischarge || 0) > 0) {
+        for (let s = 0; s < bt.pw.StaticDischarge; s++) channelOrb(state, bt, "L", rng);
       }
       if (lost > 0 && (m.pw.PainfulStabs || 0) > 0) {
         bt.di.push("Wound");
@@ -3089,12 +3644,28 @@ function calcPlayerCardNumbers(state, bt, cardStr, targetM) {
   if (def.id === "Blood for Blood" && cost >= 0) {
     cost = Math.max(0, cost - (bt.lh || 0));
   }
+  if (def.id === "Eviscerate" && cost >= 0) {
+    cost = Math.max(0, cost - (bt.discTurn || 0));
+  }
+  if (def.id === "Masterful Stab" && cost >= 0 && (!def.mod || !def.mod.includes("c"))) {
+    cost = cost + (bt.lh || 0);
+  }
+  if (def.id === "Force Field" && cost >= 0) {
+    cost = Math.max(0, cost - (bt.poAll || 0));
+  }
   if (def.type === "S" && (bt.pw.Corruption || 0) > 0 && cost >= 0) {
+    cost = 0;
+  }
+  if (def.type === "A" && (bt.pw.FreeAttackPower || 0) > 0 && cost >= 0) {
     cost = 0;
   }
   let baseDmg = def.dmg;
   if (def.id === "Body Slam") baseDmg = bt.b || 0;
   if (def.id === "Mind Blast") baseDmg = bt.dr ? bt.dr.length : 0;
+  if (def.id === "Blizzard") baseDmg = (bt.frCh || 0) * (def.mag || 2);
+  if (def.id === "Brilliance") baseDmg += (bt.mtAll || 0);
+  if (def.id === "Shiv" && (bt.pw.Accuracy || 0) > 0) baseDmg += bt.pw.Accuracy;
+  if (def.id === "Gash" && (bt.clawBonus || 0) > 0) baseDmg += bt.clawBonus;
   if (def.id === "Perfected Strike") {
     let strikes = 0;
     const all = [].concat(bt.h || [], bt.dr || [], bt.di || []);
@@ -3102,13 +3673,18 @@ function calcPlayerCardNumbers(state, bt, cardStr, targetM) {
     baseDmg += strikes * def.mag;
   }
   if (def.isStrike && hasRelic(state, "StrikeDummy")) baseDmg += 3;
+  if (def.type === "A" && cost === 0 && hasRelic(state, "WristBlade")) baseDmg += 4;
 
   let dmg = baseDmg;
   if (def.type === "A") {
     const str = getPlayerStr(state, bt);
     const mult = def.id === "Heavy Blade" ? def.mag : 1;
     dmg += str * mult;
+    if ((bt.pw.Vigor || 0) > 0) dmg += bt.pw.Vigor;
     if (!bt.firstAtkDone && hasRelic(state, "Akabeko")) dmg += 8;
+    if (bt.st === "Wrath") dmg *= 2;
+    if (bt.st === "Divinity") dmg *= 3;
+    if ((bt.pw.DoubleDamage || 0) > 0) dmg *= 2;
     if ((bt.pw.Weak || 0) > 0) dmg = Math.floor(dmg * 0.75);
     if (hasRelic(state, "Pen Nib") && (state.rc.PenNib || 0) === 9) dmg *= 2;
     if (targetM) {
@@ -3124,7 +3700,8 @@ function calcPlayerCardNumbers(state, bt, cardStr, targetM) {
   }
 
   let blk = def.blk;
-  if (blk > 0) {
+  if (def.id === "Stack") blk = (bt.di ? bt.di.length : 0) + (def.up ? 3 : 0);
+  if (blk > 0 || def.id === "Stack") {
     blk += (bt.pw.Dexterity || 0);
     if ((bt.pw.Frail || 0) > 0) blk = Math.floor(blk * 0.75);
     if ((bt.pw.NoBlock || 0) > 0) blk = 0;
@@ -3137,10 +3714,16 @@ function damageMonster(state, bt, m, rawDmg, type, rng) {
   if (!m || m.hp <= 0) return 0;
   let dmg = rawDmg;
   if ((m.pw.Intangible || 0) > 0 && dmg > 0) dmg = 1;
-  const blocked = Math.min(m.b, dmg);
+  const blocked = type === "HP_LOSS" ? 0 : Math.min(m.b, dmg);
   m.b -= blocked;
   let unblocked = dmg - blocked;
   if (type === "NORMAL" && unblocked > 0 && unblocked <= 4 && hasRelic(state, "Boot")) unblocked = 5;
+  if (type === "NORMAL" && (m.pw.BlockReturn || 0) > 0) {
+    gainPlayerBlock(state, bt, m.pw.BlockReturn, false, rng);
+  }
+  if (type === "NORMAL" && unblocked > 0 && (bt.pw.Envenom || 0) > 0) {
+    applyMonsterPower(state, bt, m, "Poison", bt.pw.Envenom);
+  }
 
   if (unblocked > 0) {
     m.hp = Math.max(0, m.hp - unblocked);
@@ -3265,6 +3848,20 @@ function onMonsterZeroHp(state, bt, m, rng) {
   if ((m.pw.SporeCloud || 0) > 0) {
     applyPlayerPower(state, bt, "Vulnerable", m.pw.SporeCloud);
   }
+  if ((m.pw.Poison || 0) > 0 && hasRelic(state, "The Specimen")) {
+    const otherAlive = bt.m.filter(x => x !== m && x.hp > 0);
+    if (otherAlive.length > 0) {
+      const rt = rng ? rng.pick(otherAlive) : otherAlive[0];
+      applyMonsterPower(state, bt, rt, "Poison", m.pw.Poison);
+    }
+  }
+  if ((m.pw.CorpseExplosion || 0) > 0) {
+    const ceDmg = m.mhp * m.pw.CorpseExplosion;
+    addLog(state, "💥 " + m.name + " 尸体爆炸，对所有敌人造成 " + ceDmg + " 点伤害！");
+    for (const x of bt.m.slice()) {
+      if (x !== m && x.hp > 0) damageMonster(state, bt, x, ceDmg, "THORNS", rng);
+    }
+  }
   if (m.st.stolen) {
     state.g += m.st.stolen;
     m.st.stolen = 0;
@@ -3288,15 +3885,222 @@ function isCombatWon(bt) {
   return bt.m.every(m => m.hp <= 0 && !m.st.halfDead);
 }
 
-// ==================== 9. Card Draw, Exhaust & Hand Management ====================
+// ==================== 9. Card Draw, Exhaust, Orbs, Stances & Hand Management ====================
+function makeTempCard(bt, cardStr) {
+  const def = getCardDef(cardStr);
+  if (bt && (bt.pw.MasterReality || 0) > 0 && def.up === 0 && def.type !== "ST" && def.type !== "C") {
+    return def.id + "+" + (def.mod ? "|" + def.mod : "");
+  }
+  return cardStr;
+}
+
+function addTempCardToHand(state, bt, cardStr, count = 1) {
+  for (let i = 0; i < count; i++) {
+    const c = makeTempCard(bt, cardStr);
+    if (bt.h.length < 10) bt.h.push(c);
+    else bt.di.push(c);
+  }
+}
+
+function modifyCardCostInCombat(cardStr, newCost) {
+  const def = getCardDef(cardStr);
+  if (def.cost < 0) return cardStr;
+  const base = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : ""));
+  const numPart = def.extra ? String(def.extra) : "";
+  return base + "|" + numPart + "c" + Math.max(0, newCost);
+}
+
+function pickDiscardIndex(bt) {
+  if (!bt.h || bt.h.length === 0) return -1;
+  let idx = bt.h.findIndex(c => { const id = getCardDef(c).id; return id === "Reflex" || id === "Tactician"; });
+  if (idx !== -1) return idx;
+  idx = bt.h.findIndex(c => { const d = getCardDef(c); return d.type === "C" || d.type === "ST"; });
+  if (idx !== -1) return idx;
+  idx = bt.h.findIndex(c => { const id = getCardDef(c).id; return id.startsWith("Defend_") || id.startsWith("Strike_"); });
+  if (idx !== -1) return idx;
+  return bt.h.length - 1;
+}
+
+function discardHandCardAt(state, bt, hIdx, rng) {
+  if (!bt.h || hIdx < 0 || hIdx >= bt.h.length) return null;
+  const c = bt.h.splice(hIdx, 1)[0];
+  const def = getCardDef(c);
+  const clean = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")) + (def.extra ? "|" + def.extra : "");
+  bt.di.push(clean);
+  bt.discTurn = (bt.discTurn || 0) + 1;
+  if (!bt.kiteUsed && hasRelic(state, "Hovering Kite")) {
+    bt.kiteUsed = true;
+    bt.e += 1;
+  }
+  if (hasRelic(state, "Tough Bandages")) {
+    gainPlayerBlock(state, bt, 3, false, rng);
+  }
+  if (hasRelic(state, "Tingsha")) {
+    const alive = bt.m.filter(x => x.hp > 0);
+    if (alive.length > 0) damageMonster(state, bt, rng.pick(alive), 3, "THORNS", rng);
+  }
+  if (def.id === "Reflex") {
+    drawCards(state, bt, def.mag || 2, rng);
+  } else if (def.id === "Tactician") {
+    bt.e += (def.mag || 1);
+  }
+  return c;
+}
+
+function discardSmartFromHand(state, bt, count, rng) {
+  for (let i = 0; i < count; i++) {
+    if (!bt.h || bt.h.length === 0) break;
+    const idx = pickDiscardIndex(bt);
+    discardHandCardAt(state, bt, idx, rng);
+  }
+}
+
+function dealOrbDamageToMonster(state, bt, m, baseDmg, rng) {
+  if (!m || m.hp <= 0) return;
+  let d = baseDmg;
+  if ((m.pw.LockOn || 0) > 0) d = Math.floor(d * 1.5);
+  damageMonster(state, bt, m, d, "THORNS", rng);
+}
+
+function triggerSingleOrbPassive(state, bt, orb, rng) {
+  if (!orb) return;
+  const focus = bt.pw.Focus || 0;
+  if (orb.t === "L") {
+    const dmg = Math.max(0, 3 + focus);
+    if ((bt.pw.Electrodynamics || 0) > 0) {
+      for (const m of bt.m.slice()) if (m.hp > 0) dealOrbDamageToMonster(state, bt, m, dmg, rng);
+    } else {
+      const alive = bt.m.filter(x => x.hp > 0);
+      if (alive.length > 0) {
+        const locked = alive.filter(x => (x.pw.LockOn || 0) > 0);
+        const t = locked.length > 0 ? rng.pick(locked) : rng.pick(alive);
+        dealOrbDamageToMonster(state, bt, t, dmg, rng);
+      }
+    }
+  } else if (orb.t === "F") {
+    const blk = Math.max(0, 2 + focus);
+    if (blk > 0) gainPlayerBlock(state, bt, blk, false, rng);
+  } else if (orb.t === "D") {
+    orb.v = (orb.v || 6) + Math.max(0, 6 + focus);
+  } else if (orb.t === "P") {
+    bt.e += 1;
+  }
+}
+
+function evokeFirstOrb(state, bt, times, rng) {
+  if (!bt.orbs || bt.orbs.length === 0) return null;
+  const orb = bt.orbs.shift();
+  const focus = bt.pw.Focus || 0;
+  const n = Math.max(0, times === undefined ? 1 : times);
+  for (let i = 0; i < n; i++) {
+    if (orb.t === "L") {
+      const dmg = Math.max(0, 8 + focus);
+      if ((bt.pw.Electrodynamics || 0) > 0) {
+        for (const m of bt.m.slice()) if (m.hp > 0) dealOrbDamageToMonster(state, bt, m, dmg, rng);
+      } else {
+        const alive = bt.m.filter(x => x.hp > 0);
+        if (alive.length > 0) {
+          const locked = alive.filter(x => (x.pw.LockOn || 0) > 0);
+          const t = locked.length > 0 ? rng.pick(locked) : rng.pick(alive);
+          dealOrbDamageToMonster(state, bt, t, dmg, rng);
+        }
+      }
+    } else if (orb.t === "F") {
+      const blk = Math.max(0, 5 + focus);
+      if (blk > 0) gainPlayerBlock(state, bt, blk, false, rng);
+    } else if (orb.t === "D") {
+      const alive = bt.m.filter(x => x.hp > 0);
+      if (alive.length > 0) {
+        let low = alive[0];
+        for (const m of alive) if (m.hp < low.hp) low = m;
+        dealOrbDamageToMonster(state, bt, low, orb.v || 6, rng);
+      }
+    } else if (orb.t === "P") {
+      bt.e += 2;
+    }
+  }
+  return orb;
+}
+
+function channelOrb(state, bt, orbType, rng) {
+  if (!bt.orbs) bt.orbs = [];
+  if (bt.maxOrbs === undefined) bt.maxOrbs = state.ch === "DEFECT" ? 3 : 1;
+  if (bt.maxOrbs <= 0) return;
+  while (bt.orbs.length >= bt.maxOrbs) {
+    evokeFirstOrb(state, bt, 1, rng);
+  }
+  bt.orbs.push({ t: orbType, v: orbType === "D" ? 6 : 0 });
+  bt.chAll = (bt.chAll || 0) + 1;
+  if (orbType === "L") bt.ltCh = (bt.ltCh || 0) + 1;
+  if (orbType === "F") bt.frCh = (bt.frCh || 0) + 1;
+  if (orbType === "D") bt.dkCh = (bt.dkCh || 0) + 1;
+}
+
+function changeStance(state, bt, newStance, rng) {
+  const cur = bt.st || "Neutral";
+  if (cur === newStance) return;
+  bt.st = newStance;
+  if (cur === "Calm") {
+    bt.e += 2 + (hasRelic(state, "VioletLotus") ? 1 : 0);
+  }
+  if (newStance === "Wrath" && (bt.pw.Rushdown || 0) > 0) {
+    drawCards(state, bt, bt.pw.Rushdown, rng);
+  } else if (newStance === "Divinity") {
+    bt.e += 3;
+  }
+  if ((bt.pw.MentalFortress || 0) > 0) {
+    gainPlayerBlock(state, bt, bt.pw.MentalFortress, false, rng);
+  }
+  for (let i = bt.di.length - 1; i >= 0; i--) {
+    if (getCardDef(bt.di[i]).id === "FlurryOfBlows" && bt.h.length < 10) {
+      bt.h.push(bt.di.splice(i, 1)[0]);
+    }
+  }
+}
+
+function gainMantra(state, bt, amt, rng) {
+  if (amt <= 0) return;
+  bt.mtAll = (bt.mtAll || 0) + amt;
+  bt.pw.Mantra = (bt.pw.Mantra || 0) + amt;
+  while ((bt.pw.Mantra || 0) >= 10) {
+    bt.pw.Mantra -= 10;
+    if (bt.pw.Mantra <= 0) delete bt.pw.Mantra;
+    changeStance(state, bt, "Divinity", rng);
+  }
+}
+
+function scryCards(state, bt, count, rng) {
+  const n = count + (hasRelic(state, "GoldenEye") ? 2 : 0);
+  if (n <= 0) return;
+  if ((bt.pw.Nirvana || 0) > 0) {
+    gainPlayerBlock(state, bt, bt.pw.Nirvana, false, rng);
+  }
+  const inspectCnt = Math.min(n, bt.dr.length);
+  for (let i = 0; i < inspectCnt; i++) {
+    const idx = bt.dr.length - 1 - i;
+    if (idx < 0 || idx >= bt.dr.length) break;
+    const d = getCardDef(bt.dr[idx]);
+    if (d.type === "ST" || d.type === "C" || d.id === "Reflex" || d.id === "Tactician") {
+      bt.di.push(bt.dr.splice(idx, 1)[0]);
+    }
+  }
+  for (let i = bt.di.length - 1; i >= 0; i--) {
+    if (getCardDef(bt.di[i]).id === "Weave" && bt.h.length < 10) {
+      bt.h.push(bt.di.splice(i, 1)[0]);
+    }
+  }
+}
+
 function drawCards(state, bt, count, rng) {
   if ((bt.pw.NoDraw || 0) > 0) return;
+  let shuffled = false;
   for (let i = 0; i < count; i++) {
     if (bt.h.length >= 10) break;
     if (bt.dr.length === 0) {
       if (bt.di.length === 0) break;
       bt.dr = rng.shuffle(bt.di);
       bt.di = [];
+      shuffled = true;
       if (hasRelic(state, "Sundial")) {
         state.rc.Sundial = ((state.rc.Sundial || 0) + 1) % 3;
         if (state.rc.Sundial === 0) bt.e += 2;
@@ -3306,11 +4110,17 @@ function drawCards(state, bt, count, rng) {
     const def = getCardDef(c);
     if ((bt.pw.Confusion || 0) > 0 && def.cost >= 0) {
       const nc = rng.int(0, 3);
-      c = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")) + "|c" + nc;
+      c = modifyCardCostInCombat(c, nc);
     }
     bt.h.push(c);
     // On-draw triggers
     if (def.id === "Void") bt.e = Math.max(0, bt.e - 1);
+    if (def.id === "Endless Agony" && bt.h.length < 10) bt.h.push(c);
+    if (def.id === "DeusExMachina") {
+      bt.h.pop();
+      triggerExhaustCard(state, bt, c, rng);
+      addTempCardToHand(state, bt, "Miracle", def.mag || 2);
+    }
     if (def.type === "ST" && (bt.pw.Evolve || 0) > 0) {
       drawCards(state, bt, bt.pw.Evolve, rng);
     }
@@ -3319,6 +4129,9 @@ function drawCards(state, bt, count, rng) {
         if (m.hp > 0) damageMonster(state, bt, m, bt.pw.FireBreathing, "THORNS", rng);
       }
     }
+  }
+  if (shuffled && hasRelic(state, "Melange")) {
+    scryCards(state, bt, 3, rng);
   }
 }
 
@@ -3340,14 +4153,21 @@ function triggerExhaustCard(state, bt, cardStr, rng) {
     }
   }
   if (hasRelic(state, "Dead Branch") && bt.h.length < 10) {
-    const pool = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
-    bt.h.push(rng.pick(pool));
+    const pool = getCharCardPool(state);
+    bt.h.push(makeTempCard(bt, rng.pick(pool)));
   }
 }
 
 // ==================== 10. Monster Turn Execution ====================
 function executeMonsterTurn(m, mIdx, bt, state, rng) {
   if (m.hp <= 0 && !m.st.halfDead) return;
+  if (m.hp > 0 && (m.pw.Poison || 0) > 0) {
+    const psn = m.pw.Poison;
+    m.pw.Poison--;
+    if (m.pw.Poison <= 0) delete m.pw.Poison;
+    damageMonster(state, bt, m, psn, "HP_LOSS", rng);
+    if (m.hp <= 0 || isCombatWon(bt)) return;
+  }
   const mv = m.mv;
   switch (m.id) {
     case "Cultist":
@@ -3848,6 +4668,9 @@ function startCombat(state, encId, roomType, rng) {
     di: [],
     ex: [],
     m: monsters,
+    orbs: [],
+    maxOrbs: state.ch === "DEFECT" ? 3 : 0,
+    st: "Neutral",
     ct: 0,
     at: 0,
     sk: 0,
@@ -3878,6 +4701,8 @@ function startCombat(state, encId, roomType, rng) {
   if (hasRelic(state, "Girya") && state.rc && state.rc.Girya) bt.pw.Strength = (bt.pw.Strength || 0) + state.rc.Girya;
   syncRedSkull(state);
   if (hasRelic(state, "Oddly Smooth Stone")) bt.pw.Dexterity = (bt.pw.Dexterity || 0) + 1;
+  if (hasRelic(state, "DataDisk")) bt.pw.Focus = (bt.pw.Focus || 0) + 1;
+  if (hasRelic(state, "Runic Capacitor")) bt.maxOrbs = (bt.maxOrbs || 0) + 3;
   if (hasRelic(state, "ClockworkSouvenir")) bt.pw.Artifact = (bt.pw.Artifact || 0) + 1;
   if (hasRelic(state, "FossilizedHelix")) bt.pw.Buffer = (bt.pw.Buffer || 0) + 1;
   if (roomType === "E" && hasRelic(state, "Sling")) bt.pw.Strength = (bt.pw.Strength || 0) + 2;
@@ -3895,6 +4720,14 @@ function startCombat(state, encId, roomType, rng) {
   if (hasRelic(state, "Red Mask")) {
     for (const m of monsters) applyMonsterPower(state, bt, m, "Weak", 1);
   }
+  if (hasRelic(state, "TwistedFunnel")) {
+    for (const m of monsters) applyMonsterPower(state, bt, m, "Poison", 4);
+  }
+  if (hasRelic(state, "Cracked Core")) channelOrb(state, bt, "L", rng);
+  if (hasRelic(state, "Symbiotic Virus")) channelOrb(state, bt, "D", rng);
+  if (hasRelic(state, "Nuclear Battery")) channelOrb(state, bt, "P", rng);
+  if (hasRelic(state, "TeardropLocket")) bt.st = "Calm";
+  if (hasRelic(state, "Damaru")) gainMantra(state, bt, 1, rng);
   if (hasRelic(state, "Lantern")) bt.e += 1;
   if (hasRelic(state, "Happy Flower")) {
     state.rc.Flower = ((state.rc.Flower || 0) + 1) % 3;
@@ -3926,8 +4759,13 @@ function startCombat(state, encId, roomType, rng) {
   // Draw initial hand
   let drawCnt = 5;
   if (hasRelic(state, "Bag of Preparation")) drawCnt += 2;
+  if (hasRelic(state, "Ring of the Snake")) drawCnt += 2;
+  if (hasRelic(state, "Ring of the Serpent")) drawCnt += 1;
   if (hasRelic(state, "Snecko Eye")) drawCnt += 2;
   drawCards(state, bt, drawCnt, rng);
+  if (hasRelic(state, "Ninja Scroll")) addTempCardToHand(state, bt, "Shiv", 3);
+  if (hasRelic(state, "PureWater")) addTempCardToHand(state, bt, "Miracle", 1);
+  if (hasRelic(state, "HolyWater")) addTempCardToHand(state, bt, "Miracle", 3);
   const mNames = bt.m.map(x => x.name).join("、");
   if (neowTriggered) {
     addLog(state, "遭遇战斗：" + mNames + "（⚡涅奥的悲恸生效：敌人当前生命降为 1，剩余 " + state.rc.Neow + " 场战斗）");
@@ -3943,6 +4781,8 @@ function canPlayCard(state, bt, cardStr) {
   if (bt.h.some(c => getCardDef(c).id === "Normality") && (bt.ct || 0) >= 3) return false;
   if (def.type === "A" && (bt.pw.Entangled || 0) > 0) return false;
   if (def.id === "Clash" && bt.h.some(c => getCardDef(c).type !== "A")) return false;
+  if (def.id === "Grand Finale" && bt.dr.length > 0) return false;
+  if (def.id === "SignatureMove" && bt.h.some(c => c !== cardStr && getCardDef(c).type === "A")) return false;
   if (def.type === "ST") {
     if (def.id === "Slimed") return bt.e >= 1;
     return hasRelic(state, "Medical Kit");
@@ -3950,7 +4790,7 @@ function canPlayCard(state, bt, cardStr) {
   if (def.type === "C") {
     return hasRelic(state, "Blue Candle");
   }
-  if (cost === -1) return true; // X-cost (Whirlwind) can be played at 0+ energy
+  if (cost === -1) return true; // X-cost can be played at 0+ energy
   return cost >= 0 && bt.e >= cost;
 }
 
@@ -3962,6 +4802,15 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
 
   if (def.type === "A") {
     bt.firstAtkDone = true;
+    delete bt.pw.Vigor;
+    if ((bt.pw.FreeAttackPower || 0) > 0) {
+      bt.pw.FreeAttackPower--;
+      if (bt.pw.FreeAttackPower <= 0) delete bt.pw.FreeAttackPower;
+    }
+    if (hasRelic(state, "Duality")) {
+      applyPlayerPower(state, bt, "Dexterity", 1);
+      applyPlayerPower(state, bt, "LoseDexterity", 1);
+    }
     if (hasRelic(state, "Pen Nib")) {
       state.rc.PenNib = ((state.rc.PenNib || 0) + 1) % 10;
     }
@@ -3989,6 +4838,11 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
     }
   } else if (def.type === "P") {
+    bt.poAll = (bt.poAll || 0) + 1;
+    if ((bt.pw.Heatsinks || 0) > 0) drawCards(state, bt, bt.pw.Heatsinks, rng);
+    if ((bt.pw.Storm || 0) > 0) {
+      for (let s = 0; s < bt.pw.Storm; s++) channelOrb(state, bt, "L", rng);
+    }
     if (hasRelic(state, "Bird Faced Urn")) healPlayer(state, 2, true);
     if (hasRelic(state, "Mummified Hand") && bt.h.length > 0) {
       const candidates = [];
@@ -3997,8 +4851,7 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
       if (candidates.length > 0) {
         const pickIdx = rng.pick(candidates);
-        const cd = getCardDef(bt.h[pickIdx]);
-        bt.h[pickIdx] = cd.id + (cd.up > 1 ? "+" + cd.up : (cd.up ? "+" : "")) + "|c0";
+        bt.h[pickIdx] = modifyCardCostInCombat(bt.h[pickIdx], 0);
       }
     }
     // Awakened One Curiosity
@@ -4008,6 +4861,19 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
     }
   }
+  if ((bt.pw.AfterImage || 0) > 0) {
+    gainPlayerBlock(state, bt, bt.pw.AfterImage, false, rng);
+  }
+  if ((bt.pw.AThousandCuts || 0) > 0) {
+    for (const m of bt.m.slice()) {
+      if (m.hp > 0) damageMonster(state, bt, m, bt.pw.AThousandCuts, "THORNS", rng);
+    }
+  }
+  for (const m of bt.m.slice()) {
+    if (m.hp > 0 && (m.pw.Choke || 0) > 0) {
+      damageMonster(state, bt, m, m.pw.Choke, "HP_LOSS", rng);
+    }
+  }
   // Chosen Hex: shuffle 1 Dazed into draw pile whenever a non-Attack card is played
   if (def.type !== "A" && (bt.pw.Hex || 0) > 0) {
     const insIdx = bt.dr.length > 0 ? rng.int(0, bt.dr.length) : 0;
@@ -4015,7 +4881,7 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
   }
 
   // Block gain
-  if (blk > 0 && def.id !== "Second Wind") {
+  if (blk > 0 && def.id !== "Second Wind" && def.id !== "Auto Shields") {
     gainPlayerBlock(state, bt, blk, true, rng);
   }
 
@@ -4446,7 +5312,853 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
       break;
     }
+    // ==================== SILENT (GREEN) ====================
+    case "Strike_G":
+    case "Slice":
+    case "Backstab":
+    case "Endless Agony":
+    case "Masterful Stab":
+    case "Glass Knife":
+    case "SignatureMove":
+    case "SandsOfTime":
+    case "WindmillStrike":
+    case "Brilliance":
+    case "FlurryOfBlows":
+    case "Weave":
+    case "Shiv":
+    case "Smite":
+    case "ThroughViolence":
+    case "Strike_B":
+    case "Strike_P":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "Neutralize":
+    case "Sucker Punch":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "Weak", mag);
+      break;
+    case "Survivor":
+      discardSmartFromHand(state, bt, 1, rng);
+      break;
+    case "Acrobatics":
+      drawCards(state, bt, mag, rng);
+      discardSmartFromHand(state, bt, 1, rng);
+      break;
+    case "Accuracy": applyPlayerPower(state, bt, "Accuracy", mag); break;
+    case "Adrenaline":
+      bt.e += mag;
+      drawCards(state, bt, 2, rng);
+      break;
+    case "After Image": applyPlayerPower(state, bt, "AfterImage", 1); break;
+    case "Alchemize": {
+      const emptySlot = state.pot ? state.pot.indexOf("") : -1;
+      if (emptySlot !== -1 && !hasRelic(state, "Sozu")) {
+        state.pot[emptySlot] = rollPotion(state, rng);
+      }
+      break;
+    }
+    case "All Out Attack":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      if (bt.h.length > 0) discardHandCardAt(state, bt, rng.int(0, bt.h.length - 1), rng);
+      break;
+    case "A Thousand Cuts": applyPlayerPower(state, bt, "AThousandCuts", mag); break;
+    case "Backflip": drawCards(state, bt, 2, rng); break;
+    case "Bane":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (t.hp > 0 && (t.pw.Poison || 0) > 0) damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "Blade Dance":
+    case "Cloak And Dagger":
+      addTempCardToHand(state, bt, "Shiv", mag);
+      break;
+    case "Blur": applyPlayerPower(state, bt, "Blur", 1); break;
+    case "Bouncing Flask":
+      for (let i = 0; i < mag; i++) {
+        const alive = bt.m.filter(x => x.hp > 0);
+        if (!alive.length) break;
+        applyMonsterPower(state, bt, rng.pick(alive), "Poison", 3);
+      }
+      break;
+    case "Bullet Time":
+      applyPlayerPower(state, bt, "NoDraw", 1);
+      bt.h = bt.h.map(c => modifyCardCostInCombat(c, 0));
+      break;
+    case "Burst": applyPlayerPower(state, bt, "Burst", mag); break;
+    case "Calculated Gamble": {
+      const cnt = bt.h.length;
+      while (bt.h.length > 0) discardHandCardAt(state, bt, 0, rng);
+      if (cnt > 0) drawCards(state, bt, cnt, rng);
+      break;
+    }
+    case "Caltrops": applyPlayerPower(state, bt, "Thorns", mag); break;
+    case "Catalyst":
+      if ((t.pw.Poison || 0) > 0) {
+        applyMonsterPower(state, bt, t, "Poison", t.pw.Poison * (mag - 1));
+      }
+      break;
+    case "Choke":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "Choke", mag);
+      break;
+    case "Concentrate":
+      discardSmartFromHand(state, bt, mag, rng);
+      bt.e += 2;
+      break;
+    case "Corpse Explosion":
+      applyMonsterPower(state, bt, t, "Poison", mag);
+      applyMonsterPower(state, bt, t, "CorpseExplosion", 1);
+      break;
+    case "Cripling Poison":
+      for (const m of bt.m) {
+        if (m.hp > 0) {
+          applyMonsterPower(state, bt, m, "Poison", mag);
+          applyMonsterPower(state, bt, m, "Weak", 2);
+        }
+      }
+      break;
+    case "Dagger Spray":
+      for (let h = 0; h < 2; h++) {
+        for (const m of bt.m.slice()) {
+          if (m.hp > 0) {
+            const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+            damageMonster(state, bt, m, d, "NORMAL", rng);
+          }
+        }
+      }
+      break;
+    case "Dagger Throw":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      drawCards(state, bt, 1, rng);
+      discardSmartFromHand(state, bt, 1, rng);
+      break;
+    case "Dash":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "Deadly Poison":
+      applyMonsterPower(state, bt, t, "Poison", mag);
+      break;
+    case "Die Die Die":
+    case "Consecrate":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      break;
+    case "Distraction": {
+      const sPool = SILENT_POOL.filter(k => RAW_CARDS[k][1] === "S");
+      if (bt.h.length < 10) bt.h.push(modifyCardCostInCombat(makeTempCard(bt, rng.pick(sPool)), 0));
+      break;
+    }
+    case "Dodge and Roll":
+      applyPlayerPower(state, bt, "NextTurnBlock", blk);
+      break;
+    case "Doppelganger": {
+      const n = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      if (n > 0) {
+        applyPlayerPower(state, bt, "Energized", n);
+        applyPlayerPower(state, bt, "DrawCardNextTurn", n);
+      }
+      break;
+    }
+    case "Envenom": applyPlayerPower(state, bt, "Envenom", 1); break;
+    case "Escape Plan": {
+      const before = bt.h.length;
+      drawCards(state, bt, 1, rng);
+      if (bt.h.length > before && getCardDef(bt.h[bt.h.length - 1]).type === "S") {
+        gainPlayerBlock(state, bt, blk, true, rng);
+      }
+      break;
+    }
+    case "Eviscerate":
+      for (let i = 0; i < 3; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    case "Expertise":
+      if (bt.h.length < mag) drawCards(state, bt, mag - bt.h.length, rng);
+      break;
+    case "Finisher": {
+      const hits = Math.max(0, (bt.at || 1) - 1);
+      for (let i = 0; i < hits; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    }
+    case "Flechettes": {
+      const skCnt = bt.h.filter(c => getCardDef(c).type === "S").length;
+      for (let i = 0; i < skCnt; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    }
+    case "Flying Knee":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyPlayerPower(state, bt, "Energized", 1);
+      break;
+    case "Footwork": applyPlayerPower(state, bt, "Dexterity", mag); break;
+    case "Grand Finale":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      break;
+    case "Heel Hook": {
+      const hadWeak = (t.pw.Weak || 0) > 0;
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (hadWeak) { bt.e += 1; drawCards(state, bt, 1, rng); }
+      break;
+    }
+    case "Infinite Blades": applyPlayerPower(state, bt, "InfiniteBlades", 1); break;
+    case "Leg Sweep": applyMonsterPower(state, bt, t, "Weak", mag); break;
+    case "Malaise": {
+      const n = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      if (n > 0) {
+        applyMonsterPower(state, bt, t, "Strength", -n);
+        applyMonsterPower(state, bt, t, "Weak", n);
+      }
+      break;
+    }
+    case "Nightmare":
+      if (bt.h.length > 0) {
+        bt.nightmareCard = bt.h[bt.h.length - 1];
+        applyPlayerPower(state, bt, "Nightmare", 3);
+      }
+      break;
+    case "Noxious Fumes": applyPlayerPower(state, bt, "NoxiousFumes", mag); break;
+    case "Outmaneuver": applyPlayerPower(state, bt, "Energized", mag); break;
+    case "Phantasmal Killer": applyPlayerPower(state, bt, "Phantasmal", 1); break;
+    case "PiercingWail":
+      for (const m of bt.m) {
+        if (m.hp > 0 && applyMonsterPower(state, bt, m, "Strength", -mag)) {
+          m.pw.Shackled = (m.pw.Shackled || 0) + mag;
+        }
+      }
+      break;
+    case "Poisoned Stab":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "Poison", mag);
+      break;
+    case "Predator":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyPlayerPower(state, bt, "DrawCardNextTurn", 2);
+      break;
+    case "Prepared":
+      drawCards(state, bt, mag, rng);
+      discardSmartFromHand(state, bt, mag, rng);
+      break;
+    case "Quick Slash":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      drawCards(state, bt, 1, rng);
+      break;
+    case "Riddle With Holes":
+      for (let i = 0; i < 5; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    case "Setup":
+      if (bt.h.length > 0) {
+        const picked = modifyCardCostInCombat(bt.h.pop(), 0);
+        bt.dr.push(picked);
+      }
+      break;
+    case "Skewer": {
+      const times = xEnergy + (hasRelic(state, "Chemical X") ? 2 : 0);
+      for (let i = 0; i < times; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    }
+    case "Storm of Steel": {
+      const cnt = bt.h.length;
+      while (bt.h.length > 0) discardHandCardAt(state, bt, 0, rng);
+      if (cnt > 0) addTempCardToHand(state, bt, def.up ? "Shiv+" : "Shiv", cnt);
+      break;
+    }
+    case "Terror": applyMonsterPower(state, bt, t, "Vulnerable", 99); break;
+    case "Tools of the Trade": applyPlayerPower(state, bt, "ToolsOfTheTrade", 1); break;
+    case "Underhanded Strike":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if ((bt.discTurn || 0) > 0) bt.e += 2;
+      break;
+    case "Unload":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      for (let i = bt.h.length - 1; i >= 0; i--) {
+        if (getCardDef(bt.h[i]).type !== "A") discardHandCardAt(state, bt, i, rng);
+      }
+      break;
+    case "Well Laid Plans": applyPlayerPower(state, bt, "WellLaidPlans", mag); break;
+    case "Wraith Form v2":
+      applyPlayerPower(state, bt, "Intangible", mag);
+      applyPlayerPower(state, bt, "WraithForm", 1);
+      break;
+
+    // ==================== DEFECT (BLUE) ====================
+    case "Zap": channelOrb(state, bt, "L", rng); break;
+    case "Dualcast": evokeFirstOrb(state, bt, 2, rng); break;
+    case "Aggregate": bt.e += Math.floor(bt.dr.length / Math.max(1, mag)); break;
+    case "All For One":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      for (let i = bt.di.length - 1; i >= 0; i--) {
+        if (calcPlayerCardNumbers(state, bt, bt.di[i], null).cost === 0 && bt.h.length < 10) {
+          bt.h.push(bt.di.splice(i, 1)[0]);
+        }
+      }
+      break;
+    case "Amplify": applyPlayerPower(state, bt, "Amplify", mag); break;
+    case "Auto Shields":
+      if (bt.b === 0) gainPlayerBlock(state, bt, blk, true, rng);
+      break;
+    case "Ball Lightning":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      channelOrb(state, bt, "L", rng);
+      break;
+    case "Barrage": {
+      const cnt = bt.orbs ? bt.orbs.length : 0;
+      for (let i = 0; i < cnt; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    }
+    case "Beam Cell":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "Vulnerable", mag);
+      break;
+    case "Biased Cognition":
+      applyPlayerPower(state, bt, "Focus", mag);
+      applyPlayerPower(state, bt, "Bias", 1);
+      break;
+    case "Blizzard":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      break;
+    case "Buffer": applyPlayerPower(state, bt, "Buffer", mag); break;
+    case "Capacitor": bt.maxOrbs = Math.min(10, (bt.maxOrbs || 0) + mag); break;
+    case "Chaos":
+      for (let i = 0; i < mag; i++) channelOrb(state, bt, rng.pick(["L", "F", "D", "P"]), rng);
+      break;
+    case "Chill": {
+      const aliveCnt = bt.m.filter(x => x.hp > 0).length;
+      for (let i = 0; i < aliveCnt; i++) channelOrb(state, bt, "F", rng);
+      break;
+    }
+    case "Gash":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      bt.clawBonus = (bt.clawBonus || 0) + mag;
+      break;
+    case "Cold Snap":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      channelOrb(state, bt, "F", rng);
+      break;
+    case "Compile Driver": {
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      const types = new Set((bt.orbs || []).map(o => o.t));
+      if (types.size > 0) drawCards(state, bt, types.size, rng);
+      break;
+    }
+    case "Conserve Battery": applyPlayerPower(state, bt, "Energized", 1); break;
+    case "Consume":
+      applyPlayerPower(state, bt, "Focus", mag);
+      bt.maxOrbs = Math.max(0, (bt.maxOrbs || 0) - 1);
+      if (bt.orbs && bt.orbs.length > bt.maxOrbs) bt.orbs.length = bt.maxOrbs;
+      break;
+    case "Coolheaded":
+      channelOrb(state, bt, "F", rng);
+      drawCards(state, bt, mag, rng);
+      break;
+    case "Core Surge":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyPlayerPower(state, bt, "Artifact", 1);
+      break;
+    case "Creative AI": applyPlayerPower(state, bt, "CreativeAI", 1); break;
+    case "Darkness":
+      channelOrb(state, bt, "D", rng);
+      if (def.up && bt.orbs) {
+        for (const o of bt.orbs) if (o.t === "D") triggerSingleOrbPassive(state, bt, o, rng);
+      }
+      break;
+    case "Defragment": applyPlayerPower(state, bt, "Focus", mag); break;
+    case "Doom and Gloom":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      channelOrb(state, bt, "D", rng);
+      break;
+    case "Double Energy": bt.e *= 2; break;
+    case "Echo Form": applyPlayerPower(state, bt, "EchoForm", 1); break;
+    case "Electrodynamics":
+      applyPlayerPower(state, bt, "Electrodynamics", 1);
+      for (let i = 0; i < mag; i++) channelOrb(state, bt, "L", rng);
+      break;
+    case "Undo": applyPlayerPower(state, bt, "Equilibrium", 1); break;
+    case "FTL":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if ((bt.ct || 0) <= mag) drawCards(state, bt, 1, rng);
+      break;
+    case "Fission": {
+      const cnt = bt.orbs ? bt.orbs.length : 0;
+      if (def.up) {
+        for (let i = 0; i < cnt; i++) evokeFirstOrb(state, bt, 1, rng);
+      } else {
+        bt.orbs = [];
+      }
+      if (cnt > 0) {
+        bt.e += cnt;
+        drawCards(state, bt, cnt, rng);
+      }
+      break;
+    }
+    case "Fusion": channelOrb(state, bt, "P", rng); break;
+    case "Genetic Algorithm": {
+      const dkIdx = state.dk.findIndex(c => getCardDef(c).id === "Genetic Algorithm");
+      if (dkIdx !== -1) {
+        const cd = getCardDef(state.dk[dkIdx]);
+        state.dk[dkIdx] = "Genetic Algorithm" + (cd.up ? "+" : "") + "|" + ((cd.extra || 0) + def.mag);
+      }
+      break;
+    }
+    case "Glacier":
+      channelOrb(state, bt, "F", rng);
+      channelOrb(state, bt, "F", rng);
+      break;
+    case "Go for the Eyes":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (t && String(t.in).indexOf("ATTACK") !== -1) applyMonsterPower(state, bt, t, "Weak", mag);
+      break;
+    case "Heatsinks": applyPlayerPower(state, bt, "Heatsinks", mag); break;
+    case "Hello World": applyPlayerPower(state, bt, "HelloWorld", 1); break;
+    case "Hologram":
+      if (bt.di.length > 0 && bt.h.length < 10) bt.h.push(bt.di.pop());
+      break;
+    case "Hyperbeam":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      applyPlayerPower(state, bt, "Focus", -3);
+      break;
+    case "Lockon":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "LockOn", mag);
+      break;
+    case "Loop": applyPlayerPower(state, bt, "Loop", mag); break;
+    case "Machine Learning": applyPlayerPower(state, bt, "MachineLearning", 1); break;
+    case "Melter":
+      t.b = 0;
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "Meteor Strike":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      for (let i = 0; i < 3; i++) channelOrb(state, bt, "P", rng);
+      break;
+    case "Multi-Cast": {
+      const times = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      evokeFirstOrb(state, bt, times, rng);
+      break;
+    }
+    case "Steam Power":
+      drawCards(state, bt, mag, rng);
+      bt.di.push("Burn");
+      break;
+    case "Rainbow":
+      channelOrb(state, bt, "L", rng);
+      channelOrb(state, bt, "F", rng);
+      channelOrb(state, bt, "D", rng);
+      break;
+    case "Reboot": {
+      bt.dr = rng.shuffle(bt.dr.concat(bt.h, bt.di));
+      bt.h = [];
+      bt.di = [];
+      drawCards(state, bt, mag, rng);
+      break;
+    }
+    case "Rebound":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyPlayerPower(state, bt, "Rebound", 1);
+      break;
+    case "Redo":
+      if (bt.orbs && bt.orbs.length > 0) {
+        const oType = bt.orbs[0].t;
+        evokeFirstOrb(state, bt, 1, rng);
+        channelOrb(state, bt, oType, rng);
+      }
+      break;
+    case "Recycle":
+      if (bt.h.length > 0) {
+        const exC = bt.h.pop();
+        const cCost = calcPlayerCardNumbers(state, bt, exC, null).cost;
+        if (cCost > 0) bt.e += cCost;
+        triggerExhaustCard(state, bt, exC, rng);
+      }
+      break;
+    case "Reinforced Body": {
+      const times = xEnergy + (hasRelic(state, "Chemical X") ? 2 : 0);
+      for (let i = 0; i < times; i++) gainPlayerBlock(state, bt, blk, true, rng);
+      break;
+    }
+    case "Reprogram":
+      applyPlayerPower(state, bt, "Focus", -mag);
+      applyPlayerPower(state, bt, "Strength", mag);
+      applyPlayerPower(state, bt, "Dexterity", mag);
+      break;
+    case "Rip and Tear":
+      for (let i = 0; i < 2; i++) {
+        const alive = bt.m.filter(x => x.hp > 0);
+        if (!alive.length) break;
+        const rm = rng.pick(alive);
+        const d = calcPlayerCardNumbers(state, bt, cardStr, rm).dmg;
+        damageMonster(state, bt, rm, d, "NORMAL", rng);
+      }
+      break;
+    case "Scrape": {
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      const before = bt.h.length;
+      drawCards(state, bt, mag, rng);
+      for (let i = bt.h.length - 1; i >= before; i--) {
+        if (calcPlayerCardNumbers(state, bt, bt.h[i], null).cost !== 0) {
+          discardHandCardAt(state, bt, i, rng);
+        }
+      }
+      break;
+    }
+    case "Seek":
+      for (let i = 0; i < mag && bt.dr.length > 0 && bt.h.length < 10; i++) {
+        bt.h.push(bt.dr.pop());
+      }
+      break;
+    case "Self Repair": applyPlayerPower(state, bt, "SelfRepair", mag); break;
+    case "Skim": drawCards(state, bt, mag, rng); break;
+    case "Static Discharge": applyPlayerPower(state, bt, "StaticDischarge", mag); break;
+    case "Storm": applyPlayerPower(state, bt, "Storm", 1); break;
+    case "Streamline":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "Sunder": {
+      const wasAlive = t.hp > 0;
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (wasAlive && t.hp <= 0) bt.e += 3;
+      break;
+    }
+    case "Sweeping Beam":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      drawCards(state, bt, 1, rng);
+      break;
+    case "Tempest": {
+      const times = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      for (let i = 0; i < times; i++) channelOrb(state, bt, "L", rng);
+      break;
+    }
+    case "Thunder Strike": {
+      const hits = bt.ltCh || 0;
+      for (let i = 0; i < hits; i++) {
+        const alive = bt.m.filter(x => x.hp > 0);
+        if (!alive.length) break;
+        const rm = rng.pick(alive);
+        const d = calcPlayerCardNumbers(state, bt, cardStr, rm).dmg;
+        damageMonster(state, bt, rm, d, "NORMAL", rng);
+      }
+      break;
+    }
+    case "Turbo":
+      bt.e += mag;
+      bt.di.push("Void");
+      break;
+    case "White Noise": {
+      const pPool = DEFECT_POOL.filter(k => RAW_CARDS[k][1] === "P");
+      if (bt.h.length < 10) bt.h.push(modifyCardCostInCombat(makeTempCard(bt, rng.pick(pPool)), 0));
+      break;
+    }
+
+    // ==================== WATCHER (PURPLE) & TEMPCARDS ====================
+    case "Eruption":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      changeStance(state, bt, "Wrath", rng);
+      break;
+    case "Vigilance":
+    case "ClearTheMind":
+      changeStance(state, bt, "Calm", rng);
+      break;
+    case "Crescendo":
+      changeStance(state, bt, "Wrath", rng);
+      break;
+    case "EmptyBody":
+      changeStance(state, bt, "Neutral", rng);
+      break;
+    case "EmptyFist":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      changeStance(state, bt, "Neutral", rng);
+      break;
+    case "EmptyMind":
+      changeStance(state, bt, "Neutral", rng);
+      drawCards(state, bt, mag, rng);
+      break;
+    case "Alpha":
+      bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "Beta"));
+      break;
+    case "Beta":
+      bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "Omega"));
+      break;
+    case "Omega":
+      applyPlayerPower(state, bt, "Omega", mag);
+      break;
+    case "BattleHymn": applyPlayerPower(state, bt, "BattleHymn", 1); break;
+    case "Blasphemy":
+      changeStance(state, bt, "Divinity", rng);
+      applyPlayerPower(state, bt, "EndTurnDeath", 1);
+      break;
+    case "BowlingBash": {
+      const aliveCnt = bt.m.filter(x => x.hp > 0).length;
+      for (let i = 0; i < aliveCnt; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    }
+    case "CarveReality":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      addTempCardToHand(state, bt, def.up ? "Smite+" : "Smite", 1);
+      break;
+    case "DeceiveReality":
+      addTempCardToHand(state, bt, def.up ? "Safety+" : "Safety", 1);
+      break;
+    case "Collect": {
+      const times = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      if (times > 0) applyPlayerPower(state, bt, "Collect", times);
+      break;
+    }
+    case "Conclude":
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0) {
+          const d = calcPlayerCardNumbers(state, bt, cardStr, m).dmg;
+          damageMonster(state, bt, m, d, "NORMAL", rng);
+        }
+      }
+      bt.endTurnRequested = true;
+      break;
+    case "ConjureBlade": {
+      const times = xEnergy + (def.up ? 1 : 0) + (hasRelic(state, "Chemical X") ? 2 : 0);
+      if (times > 0) bt.dr.splice(rng.int(0, bt.dr.length), 0, "Expunger|" + times);
+      break;
+    }
+    case "Expunger":
+      for (let i = 0; i < mag; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      break;
+    case "CrushJoints":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (bt.lt === "S") applyMonsterPower(state, bt, t, "Vulnerable", mag);
+      break;
+    case "SashWhip":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (bt.lt === "A") applyMonsterPower(state, bt, t, "Weak", mag);
+      break;
+    case "FollowUp":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (bt.lt === "A") bt.e += 1;
+      break;
+    case "Sanctity":
+      if (bt.lt === "S") drawCards(state, bt, 2, rng);
+      break;
+    case "CutThroughFate":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      scryCards(state, bt, mag, rng);
+      drawCards(state, bt, 1, rng);
+      break;
+    case "ThirdEye":
+      scryCards(state, bt, mag, rng);
+      break;
+    case "JustLucky":
+      scryCards(state, bt, mag, rng);
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "DevaForm": applyPlayerPower(state, bt, "DevaForm", 1); break;
+    case "Devotion": applyPlayerPower(state, bt, "Devotion", mag); break;
+    case "Establishment": applyPlayerPower(state, bt, "Establishment", 1); break;
+    case "Evaluate":
+      bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "Insight"));
+      break;
+    case "Fasting2":
+      applyPlayerPower(state, bt, "Strength", mag);
+      applyPlayerPower(state, bt, "Dexterity", mag);
+      applyPlayerPower(state, bt, "FastingEnergy", 1);
+      break;
+    case "FearNoEvil":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (t && String(t.in).indexOf("ATTACK") !== -1) changeStance(state, bt, "Calm", rng);
+      break;
+    case "FlyingSleeves":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (t.hp > 0) damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      break;
+    case "ForeignInfluence": {
+      const aPool = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][1] === "A" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+      let c = makeTempCard(bt, rng.pick(aPool));
+      if (def.up) c = modifyCardCostInCombat(c, 0);
+      if (bt.h.length < 10) bt.h.push(c);
+      break;
+    }
+    case "Halt":
+      if (bt.st === "Wrath") {
+        let extraB = mag + (bt.pw.Dexterity || 0);
+        if ((bt.pw.Frail || 0) > 0) extraB = Math.floor(extraB * 0.75);
+        if (extraB > 0) gainPlayerBlock(state, bt, extraB, true, rng);
+      }
+      break;
+    case "Indignation":
+      if (bt.st === "Wrath") {
+        for (const m of bt.m) if (m.hp > 0) applyMonsterPower(state, bt, m, "Vulnerable", mag);
+      } else {
+        changeStance(state, bt, "Wrath", rng);
+      }
+      break;
+    case "InnerPeace":
+      if (bt.st === "Calm") drawCards(state, bt, mag, rng);
+      else changeStance(state, bt, "Calm", rng);
+      break;
+    case "Judgement":
+      if (t.hp > 0 && t.hp <= mag) {
+        damageMonster(state, bt, t, 99999, "HP_LOSS", rng);
+      }
+      break;
+    case "LessonLearned": {
+      const wasAlive = t.hp > 0;
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (wasAlive && t.hp <= 0 && !t.st.halfDead && !t.pw.Minion) {
+        const upCands = [];
+        for (let i = 0; i < state.dk.length; i++) {
+          const cd = getCardDef(state.dk[i]);
+          if (cd.up === 0 && cd.type !== "ST" && cd.type !== "C") upCands.push(i);
+        }
+        if (upCands.length > 0) {
+          const uIdx = rng.pick(upCands);
+          state.dk[uIdx] = getCardDef(state.dk[uIdx]).id + "+";
+          addLog(state, "📚【吸取教训】永久升级了【" + getCardDef(state.dk[uIdx]).name + "】！");
+        }
+      }
+      break;
+    }
+    case "LikeWater": applyPlayerPower(state, bt, "LikeWater", mag); break;
+    case "MasterReality": applyPlayerPower(state, bt, "MasterReality", 1); break;
+    case "Meditate":
+      for (let i = 0; i < mag && bt.di.length > 0 && bt.h.length < 10; i++) {
+        bt.h.push(bt.di.pop());
+      }
+      changeStance(state, bt, "Calm", rng);
+      bt.endTurnRequested = true;
+      break;
+    case "MentalFortress": applyPlayerPower(state, bt, "MentalFortress", mag); break;
+    case "Nirvana": applyPlayerPower(state, bt, "Nirvana", mag); break;
+    case "Omniscience":
+      if (bt.dr.length > 0) {
+        const picked = bt.dr.pop();
+        executeSingleCardEffect(state, bt, picked, targetIdx, 0, rng);
+        if (state.hp > 0 && !isCombatWon(bt)) executeSingleCardEffect(state, bt, picked, targetIdx, 0, rng);
+        triggerExhaustCard(state, bt, picked, rng);
+      }
+      break;
+    case "Pray":
+      gainMantra(state, bt, mag, rng);
+      bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "Insight"));
+      break;
+    case "Prostrate":
+      gainMantra(state, bt, mag, rng);
+      break;
+    case "PathToVictory":
+      applyMonsterPower(state, bt, t, "Mark", mag);
+      for (const m of bt.m.slice()) {
+        if (m.hp > 0 && (m.pw.Mark || 0) > 0) {
+          damageMonster(state, bt, m, m.pw.Mark, "HP_LOSS", rng);
+        }
+      }
+      break;
+    case "Ragnarok":
+      for (let i = 0; i < mag; i++) {
+        const alive = bt.m.filter(x => x.hp > 0);
+        if (!alive.length) break;
+        const rm = rng.pick(alive);
+        const d = calcPlayerCardNumbers(state, bt, cardStr, rm).dmg;
+        damageMonster(state, bt, rm, d, "NORMAL", rng);
+      }
+      break;
+    case "ReachHeaven":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "ThroughViolence"));
+      break;
+    case "Adaptation": applyPlayerPower(state, bt, "Rushdown", 2); break;
+    case "Scrawl":
+      if (bt.h.length < 10) drawCards(state, bt, 10 - bt.h.length, rng);
+      break;
+    case "Vengeance": applyPlayerPower(state, bt, "Vengeance", mag); break;
+    case "SpiritShield":
+      if (bt.h.length > 0) gainPlayerBlock(state, bt, bt.h.length * mag, true, rng);
+      break;
+    case "Study": applyPlayerPower(state, bt, "Study", 1); break;
+    case "Swivel": applyPlayerPower(state, bt, "FreeAttackPower", 1); break;
+    case "TalkToTheHand":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      applyMonsterPower(state, bt, t, "BlockReturn", mag);
+      break;
+    case "Tantrum":
+      for (let i = 0; i < mag; i++) {
+        if (t.hp <= 0) break;
+        damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      }
+      changeStance(state, bt, "Wrath", rng);
+      break;
+    case "Vault":
+      bt.vaultRequested = true;
+      bt.endTurnRequested = true;
+      break;
+    case "Wallop": {
+      const unb = damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      if (unb > 0) gainPlayerBlock(state, bt, unb, false, rng);
+      break;
+    }
+    case "WaveOfTheHand": applyPlayerPower(state, bt, "WaveOfTheHand", mag); break;
+    case "WheelKick":
+      damageMonster(state, bt, t, dmg, "NORMAL", rng);
+      drawCards(state, bt, 2, rng);
+      break;
+    case "Wireheading": applyPlayerPower(state, bt, "Wireheading", mag); break;
+    case "Wish":
+      applyPlayerPower(state, bt, "Strength", mag);
+      applyPlayerPower(state, bt, "PlatedArmor", mag * 2);
+      break;
+    case "WreathOfFlame": applyPlayerPower(state, bt, "Vigor", mag); break;
+    case "Miracle": bt.e += mag; break;
+    case "Insight": drawCards(state, bt, mag, rng); break;
   }
+  bt.lt = def.type;
 }
 
 function playCardInCombat(state, cardIdx, targetIdx, rng) {
@@ -4518,8 +6230,12 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bt.pw.Panache, "THORNS", rng);
   }
 
-  // Execute effect (and Double Tap / Duplication / Necronomicon)
+  // Execute effect (EchoForm / Duplication / DoubleTap / Burst / Amplify / Necronomicon)
   let repeats = 1;
+  if ((bt.pw.EchoForm || 0) > 0 && (bt.echoUsed || 0) < bt.pw.EchoForm) {
+    bt.echoUsed = (bt.echoUsed || 0) + 1;
+    repeats++;
+  }
   if ((bt.pw.Duplication || 0) > 0) {
     bt.pw.Duplication--;
     if (bt.pw.Duplication <= 0) delete bt.pw.Duplication;
@@ -4527,6 +6243,14 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
   } else if (def.type === "A" && (bt.pw.DoubleTap || 0) > 0) {
     bt.pw.DoubleTap--;
     if (bt.pw.DoubleTap <= 0) delete bt.pw.DoubleTap;
+    repeats++;
+  } else if (def.type === "S" && (bt.pw.Burst || 0) > 0) {
+    bt.pw.Burst--;
+    if (bt.pw.Burst <= 0) delete bt.pw.Burst;
+    repeats++;
+  } else if (def.type === "P" && (bt.pw.Amplify || 0) > 0) {
+    bt.pw.Amplify--;
+    if (bt.pw.Amplify <= 0) delete bt.pw.Amplify;
     repeats++;
   }
   if (def.type === "A" && (cost >= 2 || (cost === -1 && xEnergy >= 2)) && hasRelic(state, "Necronomicon") && !bt.necroDone) {
@@ -4543,14 +6267,27 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
   // Destination pile
   let cleanCard = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : ""));
   if (def.id === "Rampage") {
-    const curExtra = (def.mod && !def.mod.startsWith("c")) ? (parseInt(def.mod, 10) || 0) : 0;
-    cleanCard += "|" + (curExtra + def.mag);
+    cleanCard += "|" + ((def.extra || 0) + def.mag);
+  } else if (def.id === "Glass Knife") {
+    cleanCard += "|" + ((def.extra || 0) - 2);
+  } else if (def.id === "Steam") {
+    cleanCard += "|" + ((def.extra || 0) - 1);
+  } else if (def.id === "Streamline") {
+    cleanCard = modifyCardCostInCombat(cleanCard, Math.max(0, def.cost - 1));
+  } else if (def.extra) {
+    cleanCard += "|" + def.extra;
   }
   const shouldExhaust = def.exhaust || (def.type === "S" && (bt.pw.Corruption || 0) > 0) || def.type === "ST" || def.type === "C";
   if (def.type === "P") {
     // Power stays in play
   } else if (shouldExhaust) {
     triggerExhaustCard(state, bt, cleanCard, rng);
+  } else if (def.id === "Tantrum") {
+    bt.dr.splice(rng.int(0, bt.dr.length), 0, cleanCard);
+  } else if (def.id !== "Rebound" && (bt.pw.Rebound || 0) > 0) {
+    bt.pw.Rebound--;
+    if (bt.pw.Rebound <= 0) delete bt.pw.Rebound;
+    bt.dr.push(cleanCard);
   } else {
     bt.di.push(cleanCard);
   }
@@ -4566,10 +6303,22 @@ function playCardInCombat(state, cardIdx, targetIdx, rng) {
         applyMonsterPower(state, bt, m, "Strength", 2);
         addLog(state, "【时间扭曲】触发！强制结束回合并使时间吞噬者 +2 力量！");
         if (!isCombatWon(bt) && state.hp > 0) {
+          delete bt.endTurnRequested;
+          delete bt.vaultRequested;
           endPlayerTurn(state, rng);
           return true;
         }
       }
+    }
+  }
+
+  if (bt.endTurnRequested) {
+    const isVault = Boolean(bt.vaultRequested);
+    delete bt.endTurnRequested;
+    delete bt.vaultRequested;
+    if (!isCombatWon(bt) && state.hp > 0) {
+      endPlayerTurn(state, rng, isVault);
+      return true;
     }
   }
 
@@ -4619,6 +6368,7 @@ function usePotion(state, potIdx, targetIdx, rng) {
     case "Explosive Potion":
       for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, val, "THORNS", rng);
       break;
+    case "Poison Potion": if (t) applyMonsterPower(state, bt, t, "Poison", val); break;
     case "FearPotion": if (t) applyMonsterPower(state, bt, t, "Vulnerable", val); break;
     case "Weak Potion": if (t) applyMonsterPower(state, bt, t, "Weak", val); break;
     case "Strength Potion": applyPlayerPower(state, bt, "Strength", val); break;
@@ -4637,18 +6387,18 @@ function usePotion(state, potIdx, targetIdx, rng) {
       bt.h = bt.h.map(c => { const d = getCardDef(c); return (d.up === 0 && d.type !== "ST" && d.type !== "C") ? d.id + "+" : c; });
       break;
     case "AttackPotion": {
-      const p = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][1] === "A" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
-      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(rng.pick(p) + "|c0");
+      const p = getCharCardPool(state).filter(k => RAW_CARDS[k][1] === "A");
+      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(modifyCardCostInCombat(makeTempCard(bt, rng.pick(p)), 0));
       break;
     }
     case "SkillPotion": {
-      const p = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][1] === "S" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
-      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(rng.pick(p) + "|c0");
+      const p = getCharCardPool(state).filter(k => RAW_CARDS[k][1] === "S");
+      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(modifyCardCostInCombat(makeTempCard(bt, rng.pick(p)), 0));
       break;
     }
     case "PowerPotion": {
-      const p = Object.keys(RAW_CARDS).filter(k => RAW_CARDS[k][1] === "P" && ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
-      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(rng.pick(p) + "|c0");
+      const p = getCharCardPool(state).filter(k => RAW_CARDS[k][1] === "P");
+      for (let i = 0; i < val && bt.h.length < 10; i++) bt.h.push(modifyCardCostInCombat(makeTempCard(bt, rng.pick(p)), 0));
       break;
     }
     case "Regen Potion": applyPlayerPower(state, bt, "Regen", val); break;
@@ -4663,11 +6413,28 @@ function usePotion(state, potIdx, targetIdx, rng) {
   return true;
 }
 
-function endPlayerTurn(state, rng) {
+function endPlayerTurn(state, rng, skipMonsters = false) {
   const bt = state.bt;
   if (!bt || state.ph !== "COMBAT") return;
 
-  // 1. Player end-of-turn relics & powers
+  // 1. Player end-of-turn orbs, relics & powers
+  if (hasRelic(state, "FrozenCore") && bt.orbs && bt.orbs.length < (bt.maxOrbs || 0)) {
+    channelOrb(state, bt, "F", rng);
+  }
+  if (bt.orbs && bt.orbs.length > 0) {
+    if (hasRelic(state, "Cables") && bt.orbs[0].t !== "P") {
+      triggerSingleOrbPassive(state, bt, bt.orbs[0], rng);
+    }
+    for (const o of bt.orbs) {
+      if (o.t !== "P") triggerSingleOrbPassive(state, bt, o, rng);
+    }
+  }
+  if ((bt.pw.LikeWater || 0) > 0 && bt.st === "Calm") {
+    gainPlayerBlock(state, bt, bt.pw.LikeWater, false, rng);
+  }
+  if (hasRelic(state, "CloakClasp") && bt.h.length > 0) {
+    gainPlayerBlock(state, bt, bt.h.length, false, rng);
+  }
   if (hasRelic(state, "Orichalcum") && bt.b === 0) {
     gainPlayerBlock(state, bt, 6, false, rng);
   }
@@ -4680,6 +6447,12 @@ function endPlayerTurn(state, rng) {
   if ((bt.pw.Combust || 0) > 0) {
     losePlayerHp(state, bt, 1, true, rng);
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bt.pw.Combust, "THORNS", rng);
+  }
+  if ((bt.pw.Omega || 0) > 0) {
+    for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, bt.pw.Omega, "THORNS", rng);
+  }
+  if ((bt.pw.Study || 0) > 0) {
+    for (let s = 0; s < bt.pw.Study; s++) bt.dr.splice(rng.int(0, bt.dr.length), 0, makeTempCard(bt, "Insight"));
   }
   if ((bt.pw.TheBomb || 0) > 0) {
     bt.pw.TheBomb--;
@@ -4713,18 +6486,32 @@ function endPlayerTurn(state, rng) {
     applyPlayerPower(state, bt, "Dexterity", -bt.pw.LoseDexterity);
     delete bt.pw.LoseDexterity;
   }
+  if ((bt.pw.WraithForm || 0) > 0) {
+    applyPlayerPower(state, bt, "Dexterity", -bt.pw.WraithForm);
+  }
   delete bt.pw.Rage;
   delete bt.pw.DoubleTap;
+  delete bt.pw.Burst;
+  delete bt.pw.Amplify;
   delete bt.pw.Duplication;
+  delete bt.pw.DoubleDamage;
+  delete bt.pw.Rebound;
   delete bt.pw.NoDraw;
   delete bt.pw.Entangled;
+  for (const m of bt.m) delete m.pw.Choke;
 
   // Enter Monster/End-of-Turn phase: debuffs applied to player from here until player's next turn are marked justApplied (bt.ja)
   bt.inMonsterPhase = true;
 
-  // 2. End-of-turn cards in hand (Burn, Decay, Doubt, Shame, Regret, Ethereal)
+  // 2. End-of-turn cards in hand (Burn, Decay, Doubt, Shame, Regret, Ethereal, Retain)
   const handSnapshot = bt.h.slice();
   const keptHand = [];
+  let wlpLeft = bt.pw.WellLaidPlans || 0;
+  const eqRetain = (bt.pw.Equilibrium || 0) > 0;
+  if (eqRetain) {
+    bt.pw.Equilibrium--;
+    if (bt.pw.Equilibrium <= 0) delete bt.pw.Equilibrium;
+  }
   for (const c of handSnapshot) {
     const def = getCardDef(c);
     if (def.id === "Burn") {
@@ -4745,11 +6532,21 @@ function endPlayerTurn(state, rng) {
     }
     if (def.ethereal) {
       triggerExhaustCard(state, bt, c, rng);
-    } else if (hasRelic(state, "Runic Pyramid")) {
-      // Strip temporary 0-cost modifier at end of turn
-      keptHand.push(def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")));
+    } else if (hasRelic(state, "Runic Pyramid") || eqRetain || def.retain || (wlpLeft > 0 && def.type !== "ST" && def.type !== "C")) {
+      if (!hasRelic(state, "Runic Pyramid") && !eqRetain && !def.retain && wlpLeft > 0) wlpLeft--;
+      let rc = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")) + (def.extra ? "|" + def.extra : "");
+      if (def.id === "WindmillStrike" || def.id === "Perseverance") {
+        rc = def.id + (def.up ? "+" : "") + "|" + ((def.extra || 0) + def.mag);
+      } else if (def.id === "SandsOfTime") {
+        rc = modifyCardCostInCombat(rc, Math.max(0, def.cost - 1));
+      }
+      if ((bt.pw.Establishment || 0) > 0) {
+        const curDef = getCardDef(rc);
+        rc = modifyCardCostInCombat(rc, Math.max(0, curDef.cost - bt.pw.Establishment));
+      }
+      keptHand.push(rc);
     } else {
-      const clean = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")) + (def.id === "Rampage" && def.mod && !def.mod.startsWith("c") ? "|" + def.mod : "");
+      const clean = def.id + (def.up > 1 ? "+" + def.up : (def.up ? "+" : "")) + (def.extra ? "|" + def.extra : "");
       bt.di.push(clean);
     }
   }
@@ -4758,79 +6555,104 @@ function endPlayerTurn(state, rng) {
   if (state.hp <= 0) { delete bt.inMonsterPhase; onPlayerDefeat(state); return; }
   if (isCombatWon(bt)) { delete bt.inMonsterPhase; onCombatVictory(state, rng); return; }
 
-  // 3. Monsters start of turn (lose block unless Barricade) & execute turns
-  for (const m of bt.m) {
-    if (m.hp > 0 && !m.pw.Barricade) m.b = 0;
-    if (m.pw.Slow !== undefined) m.pw.Slow = 0;
-  }
+  if (!skipMonsters) {
+    // 3. Monsters start of turn (lose block unless Barricade) & execute turns
+    for (const m of bt.m) {
+      if (m.hp > 0 && !m.pw.Barricade) m.b = 0;
+      if (m.pw.Slow !== undefined) m.pw.Slow = 0;
+    }
 
-  const mCopy = bt.m.slice();
-  for (let i = 0; i < mCopy.length; i++) {
-    const m = mCopy[i];
-    const curIdx = bt.m.indexOf(m);
-    if (curIdx === -1) continue;
-    executeMonsterTurn(m, curIdx, bt, state, rng);
-    if (state.hp <= 0) { delete bt.inMonsterPhase; onPlayerDefeat(state); return; }
-  }
+    const mCopy = bt.m.slice();
+    for (let i = 0; i < mCopy.length; i++) {
+      const m = mCopy[i];
+      const curIdx = bt.m.indexOf(m);
+      if (curIdx === -1) continue;
+      executeMonsterTurn(m, curIdx, bt, state, rng);
+      if (state.hp <= 0) { delete bt.inMonsterPhase; onPlayerDefeat(state); return; }
+    }
 
-  // 4. Monsters end-of-turn powers (Ritual, Metallicize, PlatedArmor, RegenerateMonster, Fading, Shackled/Shifting, Weak/Vuln/Intangible tick)
-  for (const m of bt.m) {
-    if (m.hp <= 0 && !m.st.halfDead) continue;
-    if ((m.pw.Ritual || 0) > 0) {
-      if (m.st.justRitual) m.st.justRitual = false;
-      else applyMonsterPower(state, bt, m, "Strength", m.pw.Ritual);
-    }
-    if ((m.pw.GenericStrengthUp || 0) > 0) applyMonsterPower(state, bt, m, "Strength", m.pw.GenericStrengthUp);
-    if ((m.pw.Metallicize || 0) > 0) m.b += m.pw.Metallicize;
-    if ((m.pw.PlatedArmor || 0) > 0) m.b += m.pw.PlatedArmor;
-    if ((m.pw.RegenerateMonster || 0) > 0 && m.hp > 0) m.hp = Math.min(m.mhp, m.hp + m.pw.RegenerateMonster);
-    if ((m.pw.Shackled || 0) > 0) {
-      m.pw.Strength = (m.pw.Strength || 0) + m.pw.Shackled;
-      if (m.pw.Strength === 0) delete m.pw.Strength;
-      delete m.pw.Shackled;
-    }
-    if (m.st.shiftLoss) {
-      applyMonsterPower(state, bt, m, "Strength", m.st.shiftLoss);
-      m.st.shiftLoss = 0;
-    }
-    if (m.st.baseMal) m.pw.Malleable = m.st.baseMal;
-    if (m.id === "Byrd" && !m.st.air && m.mv === 4) {
-      m.st.air = true;
-      m.pw.Flight = 3;
-    }
-    if ((m.pw.Fading || 0) > 0) {
-      m.pw.Fading--;
-      if (m.pw.Fading <= 0) { m.hp = 0; m.b = 0; addLog(state, m.name + " 消逝了！"); }
-    }
-    const hadIntangible = (m.pw.Intangible || 0) > 0;
-    for (const dKey of ["Weak", "Vulnerable", "Intangible"]) {
-      if ((m.pw[dKey] || 0) > 0) {
-        m.pw[dKey]--;
-        if (m.pw[dKey] <= 0) delete m.pw[dKey];
+    // 4. Monsters end-of-turn powers
+    for (const m of bt.m) {
+      if (m.hp <= 0 && !m.st.halfDead) continue;
+      if ((m.pw.Ritual || 0) > 0) {
+        if (m.st.justRitual) m.st.justRitual = false;
+        else applyMonsterPower(state, bt, m, "Strength", m.pw.Ritual);
+      }
+      if ((m.pw.GenericStrengthUp || 0) > 0) applyMonsterPower(state, bt, m, "Strength", m.pw.GenericStrengthUp);
+      if ((m.pw.Metallicize || 0) > 0) m.b += m.pw.Metallicize;
+      if ((m.pw.PlatedArmor || 0) > 0) m.b += m.pw.PlatedArmor;
+      if ((m.pw.RegenerateMonster || 0) > 0 && m.hp > 0) m.hp = Math.min(m.mhp, m.hp + m.pw.RegenerateMonster);
+      if ((m.pw.Shackled || 0) > 0) {
+        m.pw.Strength = (m.pw.Strength || 0) + m.pw.Shackled;
+        if (m.pw.Strength === 0) delete m.pw.Strength;
+        delete m.pw.Shackled;
+      }
+      if (m.st.shiftLoss) {
+        applyMonsterPower(state, bt, m, "Strength", m.st.shiftLoss);
+        m.st.shiftLoss = 0;
+      }
+      if (m.st.baseMal) m.pw.Malleable = m.st.baseMal;
+      if (m.id === "Byrd" && !m.st.air && m.mv === 4) {
+        m.st.air = true;
+        m.pw.Flight = 3;
+      }
+      if ((m.pw.Fading || 0) > 0) {
+        m.pw.Fading--;
+        if (m.pw.Fading <= 0) { m.hp = 0; m.b = 0; addLog(state, m.name + " 消逝了！"); }
+      }
+      const hadIntangible = (m.pw.Intangible || 0) > 0;
+      for (const dKey of ["Weak", "Vulnerable", "Intangible", "LockOn"]) {
+        if ((m.pw[dKey] || 0) > 0) {
+          m.pw[dKey]--;
+          if (m.pw[dKey] <= 0) delete m.pw[dKey];
+        }
+      }
+      if (m.id === "Nemesis" && m.hp > 0 && !hadIntangible) {
+        m.pw.Intangible = 1;
       }
     }
-    if (m.id === "Nemesis" && m.hp > 0 && !hadIntangible) {
-      m.pw.Intangible = 1;
+    delete bt.inMonsterPhase;
+
+    if (isCombatWon(bt)) { onCombatVictory(state, rng); return; }
+
+    // Roll next monster moves
+    for (const m of bt.m) {
+      rollMonsterMove(m, bt, state, rng);
     }
-  }
-  delete bt.inMonsterPhase;
-
-  if (isCombatWon(bt)) { onCombatVictory(state, rng); return; }
-
-  // Roll next monster moves
-  for (const m of bt.m) {
-    rollMonsterMove(m, bt, state, rng);
+  } else {
+    delete bt.inMonsterPhase;
   }
 
   // 5. Player start of next turn
   const prevAtks = bt.at || 0;
   const prevCards = bt.ct || 0;
+  const lostHpLastTurn = Boolean(bt.lostHpTurn);
+  bt.lostHpTurn = false;
   bt.t += 1;
-  bt.ct = 0; bt.at = 0; bt.sk = 0; bt.po = 0; bt.pelletsDone = false; bt.necroDone = false;
+  bt.ct = 0; bt.at = 0; bt.sk = 0; bt.po = 0; bt.discTurn = 0; bt.kiteUsed = false; bt.echoUsed = 0;
+  bt.pelletsDone = false; bt.necroDone = false;
+
+  if ((bt.pw.EndTurnDeath || 0) > 0) {
+    delete bt.pw.EndTurnDeath;
+    losePlayerHp(state, bt, 99999, true, rng);
+    if (state.hp <= 0) { onPlayerDefeat(state); return; }
+  }
+  if (bt.st === "Divinity") {
+    changeStance(state, bt, "Neutral", rng);
+  }
+  if ((bt.pw.Vengeance || 0) > 0) {
+    const vDraw = bt.pw.Vengeance;
+    delete bt.pw.Vengeance;
+    changeStance(state, bt, "Wrath", rng);
+    drawCards(state, bt, vDraw, rng);
+  }
 
   // Player Block decay
   if ((bt.pw.Barricade || 0) > 0) {
     // Keep all block
+  } else if ((bt.pw.Blur || 0) > 0) {
+    bt.pw.Blur--;
+    if (bt.pw.Blur <= 0) delete bt.pw.Blur;
   } else if (hasRelic(state, "Calipers")) {
     bt.b = Math.max(0, bt.b - 15);
   } else {
@@ -4861,6 +6683,22 @@ function endPlayerTurn(state, rng) {
     bt.pw.Intangible--;
     if (bt.pw.Intangible <= 0) delete bt.pw.Intangible;
   }
+  if ((bt.pw.Phantasmal || 0) > 0) {
+    bt.pw.DoubleDamage = (bt.pw.DoubleDamage || 0) + 1;
+    bt.pw.Phantasmal--;
+    if (bt.pw.Phantasmal <= 0) delete bt.pw.Phantasmal;
+  }
+  if ((bt.pw.NoxiousFumes || 0) > 0) {
+    for (const m of bt.m) if (m.hp > 0) applyMonsterPower(state, bt, m, "Poison", bt.pw.NoxiousFumes);
+  }
+  if ((bt.pw.InfiniteBlades || 0) > 0) addTempCardToHand(state, bt, "Shiv", bt.pw.InfiniteBlades);
+  if ((bt.pw.Nightmare || 0) > 0 && bt.nightmareCard) {
+    addTempCardToHand(state, bt, bt.nightmareCard, bt.pw.Nightmare);
+    delete bt.pw.Nightmare;
+    delete bt.nightmareCard;
+  }
+  if ((bt.pw.Bias || 0) > 0) applyPlayerPower(state, bt, "Focus", -bt.pw.Bias);
+  if (hasRelic(state, "Inserter") && bt.t % 2 === 0) bt.maxOrbs = Math.min(10, (bt.maxOrbs || 0) + 1);
   if ((bt.pw.Ritual || 0) > 0) applyPlayerPower(state, bt, "Strength", bt.pw.Ritual);
   if ((bt.pw.DemonForm || 0) > 0) applyPlayerPower(state, bt, "Strength", bt.pw.DemonForm);
   if ((bt.pw.Brutality || 0) > 0) {
@@ -4872,6 +6710,36 @@ function endPlayerTurn(state, rng) {
   if (hasRelic(state, "Ice Cream")) bt.e += bt.me;
   else bt.e = bt.me;
   if ((bt.pw.Berserk || 0) > 0) bt.e += bt.pw.Berserk;
+  if ((bt.pw.Energized || 0) > 0) { bt.e += bt.pw.Energized; delete bt.pw.Energized; }
+  if ((bt.pw.DevaForm || 0) > 0) { bt.devaE = (bt.devaE || 0) + bt.pw.DevaForm; bt.e += bt.devaE; }
+  if ((bt.pw.FastingEnergy || 0) > 0) bt.e = Math.max(0, bt.e - bt.pw.FastingEnergy);
+  if (bt.orbs && bt.orbs.length > 0) {
+    if (hasRelic(state, "Cables") && bt.orbs[0].t === "P") bt.e += 1;
+    for (const o of bt.orbs) if (o.t === "P") bt.e += 1;
+    if ((bt.pw.Loop || 0) > 0) {
+      const loops = bt.pw.Loop + (hasRelic(state, "Cables") ? 1 : 0);
+      for (let l = 0; l < loops; l++) triggerSingleOrbPassive(state, bt, bt.orbs[0], rng);
+    }
+    if (lostHpLastTurn && hasRelic(state, "Emotion Chip")) {
+      for (const o of bt.orbs) triggerSingleOrbPassive(state, bt, o, rng);
+    }
+  }
+  if ((bt.pw.HelloWorld || 0) > 0) {
+    const cPool = DEFECT_POOL.filter(k => RAW_CARDS[k][2] === "C");
+    for (let h = 0; h < bt.pw.HelloWorld; h++) addTempCardToHand(state, bt, rng.pick(cPool), 1);
+  }
+  if ((bt.pw.CreativeAI || 0) > 0) {
+    const pPool = DEFECT_POOL.filter(k => RAW_CARDS[k][1] === "P");
+    for (let c = 0; c < bt.pw.CreativeAI; c++) addTempCardToHand(state, bt, rng.pick(pPool), 1);
+  }
+  if (hasRelic(state, "Damaru")) gainMantra(state, bt, 1, rng);
+  if ((bt.pw.Devotion || 0) > 0) gainMantra(state, bt, bt.pw.Devotion, rng);
+  if ((bt.pw.BattleHymn || 0) > 0) addTempCardToHand(state, bt, "Smite", bt.pw.BattleHymn);
+  if ((bt.pw.Collect || 0) > 0) {
+    addTempCardToHand(state, bt, "Miracle+", 1);
+    bt.pw.Collect--;
+    if (bt.pw.Collect <= 0) delete bt.pw.Collect;
+  }
   if ((state.rt === "E" || state.rt === "B") && hasRelic(state, "SlaversCollar")) bt.e += 1;
   if (hasRelic(state, "Art of War") && prevAtks === 0) bt.e += 1;
   if (hasRelic(state, "Happy Flower")) {
@@ -4885,9 +6753,16 @@ function endPlayerTurn(state, rng) {
   if (hasRelic(state, "Mercury Hourglass")) {
     for (const m of bt.m.slice()) if (m.hp > 0) damageMonster(state, bt, m, 3, "THORNS", rng);
   }
+  if ((bt.pw.Wireheading || 0) > 0) scryCards(state, bt, bt.pw.Wireheading, rng);
 
   // Draw cards for turn
   let drawCnt = 5;
+  if (hasRelic(state, "Ring of the Serpent")) drawCnt += 1;
+  if ((bt.pw.MachineLearning || 0) > 0) drawCnt += bt.pw.MachineLearning;
+  if ((bt.pw.DrawCardNextTurn || 0) > 0) {
+    drawCnt += bt.pw.DrawCardNextTurn;
+    delete bt.pw.DrawCardNextTurn;
+  }
   if (hasRelic(state, "Snecko Eye")) drawCnt += 2;
   if (hasRelic(state, "Pocketwatch") && prevCards <= 3) drawCnt += 3;
   if ((bt.pw.DrawReduction || 0) > 0) {
@@ -4895,6 +6770,10 @@ function endPlayerTurn(state, rng) {
     delete bt.pw.DrawReduction;
   }
   drawCards(state, bt, drawCnt, rng);
+  if ((bt.pw.ToolsOfTheTrade || 0) > 0) {
+    drawCards(state, bt, bt.pw.ToolsOfTheTrade, rng);
+    discardSmartFromHand(state, bt, bt.pw.ToolsOfTheTrade, rng);
+  }
 
   // Mayhem power
   if ((bt.pw.Mayhem || 0) > 0 && bt.dr.length > 0) {
@@ -4911,10 +6790,16 @@ function endPlayerTurn(state, rng) {
 function obtainRelic(state, relId, rng) {
   if (!relId || !RELICS[relId] || hasRelic(state, relId)) return false;
   if (!state.rc) state.rc = {};
-  if (relId === "Black Blood") {
-    const idx = state.rel.indexOf("Burning Blood");
-    if (idx !== -1) state.rel.splice(idx, 1, "Black Blood");
-    else state.rel.push("Black Blood");
+  const starterReplacements = {
+    "Black Blood": "Burning Blood",
+    "Ring of the Serpent": "Ring of the Snake",
+    "FrozenCore": "Cracked Core",
+    "HolyWater": "PureWater",
+  };
+  if (starterReplacements[relId]) {
+    const idx = state.rel.indexOf(starterReplacements[relId]);
+    if (idx !== -1) state.rel.splice(idx, 1, relId);
+    else state.rel.push(relId);
   } else {
     state.rel.push(relId);
   }
@@ -4957,21 +6842,21 @@ function obtainRelic(state, relId, rng) {
       obtainRelic(state, rollRelic(state, rng, "R"), rng);
       break;
     case "Pandora's Box": {
-      const pool = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+      const pool = getCharCardPool(state);
       for (let i = 0; i < state.dk.length; i++) {
         const id = getCardDef(state.dk[i]).id;
-        if (id === "Strike_R" || id === "Defend_R") {
+        if (id.startsWith("Strike_") || id.startsWith("Defend_")) {
           state.dk[i] = rng.pick(pool);
         }
       }
       break;
     }
     case "Astrolabe": {
-      const pool = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+      const pool = getCharCardPool(state);
       let transformed = 0;
       for (let i = 0; i < state.dk.length && transformed < 3; i++) {
         const id = getCardDef(state.dk[i]).id;
-        if (id === "Strike_R" || id === "Defend_R") {
+        if (id.startsWith("Strike_") || id.startsWith("Defend_")) {
           state.dk[i] = rng.pick(pool) + "+";
           transformed++;
         }
@@ -5003,12 +6888,13 @@ function obtainRelic(state, relId, rng) {
 }
 
 function rollRelic(state, rng, tier) {
+  const curChar = state.ch || "IRONCLAD";
   const tiers = tier ? (tier === "S" ? ["SH"] : [tier]) : ["C", "U", "R"];
   for (const t of tiers) {
-    const candidates = Object.keys(RELICS).filter(k => RELICS[k].tier === t && !hasRelic(state, k));
+    const candidates = Object.keys(RELICS).filter(k => RELICS[k].tier === t && !hasRelic(state, k) && (!RELICS[k].char || RELICS[k].char === curChar));
     if (candidates.length > 0) return rng.pick(candidates);
   }
-  const fallback = Object.keys(RELICS).filter(k => ["C", "U", "R"].indexOf(RELICS[k].tier) !== -1 && !hasRelic(state, k));
+  const fallback = Object.keys(RELICS).filter(k => ["C", "U", "R"].indexOf(RELICS[k].tier) !== -1 && !hasRelic(state, k) && (!RELICS[k].char || RELICS[k].char === curChar));
   return fallback.length > 0 ? rng.pick(fallback) : "Circlet";
 }
 
@@ -5037,9 +6923,10 @@ function rollCardRewards(state, rng, roomType, countOverride) {
     if (hasRelic(state, "Question Card")) count += 1;
     if (hasRelic(state, "Busted Crown")) count = Math.max(1, count - 2);
   }
-  const commons = IRONCLAD_POOL.filter(k => RAW_CARDS[k][2] === "C");
-  const uncommons = IRONCLAD_POOL.filter(k => RAW_CARDS[k][2] === "U");
-  const rares = IRONCLAD_POOL.filter(k => RAW_CARDS[k][2] === "R");
+  const charPool = getCharCardPool(state);
+  const commons = charPool.filter(k => RAW_CARDS[k][2] === "C");
+  const uncommons = charPool.filter(k => RAW_CARDS[k][2] === "U");
+  const rares = charPool.filter(k => RAW_CARDS[k][2] === "R");
 
   const picked = [];
   for (let i = 0; i < count; i++) {
@@ -5062,7 +6949,9 @@ function rollCardRewards(state, rng, roomType, countOverride) {
 }
 
 function onCombatVictory(state, rng) {
+  const selfRep = (state.bt && state.bt.pw && state.bt.pw.SelfRepair) || 0;
   state.bt = null;
+  if (selfRep > 0) healPlayer(state, selfRep, false);
   if (hasRelic(state, "Burning Blood")) healPlayer(state, 6, false);
   if (hasRelic(state, "Black Blood")) healPlayer(state, 12, false);
   if (hasRelic(state, "Meat on the Bone") && state.hp <= Math.floor(state.mhp * 0.5)) healPlayer(state, 12, false);
@@ -5341,7 +7230,7 @@ function handleEventAction(state, choiceIdx, cardIdx, rng) {
 
   const transformPickedCard = () => {
     const idx = (dkIdx >= 0 && dkIdx < state.dk.length) ? dkIdx : 0;
-    const pool = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+    const pool = getCharCardPool(state);
     const newCard = rng.pick(pool);
     state.dk[idx] = newCard;
     addLog(state, "卡牌变化为【" + getCardDef(newCard).name + "】");
@@ -5403,7 +7292,7 @@ function handleEventAction(state, choiceIdx, cardIdx, rng) {
         const loss = Math.floor(state.mhp * 0.30);
         state.mhp = Math.max(1, state.mhp - loss);
         state.hp = Math.min(state.hp, state.mhp);
-        state.dk = state.dk.filter(c => getCardDef(c).id !== "Strike_R");
+        state.dk = state.dk.filter(c => !getCardDef(c).id.startsWith("Strike_"));
         for (let i = 0; i < 5; i++) addCardToMasterDeck(state, "Bite", rng);
       }
       break;
@@ -5419,13 +7308,13 @@ function handleEventAction(state, choiceIdx, cardIdx, rng) {
       else {
         for (let i = 0; i < state.dk.length; i++) {
           const d = getCardDef(state.dk[i]);
-          if ((d.id === "Strike_R" || d.id === "Defend_R") && d.up === 0) state.dk[i] = d.id + "+";
+          if ((d.id.startsWith("Strike_") || d.id.startsWith("Defend_")) && d.up === 0) state.dk[i] = d.id + "+";
         }
       }
       break;
     case "TheLibrary":
       if (cIdx === 0) {
-        const pool = Object.keys(RAW_CARDS).filter(k => ["U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+        const pool = getCharCardPool(state).filter(k => ["U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
         addCardToMasterDeck(state, rng.pick(pool) + "+", rng);
       } else {
         healPlayer(state, Math.floor(state.mhp * 0.33), false);
@@ -5488,9 +7377,10 @@ function calcShopPrice(state, basePrice) {
 }
 
 function generateShop(state, rng) {
-  const attacks = IRONCLAD_POOL.filter(k => RAW_CARDS[k][1] === "A");
-  const skills = IRONCLAD_POOL.filter(k => RAW_CARDS[k][1] === "S");
-  const powers = IRONCLAD_POOL.filter(k => RAW_CARDS[k][1] === "P");
+  const charPool = getCharCardPool(state);
+  const attacks = charPool.filter(k => RAW_CARDS[k][1] === "A");
+  const skills = charPool.filter(k => RAW_CARDS[k][1] === "S");
+  const powers = charPool.filter(k => RAW_CARDS[k][1] === "P");
   const colorless = COLORLESS_CARDS;
 
   const rawCards = [
@@ -5543,7 +7433,7 @@ function handleShopAction(state, act, rng) {
       item.sold = true;
       addCardToMasterDeck(state, item.c, rng);
       if (hasRelic(state, "The Courier")) {
-        const pool = Object.keys(RAW_CARDS).filter(k => ["C", "U", "R"].indexOf(RAW_CARDS[k][2]) !== -1);
+        const pool = getCharCardPool(state);
         const nc = rng.pick(pool);
         sh.cards[idx] = { c: maybeAutoUpgradeCard(state, nc, rng, false), p: calcShopPrice(state, 65), sale: false };
       }
@@ -5664,7 +7554,16 @@ function proceedAfterReward(state, rng) {
       addLog(state, "🎉 恭喜登顶杀戮尖塔！");
     } else {
       // Roll 3 Boss Relics
-      const bossPool = Object.keys(RELICS).filter(k => RELICS[k].tier === "B" && !hasRelic(state, k) && (k !== "Black Blood" || hasRelic(state, "Burning Blood")));
+      const curChar = state.ch || "IRONCLAD";
+      const bossPool = Object.keys(RELICS).filter(k => {
+        if (RELICS[k].tier !== "B" || hasRelic(state, k)) return false;
+        if (RELICS[k].char && RELICS[k].char !== curChar) return false;
+        if (k === "Black Blood" && !hasRelic(state, "Burning Blood")) return false;
+        if (k === "Ring of the Serpent" && !hasRelic(state, "Ring of the Snake")) return false;
+        if (k === "FrozenCore" && !hasRelic(state, "Cracked Core")) return false;
+        if (k === "HolyWater" && !hasRelic(state, "PureWater")) return false;
+        return true;
+      });
       rng.shuffle(bossPool);
       state.br = bossPool.slice(0, 3);
       state.ph = "BOSS_RELIC";
@@ -5837,11 +7736,24 @@ function enterMapNode(state, x, y, rng) {
 // ============================================================================
 // INITIALIZE RUN & PROTOCOL V5 JUDGE ENTRY
 // ============================================================================
-function createInitialState(seedStr) {
+function applyCharacterToInitialState(state, charId) {
+  const chKey = CHAR_META[charId] ? charId : "IRONCLAD";
+  const cm = CHAR_META[chKey];
+  state.ch = chKey;
+  state.hp = cm.hp;
+  state.mhp = cm.mhp || cm.hp;
+  state.rel = [cm.relic];
+  state.dk = cm.deck.slice();
+}
+
+function createInitialState(seedStr, charId = "IRONCLAD") {
   const seed = hashStr(String(seedStr || "sts-default-seed"));
+  const chKey = CHAR_META[charId] ? charId : "IRONCLAD";
+  const cm = CHAR_META[chKey];
   return {
     s: seed,
     rs: (seed ^ 0x9e3779b9) >>> 0,
+    ch: chKey,
     a: 1,       // Act 1..3
     r: -1,      // Current Row (-1 before floor 1, 0..14 map, 15 boss)
     c: -1,      // Current Col
@@ -5853,25 +7765,21 @@ function createInitialState(seedStr) {
     pr: 0,      // Shop purges used
     ph: "NEOW", // Phase: NEOW, MAP, COMBAT, REWARD, BOSS_RELIC, EVENT, SHOP, REST, TREASURE, VICTORY, DEFEAT, RETREAT
     rt: "N",    // Current room type
-    hp: 80,
-    mhp: 80,
+    hp: cm.hp,
+    mhp: cm.mhp || cm.hp,
     g: 99,
     pot: ["", "", ""],
-    rel: ["Burning Blood"],
+    rel: [cm.relic],
     rc: {},
-    dk: [
-      "Strike_R", "Strike_R", "Strike_R", "Strike_R", "Strike_R",
-      "Defend_R", "Defend_R", "Defend_R", "Defend_R",
-      "Bash",
-    ],
+    dk: cm.deck.slice(),
     ev: { id: "NEOW" },
-    lg: ["踏入杀戮尖塔第一幕【塔底】！请接受涅奥的赐福。"],
+    lg: ["踏入杀戮尖塔第一幕【塔底】！请选择英雄并接受涅奥的赐福。"],
   };
 }
 
 const meta = {
   name: "杀戮尖塔·三幕攀塔",
-  description: "原汁原味三大幕 15×7 分支地图、全怪物/卡牌/遗物/药水/商店/事件爬塔红包",
+  description: "原汁原味四大职业、三大幕 15×7 分支地图、全怪物/卡牌/遗物/药水/商店/事件爬塔红包",
 };
 
 const hongbao = {
@@ -5909,7 +7817,7 @@ function setup(p, hb) {
   return {
     state: { clears: 0 },
     view: {
-      summary: "杀戮尖塔三大幕高塔已开启！打开网页选择涅奥的赐福即可踏入第一幕【塔底】。",
+      summary: "杀戮尖塔三大幕高塔已开启！打开网页选择英雄与涅奥的赐福即可踏入第一幕【塔底】。",
       data: Object.assign({}, preview, { mr: maxReward, pd: 0 }),
     },
   };
@@ -5926,7 +7834,8 @@ function parseSubmissionAction(submission) {
   const parts = raw.split(":");
   const cmd = parts[0].toUpperCase();
   if (cmd === "START" || cmd === "INIT") return { type: "init" };
-  if (cmd === "BLESS" || cmd === "NEOW") return { type: "neow_blessing", choiceIdx: Number(parts[1] || 0) };
+  if (cmd === "CHAR") return { type: "select_char", char: parts[1] || "IRONCLAD" };
+  if (cmd === "BLESS" || cmd === "NEOW") return { type: "neow_blessing", choiceIdx: Number(parts[1] || 0), char: parts[2] };
   if (cmd === "NODE") {
     const [x, y] = (parts[1] || "0,0").split(",").map(Number);
     return { type: "choose_node", x, y };
@@ -5971,6 +7880,14 @@ function judge(submission, tools) {
     if (!subAct || subAct.type === "init" || st.ph === "VICTORY" || st.ph === "DEFEAT" || st.ph === "RETREAT") return;
     const t = subAct.type;
 
+    if (t === "select_char") {
+      if (st.ph === "NEOW" && (st.fl || 0) === 0) {
+        applyCharacterToInitialState(st, subAct.char || subAct.charId || "IRONCLAD");
+        addLog(st, "已切换角色为【" + CHAR_META[st.ch].name + "】！");
+      }
+      return;
+    }
+
     if (t === "use_potion") {
       usePotion(st, Number(subAct.potIdx ?? subAct.index ?? 0), Number(subAct.targetIdx ?? 0), rng);
     } else if (t === "discard_potion") {
@@ -5986,6 +7903,9 @@ function judge(submission, tools) {
       }
     } else if (st.ph === "NEOW" || st.ph === "EVENT") {
       if (t === "event_choice" || t === "neow_blessing") {
+        if (st.ph === "NEOW" && (st.fl || 0) === 0 && subAct.char && CHAR_META[subAct.char] && st.ch !== subAct.char) {
+          applyCharacterToInitialState(st, subAct.char);
+        }
         handleEventAction(st, subAct.choiceIdx ?? subAct.index ?? 0, subAct.cardIdx ?? 0, rng);
       }
     } else if (st.ph === "MAP") {
@@ -6061,9 +7981,115 @@ function spIcon(cat, key, size = 18, fallback = "") {
   const map = SPRITE_MANIFEST[cat];
   const idx = map && map[key];
   if (idx === undefined) return fallback;
-  const col = idx % 16, row = Math.floor(idx / 16);
-  const px = (col / 15) * 100, py = (row / 15) * 100;
+  const col = idx % 20, row = Math.floor(idx / 20);
+  const px = (col / 19) * 100, py = (row / 19) * 100;
   return '<span class="sp-icon" style="width:' + size + 'px;height:' + size + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(2) + '%"></span>';
+}
+
+function getHeroMeta(st) {
+  const ch = (st && st.ch && typeof CHAR_META !== "undefined" && CHAR_META[st.ch]) ? st.ch : "IRONCLAD";
+  const m = (typeof CHAR_META !== "undefined" && CHAR_META[ch]) ? CHAR_META[ch] : {
+    name: "铁甲战士", title: "铁甲战士", spine: "Ironclad", shoulder: "ironcladShoulder", corpse: "ironcladCorpse", hp: 80, relic: "Burning Blood", desc: ""
+  };
+  const iconMap = {
+    IRONCLAD: "char_ironclad",
+    THE_SILENT: "char_silent",
+    DEFECT: "char_defect",
+    WATCHER: "char_watcher",
+  };
+  const energyMap = {
+    IRONCLAD: "energyRed",
+    THE_SILENT: "energyGreen",
+    DEFECT: "energyBlue",
+    WATCHER: "energyPurple",
+  };
+  return {
+    id: ch,
+    name: m.name,
+    title: m.title,
+    spine: m.spine || "Ironclad",
+    shoulder: m.shoulder || "ironcladShoulder",
+    corpse: m.corpse || "ironcladCorpse",
+    charIcon: iconMap[ch] || "char_ironclad",
+    energyIcon: energyMap[ch] || "energyRed",
+    hp: m.hp,
+    relic: m.relic,
+    desc: m.desc,
+  };
+}
+
+function renderHeroMechanicsHtml(st, bt) {
+  if (!bt) return "";
+  let html = "";
+  const stance = bt.st || "Neutral";
+  if (stance !== "Neutral") {
+    const stTip = stance === "Calm"
+      ? "【平静姿态】离开此姿态时获得 2 点能量" + (hasRelic(st, "VioletLotus") ? "（紫莲花：3 点）" : "")
+      : (stance === "Wrath"
+        ? "【愤怒姿态】造成的攻击伤害与受到的攻击伤害均翻倍 (2×)"
+        : "【神格姿态】造成的攻击伤害变为 3 倍，下回合开始时自动离开神格");
+    html += '<div class="sts-stance-aura stance-' + stance + '" title="' + stTip + '"></div>';
+  }
+
+  const maxOrbs = bt.maxOrbs || 0;
+  const orbs = bt.orbs || [];
+  if (maxOrbs > 0 || orbs.length > 0) {
+    const slots = Math.max(maxOrbs, orbs.length);
+    const focus = (bt.pw && bt.pw.Focus) || 0;
+    let orbsHtml = "";
+    for (let i = 0; i < slots; i++) {
+      // Original STS arc above hero: slot 0 at front-right (angle ~25 deg), slot N-1 at back-left (angle ~155 deg)
+      const frac = slots === 1 ? 0.5 : (i / (slots - 1));
+      const deg = 25 + frac * 130;
+      const rad = (deg * Math.PI) / 180;
+      const rx = 50 + Math.cos(rad) * 56;
+      const ry = 14 - Math.sin(rad) * 42;
+      const orb = orbs[i];
+      if (orb && orb.t) {
+        let icoKey = "orb_lightning";
+        let pasTxt = "";
+        let darkEvokeHtml = "";
+        let tip = "";
+        if (orb.t === "L" || orb.t === "Lightning") {
+          icoKey = "orb_lightning";
+          const p = Math.max(0, 3 + focus);
+          const e = Math.max(0, 8 + focus);
+          pasTxt = String(p);
+          tip = "⚡ 闪电充能球 — 被动：回合结束随机造成 " + p + " 点伤害；激发：造成 " + e + " 点伤害";
+        } else if (orb.t === "F" || orb.t === "Frost") {
+          icoKey = "orb_frost";
+          const p = Math.max(0, 2 + focus);
+          const e = Math.max(0, 5 + focus);
+          pasTxt = String(p);
+          tip = "❄️ 冰霜充能球 — 被动：回合结束获得 " + p + " 点格挡；激发：获得 " + e + " 点格挡";
+        } else if (orb.t === "D" || orb.t === "Dark") {
+          icoKey = "orb_dark";
+          const p = Math.max(0, 6 + focus);
+          const e = orb.v !== undefined ? orb.v : 6;
+          pasTxt = String(p);
+          darkEvokeHtml = '<span class="sts-orb-val dark-evoke">' + e + '</span>';
+          tip = "🌑 黑暗充能球 — 被动：回合结束伤害 +" + p + "；激发：对生命最低敌人造成 " + e + " 点伤害";
+        } else if (orb.t === "P" || orb.t === "Plasma") {
+          icoKey = "orb_plasma";
+          pasTxt = "+1";
+          tip = "☀️ 等离子充能球 — 被动：回合开始获得 1 点能量；激发：获得 2 点能量";
+        }
+        orbsHtml +=
+          '<div class="sts-orb-slot' + (i === 0 ? " next-evoke" : "") + '" style="left:' + rx.toFixed(1) + '%;top:' + ry.toFixed(1) + '%;animation-delay:' + (i * 0.22).toFixed(2) + 's" title="' + tip + (i === 0 ? "（下一个激发位置）" : "") + '">' +
+            spIcon("hud", icoKey, 34, "🔮") +
+            darkEvokeHtml +
+            '<span class="sts-orb-val">' + pasTxt + '</span>' +
+          '</div>';
+      } else {
+        orbsHtml +=
+          '<div class="sts-orb-slot empty-orb" style="left:' + rx.toFixed(1) + '%;top:' + ry.toFixed(1) + '%;opacity:0.65;animation-delay:' + (i * 0.22).toFixed(2) + 's" title="空充能球栏位">' +
+            spIcon("hud", "orb_empty", 32, "⚪") +
+          '</div>';
+      }
+    }
+    html += '<div class="sts-orb-arc">' + orbsHtml + '</div>';
+  }
+  return html;
 }
 
 function spMonster(key, size = 78, seedIdx = 0) {
@@ -6516,6 +8542,9 @@ function getMonsterStateSpriteKey(m) {
 // Authentic Original Slay the Spire Creature Proportions & Hitbox Widths (desktop-1.0.jar)
 const MONSTER_VISUAL_SPEC = {
   Ironclad: { size: 132, hpW: 108, shadowW: 86 },
+  TheSilent: { size: 132, hpW: 106, shadowW: 84 },
+  Defect: { size: 134, hpW: 108, shadowW: 86 },
+  Watcher: { size: 136, hpW: 106, shadowW: 84 },
   // Tiny / Small Monsters
   AcidSlime_S: { size: 64, hpW: 64, shadowW: 54 },
   SpikeSlime_S: { size: 64, hpW: 64, shadowW: 54 },
@@ -6847,7 +8876,7 @@ function uiPanelBgStyle(panelKey) {
   const p = panels[panelKey];
   if (!p) return "";
   const SW = panels.sheetW || 1032;
-  const SH = panels.sheetH || 1044;
+  const SH = panels.sheetH || 2900;
   const sx = ((SW / p.w) * 100).toFixed(3) + "%";
   const sy = ((SH / p.h) * 100).toFixed(3) + "%";
   const px = ((p.x / (SW - p.w)) * 100).toFixed(3) + "%";
@@ -6858,8 +8887,8 @@ function uiPanelBgStyle(panelKey) {
 function spCardPos(cardId) {
   const map = SPRITE_MANIFEST.cards;
   const idx = (map && map[cardId] !== undefined) ? map[cardId] : 0;
-  const col = idx % 12, row = Math.floor(idx / 12);
-  return ((col / 11) * 100).toFixed(2) + '% ' + ((row / 10) * 100).toFixed(2) + '%';
+  const col = idx % 19, row = Math.floor(idx / 19);
+  return ((col / 18) * 100).toFixed(2) + '% ' + ((row / 18) * 100).toFixed(2) + '%';
 }
 
 function spCardFramePos(def) {
@@ -6868,6 +8897,7 @@ function spCardFramePos(def) {
   if (def.type === "ST" || def.type === "C") {
     key = "status_curse";
   } else if (
+    def.color === "CL" ||
     (typeof COLORLESS_CARDS !== "undefined" && COLORLESS_CARDS.indexOf(def.id) !== -1) ||
     def.rarity === "SP"
   ) {
@@ -6875,12 +8905,14 @@ function spCardFramePos(def) {
   } else {
     const tKey = def.type === "A" ? "attack" : (def.type === "P" ? "power" : "skill");
     const rKey = def.rarity === "R" ? "rare" : (def.rarity === "U" ? "uncommon" : "common");
-    key = tKey + "_" + rKey;
+    const colSuffix = (def.color === "G" || def.color === "B" || def.color === "P") ? ("_" + def.color) : "";
+    key = tKey + "_" + rKey + colSuffix;
   }
   const idx = frames[key] !== undefined ? frames[key] : 0;
-  const col = idx % 6, row = Math.floor(idx / 6);
-  const SH = (SPRITE_MANIFEST.uiPanels && SPRITE_MANIFEST.uiPanels.sheetH) || 1044;
-  const py = ((row * 222) / (SH - 222)) * 100;
+  const col = idx % 6;
+  const fy = idx < 12 ? Math.floor(idx / 6) * 222 : 1620 + Math.floor((idx - 12) / 6) * 222;
+  const SH = (SPRITE_MANIFEST.uiPanels && SPRITE_MANIFEST.uiPanels.sheetH) || 2900;
+  const py = (fy / (SH - 222)) * 100;
   return ((col / 5) * 100).toFixed(2) + '% ' + py.toFixed(3) + '%';
 }
 
@@ -6992,7 +9024,7 @@ const UI_EVENTS_DEF = {
     title: "寂静图书馆", icon: "📚",
     desc: "你走进一座宏伟的地下图书馆，成千上万本古籍静静陈列。",
     opts: [
-      { label: "【潜心阅读】获得 1 张随机已升级的罕见/稀有铁甲战士牌", tag: "强力新牌" },
+      { label: "【潜心阅读】获得 1 张随机已升级的罕见/稀有本职业卡牌", tag: "强力新牌" },
       { label: "【伏案小憩】恢复 33% 最大生命值", tag: "回血" }
     ]
   },
@@ -7269,7 +9301,7 @@ function runLocalJudge(payload, skipRender = false) {
   const res = judge({
     input: typeof payload === "string" ? payload : JSON.stringify(payload),
     params: { maxReward: maxR, retainPercent: 50 },
-    user: { id: 10001, username: "铁甲战士" },
+    user: { id: 10001, username: "尖塔行者" },
     player: {
       pending: localPending,
       state: baseState,
@@ -7284,8 +9316,9 @@ function runLocalJudge(payload, skipRender = false) {
   }
 }
 
-function resetLocalRun() {
-  const fresh = createInitialState("sts-spire-seed-" + Date.now() + "-" + Math.floor(Math.random() * 100000));
+function resetLocalRun(charId) {
+  const ch = charId || (currentData && currentData.ch) || "IRONCLAD";
+  const fresh = createInitialState("sts-spire-seed-" + Date.now() + "-" + Math.floor(Math.random() * 100000), ch);
   localPlayerState = fresh;
   localPending = 0;
   pendingActionsQueue = [];
@@ -7589,6 +9622,7 @@ const CombatVfxEngine = (() => {
       mhp: st.mhp,
       b: bt ? (bt.b || 0) : 0,
       t: bt ? (bt.t || 1) : 1,
+      st: bt ? (bt.st || "Neutral") : "Neutral",
       pw: bt && bt.pw ? Object.assign({}, bt.pw) : {},
       enemies: bt && bt.m ? bt.m.map((m, idx) => ({
         id: m.id,
@@ -7716,6 +9750,13 @@ const CombatVfxEngine = (() => {
       }
       if (nextBt) {
         diffPowerFloaters(snap.pw, nextBt.pw, hCx, hCy, 80);
+        const nextStance = nextBt.st || "Neutral";
+        if (nextStance !== snap.st) {
+          if (nextStance === "Wrath") spawnFloatTag(hCx, hCy - 36, "🔥 姿态：愤怒", "debuff-gain", 30);
+          else if (nextStance === "Calm") spawnFloatTag(hCx, hCy - 36, "💧 姿态：平静", "block-gain", 30);
+          else if (nextStance === "Divinity") spawnFloatTag(hCx, hCy - 36, "✨ 姿态：神格！", "buff-gain", 30);
+          else if (nextStance === "Neutral" && snap.st !== "Neutral") spawnFloatTag(hCx, hCy - 36, "⚪ 退出姿态", "buff-gain", 30);
+        }
       }
 
       // 5. End Turn Enemy Attacks & Turn Banner
@@ -7770,6 +9811,12 @@ function sendAction(payload) {
   CombatVfxEngine.playPostAction(vfxSnap, currentData, actObj);
 
   if (hbConnected && window.hb && typeof window.hb.submit === "function") {
+    if (actObj && actObj.type === "select_char" && prevPh === "NEOW") {
+      // Character selection in Neow room is carried by neow_blessing.char on first server flush
+      persistSessionState();
+      renderApp();
+      return;
+    }
     pendingActionsQueue.push(actObj);
     persistSessionState();
     if (shouldFlushToServer(prevPh, nextPh, actObj)) {
@@ -7789,7 +9836,7 @@ function formatCardDesc(def, nums) {
   s = s.replace(/!D!/g, '<span class="' + dCls + '">' + nums.dmg + '</span>');
   s = s.replace(/!B!/g, '<span class="' + bCls + '">' + nums.blk + '</span>');
   s = s.replace(/!M!/g, '<b>' + nums.mag + '</b>');
-  s = s.replace(/\[R\]/g, "⚡");
+  s = s.replace(/\[(?:R|G|B|W|E)\]/g, "⚡");
   s = s.replace(/ NL /g, "<br/>");
   return s;
 }
@@ -8130,16 +10177,18 @@ function renderCombatStage(st) {
   });
 
   // Hero Floor-standing Unit (Original STS: drawX = 1920 * 0.25 = 25%, drawY = floorY)
+  const hm = getHeroMeta(st);
   const hero = document.createElement("div");
   hero.className = "sts-unit hero-unit";
   const heroPws = renderPowerChipsHtml(bt.pw, bt);
   const heroIntangible = ((bt.pw && bt.pw.Intangible) || 0) > 0;
-  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
+  const heroSpec = getMonsterVisualSpec(hm.spine, hm.spine, 1);
 
   hero.innerHTML =
     '<div class="sprite-stage-box' + (heroIntangible ? ' is-intangible' : '') + '" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
+      renderHeroMechanicsHtml(st, bt) +
       '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
-      spMonster("Ironclad", heroSpec.size) +
+      spMonster(hm.spine, heroSpec.size) +
     '</div>' +
     '<div class="sts-under-foot">' +
       '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
@@ -8150,7 +10199,7 @@ function renderCombatStage(st) {
         '</div>' +
       '</div>' +
       '<div class="power-row">' + heroPws + '</div>' +
-      '<div class="unit-name">铁甲战士</div>' +
+      '<div class="unit-name">' + hm.name + '</div>' +
     '</div>';
   arena.appendChild(hero);
 
@@ -8232,7 +10281,7 @@ function renderCombatStage(st) {
   leftDock.className = "dock-side";
   leftDock.innerHTML =
     '<div class="sts-energy-orb ' + (bt.e <= 0 ? "empty-energy" : "") + '" title="当前能量 ' + bt.e + ' / ' + bt.me + '">' +
-      spIcon("hud", "energyRed", 68, "⚡") +
+      spIcon("hud", hm.energyIcon, 68, "⚡") +
       '<div class="sts-energy-text">' + bt.e + '/' + bt.me + '</div>' +
     '</div>' +
     '<button class="sts-pile-btn" id="btn-draw-pile" title="点击查看抽牌堆（已打乱顺序）">' +
@@ -8354,6 +10403,7 @@ function renderWavySpeechText(str) {
 
 function renderNeowRoomStage(st) {
   const def = UI_EVENTS_DEF.NEOW;
+  const hm = getHeroMeta(st);
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-neow-stage";
 
@@ -8370,14 +10420,42 @@ function renderNeowRoomStage(st) {
   ambient.className = "sts-neow-ambient";
   stageWrap.appendChild(ambient);
 
-  // Left: Ironclad standing on the Exordium floor (drawX = 25%, drawY = floorY)
+  // Top-Left: Character Selector Bar (Ironclad / The Silent / Defect / Watcher)
+  const charBar = document.createElement("div");
+  charBar.className = "sts-char-select-bar";
+  const charKeys = ["IRONCLAD", "THE_SILENT", "DEFECT", "WATCHER"];
+  const startRelicDef = RELICS[hm.relic] || { name: hm.relic, desc: "" };
+  charBar.innerHTML =
+    '<div class="sts-char-select-head">' +
+      '<span>⚔️ 选择攀塔角色</span>' +
+      '<span style="color:#94a3b8;font-weight:700">初始生命 ' + hm.hp + ' · ' + startRelicDef.name + '</span>' +
+    '</div>' +
+    '<div class="sts-char-select-row" id="neow-char-row"></div>' +
+    '<div class="sts-char-select-desc">' + (hm.desc || "") + '</div>';
+  const charRow = charBar.querySelector("#neow-char-row");
+  charKeys.forEach(cKey => {
+    const cm = getHeroMeta({ ch: cKey });
+    const btn = document.createElement("button");
+    btn.className = "sts-char-select-btn" + (hm.id === cKey ? " active" : "");
+    btn.setAttribute("data-char-id", cKey);
+    btn.innerHTML = spIcon("hud", cm.charIcon, 26, "") + '<span>' + cm.name + '</span>';
+    btn.addEventListener("click", () => {
+      if (hm.id !== cKey) {
+        sendAction({ type: "select_char", char: cKey });
+      }
+    });
+    charRow.appendChild(btn);
+  });
+  stageWrap.appendChild(charBar);
+
+  // Left: Selected Hero standing on the Exordium floor (drawX = 25%, drawY = floorY)
   const hero = document.createElement("div");
   hero.className = "sts-neow-hero";
-  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
+  const heroSpec = getMonsterVisualSpec(hm.spine, hm.spine, 1);
   hero.innerHTML =
     '<div class="sprite-stage-box" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
       '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
-      spMonster("Ironclad", heroSpec.size, 0) +
+      spMonster(hm.spine, heroSpec.size, 0) +
     '</div>' +
     '<div class="sts-under-foot">' +
       '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
@@ -8386,7 +10464,7 @@ function renderNeowRoomStage(st) {
           '<div class="hp-bar-text">' + st.hp + '/' + st.mhp + '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="unit-name" style="opacity:1">铁甲战士</div>' +
+      '<div class="unit-name" style="opacity:1">' + hm.name + '</div>' +
     '</div>';
   stageWrap.appendChild(hero);
 
@@ -8417,7 +10495,7 @@ function renderNeowRoomStage(st) {
     btn.setAttribute("style", btnBgStyle + "animation-delay:" + (idx * 0.065).toFixed(3) + "s;");
     btn.innerHTML = '<span>' + formatStsEventOptionLabel(opt.label) + '</span>';
     btn.addEventListener("click", () => {
-      sendAction({ type: "neow_blessing", choiceIdx: idx, cardIdx: 0 });
+      sendAction({ type: "neow_blessing", choiceIdx: idx, cardIdx: 0, char: hm.id });
     });
     dock.appendChild(btn);
   });
@@ -8506,14 +10584,15 @@ function renderRewardStage(st) {
   stageWrap.className = "sts-reward-stage";
   appendStageSceneBackdrop(stageWrap, st);
 
-  // Ironclad standing at exact same floor coordinate (left: 25%, bottom: var(--sts-floor-y)) during CombatRewardScreen
+  // Hero standing at exact same floor coordinate (left: 25%, bottom: var(--sts-floor-y)) during CombatRewardScreen
+  const hm = getHeroMeta(st);
   const heroBg = document.createElement("div");
   heroBg.className = "sts-stage-hero-bg";
-  const heroSpec = getMonsterVisualSpec("Ironclad", "Ironclad", 1);
+  const heroSpec = getMonsterVisualSpec(hm.spine, hm.spine, 1);
   heroBg.innerHTML =
     '<div class="sprite-stage-box" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
       '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
-      spMonster("Ironclad", heroSpec.size) +
+      spMonster(hm.spine, heroSpec.size) +
     '</div>' +
     '<div class="sts-under-foot">' +
       '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
@@ -8621,12 +10700,12 @@ function renderRewardStage(st) {
     const b = document.createElement("button");
     b.className = "sts-reward-item";
     b.setAttribute("style", itemBg);
-    b.title = r.desc.replace(/\[R\]/g, "⚡");
+    b.title = r.desc.replace(/\[(?:R|G|B|W|E)\]/g, "⚡");
     b.innerHTML =
       '<div class="sts-reward-item-icon">' + spIcon("relics", rId, 32, "👑") + '</div>' +
       '<div class="sts-reward-item-text">' +
         '<div>' + r.name + '</div>' +
-        '<div class="sts-reward-item-sub">' + r.desc.replace(/\[R\]/g, "⚡") + '</div>' +
+        '<div class="sts-reward-item-sub">' + r.desc.replace(/\[(?:R|G|B|W|E)\]/g, "⚡") + '</div>' +
       '</div>';
     b.addEventListener("click", () => sendAction({ type: "claim_reward_relic", index: rIdx }));
     scroll.appendChild(b);
@@ -8694,7 +10773,7 @@ function renderBossRelicStage(st) {
     card.innerHTML =
       '<div>' + spIcon("relics", rId, 52, "🌟") + '</div>' +
       '<div style="font-size:15px;font-weight:900;color:#fef08a;text-shadow:0 1px 3px #000">' + r.name + '</div>' +
-      '<div style="font-size:11.5px;color:#e2e8f0;line-height:1.45">' + r.desc.replace(/\[R\]/g, "⚡") + '</div>';
+      '<div style="font-size:11.5px;color:#e2e8f0;line-height:1.45">' + r.desc.replace(/\[(?:R|G|B|W|E)\]/g, "⚡") + '</div>';
     card.addEventListener("click", () => sendAction({ type: "pick_boss_relic", index: idx }));
     row.appendChild(card);
   });
@@ -8780,7 +10859,7 @@ function renderShopStage(st) {
     const r = RELICS[item.r] || { name: item.r, desc: "" };
     const slot = document.createElement("div");
     slot.className = "sts-shop-slot" + (item.sold ? " sold-out" : "");
-    slot.title = "【" + r.name + "】" + r.desc.replace(/\[R\]/g, "⚡");
+    slot.title = "【" + r.name + "】" + r.desc.replace(/\[(?:R|G|B|W|E)\]/g, "⚡");
     slot.innerHTML =
       '<div class="sts-shop-icon-box">' + spIcon("relics", item.r, 40, "👑") + '</div>' +
       '<div class="sts-shop-item-label">' + r.name + '</div>' +
@@ -8856,18 +10935,19 @@ function renderShopStage(st) {
 }
 
 function renderRestStage(st) {
+  const hm = getHeroMeta(st);
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-campfire-stage";
   appendStageSceneBackdrop(stageWrap, st);
 
-  // Flickering firelight + Ironclad resting shoulder silhouette (shoulder2.png)
+  // Flickering firelight + Hero resting shoulder silhouette (shoulder2.png)
   const glow = document.createElement("div");
   glow.className = "sts-campfire-glow";
   stageWrap.appendChild(glow);
 
   const shoulder = document.createElement("div");
   shoulder.className = "sts-camp-shoulder";
-  shoulder.setAttribute("style", uiPanelBgStyle("ironcladShoulder"));
+  shoulder.setAttribute("style", uiPanelBgStyle(hm.shoulder));
   stageWrap.appendChild(shoulder);
 
   // Top Curved Banner: "要做些什么？"
@@ -8982,6 +11062,7 @@ function renderRestStage(st) {
 }
 
 function renderTreasureStage(st) {
+  const hm = getHeroMeta(st);
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-reward-stage";
   appendStageSceneBackdrop(stageWrap, st);
@@ -8998,9 +11079,9 @@ function renderTreasureStage(st) {
     '<div class="sts-unit hero-unit">' +
       '<div class="sprite-stage-box">' +
         '<div class="unit-shadow"></div>' +
-        spMonster("Ironclad", 112) +
+        spMonster(hm.spine, 112) +
       '</div>' +
-      '<div class="unit-name">铁甲战士</div>' +
+      '<div class="unit-name">' + hm.name + '</div>' +
     '</div>' +
     '<button class="sts-treasure-chest-btn" id="btn-open-chest">' +
       '<div class="sts-chest-sprite" style="' + uiPanelBgStyle("bossChestClosed") + '"></div>' +
@@ -9023,6 +11104,7 @@ function renderTreasureStage(st) {
 }
 
 function renderSettlementStage(st) {
+  const hm = getHeroMeta(st);
   const isWin = st.ph === "VICTORY";
   const isRetreat = st.ph === "RETREAT";
   const bannerTitle = isWin ? "胜利！" : (isRetreat ? "见好就收" : "败北……");
@@ -9039,8 +11121,8 @@ function renderSettlementStage(st) {
     '<div class="sts-reward-scroll" style="' + uiPanelBgStyle("rewardSheet") + ';width:356px;min-height:390px;justify-content:space-between;padding:42px 26px 28px">' +
       '<div style="display:flex;flex-direction:column;align-items:center;gap:6px">' +
         (isWin || isRetreat
-          ? spMonster("Ironclad", 84)
-          : '<div style="width:184px;height:52px;margin:14px 0;' + uiPanelBgStyle("ironcladCorpse") + '"></div>') +
+          ? spMonster(hm.spine, 84)
+          : '<div style="width:184px;height:62px;margin:14px 0;' + uiPanelBgStyle(hm.corpse) + '"></div>') +
         '<div style="font-size:15px;font-weight:900;color:#fef08a;text-align:center;text-shadow:0 2px 4px #000">' +
           (isWin ? "三大幕高塔全部通关！" : (isRetreat ? "成功携带赏金安全撤离！" : "倒在了攀登高塔的途中")) +
         '</div>' +
@@ -9066,6 +11148,7 @@ function renderApp() {
   const root = document.getElementById("app");
   if (!root || !currentData) return;
   const st = currentData;
+  const hm = getHeroMeta(st);
   root.innerHTML = "";
 
   // 1. Original STS Top Bar
@@ -9077,7 +11160,7 @@ function renderApp() {
 
   top.innerHTML =
     '<div class="hud-left">' +
-      '<span class="sts-stat hero-stat">铁甲战士</span>' +
+      '<span class="sts-stat hero-stat">' + spIcon("hud", hm.charIcon, 22, "") + ' ' + hm.name + '</span>' +
       '<span class="sts-stat hp-stat" title="生命值">' + spIcon("hud", "heart", 22, "❤️") + ' ' + st.hp + '/' + st.mhp + '</span>' +
       '<span class="sts-stat gold-stat" title="持有金币">' + spIcon("hud", "gold", 22, "💰") + ' ' + st.g + '</span>' +
       '<div class="potion-belt" id="hud-potions" title="药水栏（战斗中点击饮用或投掷）"></div>' +
@@ -9174,8 +11257,18 @@ function renderApp() {
       cntText = String(rc.Burner);
     } else if (rId === "Sundial" && rc.Sundial !== undefined) {
       cntText = String(rc.Sundial);
+    } else if (rId === "Kunai" && rc.Kunai !== undefined) {
+      cntText = String(rc.Kunai);
+    } else if (rId === "Shuriken" && rc.Shuriken !== undefined) {
+      cntText = String(rc.Shuriken);
+    } else if (rId === "Ornamental Fan" && rc.Fan !== undefined) {
+      cntText = String(rc.Fan);
+    } else if (rId === "Letter Opener" && rc.Letter !== undefined) {
+      cntText = String(rc.Letter);
+    } else if (rId === "Inserter" && rc.Inserter !== undefined) {
+      cntText = String(rc.Inserter);
     }
-    wrap.title = "【" + r.name + "】" + tipExtra + " — " + r.desc.replace(/\[R\]/g, "⚡");
+    wrap.title = "【" + r.name + "】" + tipExtra + " — " + r.desc.replace(/\[(?:R|G|B|W|E)\]/g, "⚡");
     wrap.innerHTML =
       spIcon("relics", rId, 32, "👑") +
       (cntText !== "" ? '<span class="relic-counter' + (cntUsed ? " used" : "") + '">' + cntText + '</span>' : '');
