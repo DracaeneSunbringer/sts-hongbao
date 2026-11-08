@@ -72,7 +72,7 @@
     display: inline-block; flex-shrink: 0;
     background-image: url("assets/events.webp");
     background-repeat: no-repeat;
-    background-size: 500% 1240%;
+    background-size: 500% 1832%;
     border-radius: 8px;
     border: 1px solid rgba(245, 196, 81, 0.4);
     box-shadow: 0 4px 14px rgba(0,0,0,0.6);
@@ -9235,25 +9235,27 @@ function spEventBanner(key, w = 135, h = 90) {
   const map = SPRITE_MANIFEST.events;
   const idx = (map && map[key] !== undefined) ? map[key] : 0;
   const col = idx % 5, row = Math.floor(idx / 5);
-  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 2480;
+  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 3664;
+  const sy = ((SH / 200) * 100).toFixed(2) + "%";
   const px = (col / 4) * 100, py = ((row * 200) / (SH - 200)) * 100;
-  return '<span class="sp-event" style="width:' + w + 'px;height:' + h + 'px;background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
+  return '<span class="sp-event" style="width:' + w + 'px;height:' + h + 'px;background-size:500% ' + sy + ';background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
 }
 
 function spEventSquare(key, size = 240) {
   const map = SPRITE_MANIFEST.events;
   const idx = (map && map[key] !== undefined) ? map[key] : 4;
   const col = idx % 5, row = Math.floor(idx / 5);
-  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 2480;
+  const SH = (SPRITE_MANIFEST.combatBgs && SPRITE_MANIFEST.combatBgs.sheetH) || 3664;
+  const sy = ((SH / 200) * 100).toFixed(2) + "%";
   const px = (col / 4) * 100, py = ((row * 200) / (SH - 200)) * 100;
-  return '<span class="sp-event" style="width:' + size + 'px;height:' + size + 'px;border-radius:4px;border:none;background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
+  return '<span class="sp-event" style="width:' + size + 'px;height:' + size + 'px;border-radius:4px;border:none;background-size:500% ' + sy + ';background-position:' + px.toFixed(2) + '% ' + py.toFixed(3) + '%"></span>';
 }
 
 function combatBgStyle(actSceneKey) {
   const bgs = SPRITE_MANIFEST.combatBgs || {};
   const p = bgs[actSceneKey] || bgs.Exordium || { x: 0, y: 800, w: 1000, h: 560 };
   const SW = bgs.sheetW || 1000;
-  const SH = bgs.sheetH || 2480;
+  const SH = bgs.sheetH || 3664;
   const sx = ((SW / p.w) * 100).toFixed(3) + "%";
   const sy = ((SH / p.h) * 100).toFixed(3) + "%";
   const px = p.w < SW ? ((p.x / (SW - p.w)) * 100).toFixed(3) + "%" : "0%";
