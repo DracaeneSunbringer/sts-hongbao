@@ -7301,13 +7301,23 @@ function onPlayerDefeat(state) {
 
 function calcBounty(state, args, maxReward) {
   if (!maxReward || maxReward <= 0) return 0;
-  if (state.ph === "VICTORY") return maxReward;
+  if (state.ph === "VICTORY") {
+    return (state.a || 1) >= 4 ? Math.floor(maxReward * 1.5) : maxReward;
+  }
 
-  // Progressive bounty based on Act/Floor climbed, Elites slain, and Act Bosses defeated
-  const floorPct = Math.min(48, state.fl || 0) * 0.012; // up to 57.6% across 48 floors
-  const elitePct = (state.ek || 0) * 0.04;              // +4% per Elite
-  const bossPct = (state.bk || 0) * 0.14;               // +14% per Act Boss
-  const rawPct = Math.min(0.92, floorPct + elitePct + bossPct);
+  // Progressive bounty:
+  // - Acts 1-3: floor/elite/boss progression up to 92%, reaching 100% once all 3 Act Bosses are defeated
+  // - Act 4: starts at 100% (Acts 1-3 cleared), +15% after Spire Shield & Spear, and 150% on defeating Corrupt Heart
+  let rawPct;
+  if ((state.a || 1) >= 4 || (state.bk || 0) >= 3) {
+    const beatAct4Elite = (state.a || 1) >= 4 && ((state.r || 0) > 2 || ((state.r || 0) === 2 && state.ph !== "COMBAT" && state.ph !== "DEFEAT"));
+    rawPct = beatAct4Elite ? 1.15 : 1.0;
+  } else {
+    const floorPct = Math.min(48, state.fl || 0) * 0.012; // up to 57.6% across 48 floors
+    const elitePct = (state.ek || 0) * 0.04;              // +4% per Elite
+    const bossPct = (state.bk || 0) * 0.14;               // +14% per Act Boss
+    rawPct = Math.min(0.92, floorPct + elitePct + bossPct);
+  }
   const fullPending = Math.floor(maxReward * rawPct);
 
   if (state.ph === "DEFEAT") {
@@ -8138,11 +8148,11 @@ const hongbao = {
 const params = [
   {
     key: "maxReward",
-    label: "登顶满额悬赏",
+    label: "前三幕打通悬赏",
     type: "money",
     default: 1000,
     min: 10,
-    hint: "击败第三幕首领或第四幕腐化之心通关时的最高悬赏金额",
+    hint: "打通前三幕拿满 100% 悬赏；集齐三钥匙击败第四幕腐化之心额外奖励 +50%（共 150%）",
   },
   {
     key: "retainPercent",
@@ -8151,7 +8161,7 @@ const params = [
     default: 50,
     min: 0,
     max: 100,
-    hint: "半途战败时可带走当前已积累悬赏的百分比（仅在营火处主动撤离或通关可带走100%）",
+    hint: "半途战败时可带走当前已积累悬赏的百分比（仅在营火处主动撤离或通关可带走全额）",
   },
 ];
 
@@ -8376,11 +8386,14 @@ function judge(submission, tools) {
     add,
     settle,
     message: lastLog,
-    ...(st.ph === "VICTORY" ? { announce: ((submission && submission.user && submission.user.username) || "勇士") + " 击败第三幕终极首领，成功登顶杀戮尖塔！" } : {}),
+    ...(st.ph === "VICTORY" ? {
+      announce: ((submission && submission.user && submission.user.username) || "勇士") +
+        ((st.a || 1) >= 4 ? " 弑杀第四幕【腐化之心】达成真结局完美登顶（150% 悬赏）！" : " 击败第三幕终极首领，成功打通杀戮尖塔（100% 悬赏）！")
+    } : {}),
     player: {
       state: st,
       view: {
-        summary: "第" + st.a + "幕 " + (st.fl || 0) + "/48层 · ❤️" + st.hp + "/" + st.mhp + " · 💰" + st.g + " · " + lastLog,
+        summary: "第" + st.a + "幕 " + (st.fl || 0) + "/" + ((st.a || 1) >= 4 || (st.fl || 0) > 48 ? 52 : 48) + "层 · ❤️" + st.hp + "/" + st.mhp + " · 💰" + st.g + " · " + lastLog,
         data: viewData,
       },
     },
@@ -11768,7 +11781,7 @@ function renderSettlementStage(st) {
           ? spMonster(hm.spine, 84)
           : '<div style="width:184px;height:62px;margin:14px 0;' + uiPanelBgStyle(hm.corpse) + '"></div>') +
         '<div style="font-size:15px;font-weight:900;color:#fef08a;text-align:center;text-shadow:0 2px 4px #000">' +
-          (isWin ? (st.a === 4 ? "成功弑杀腐化之心 · 终幕真结局通关！" : "三大幕高塔全部通关！") : (isRetreat ? "成功携带赏金安全撤离！" : "倒在了攀登高塔的途中")) +
+          (isWin ? (st.a === 4 ? "成功弑杀腐化之心 · 终幕真结局通关 (+50% 额外奖励)！" : "三大幕高塔全部通关 (100% 满额悬赏)！") : (isRetreat ? "成功携带赏金安全撤离！" : "倒在了攀登高塔的途中")) +
         '</div>' +
         '<div style="font-size:14px;font-weight:900;color:#6ee7b7;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.45);padding:4px 12px;border-radius:12px">' +
           '🧧 结算赏金：' + yuan +
@@ -11827,7 +11840,7 @@ function renderApp() {
     '</div>' +
     '<div class="hud-center">' +
       '<span class="sts-stat floor-stat" title="当前攀登层数">' + spIcon("hud", "floor", 22, "🏰") + ' ' + actInfo.name + ' · ' + (st.fl || 0) + '/' + maxFl + '层</span>' +
-      '<span class="sts-stat bounty-stat" title="随着攀爬层数、击败精英和首领不断累积（仅可在篝火休息处主动撤离或通关带走100%）">🧧 赏金 ' + yuan + '</span>' +
+      '<span class="sts-stat bounty-stat" title="随攀爬层数、击败精英与首领累积：打通前三幕拿满100%，第四幕弑心额外+50%（共150%）；篝火处可100%带走当前赏金">🧧 赏金 ' + yuan + '</span>' +
     '</div>' +
     '<div class="hud-right">' +
       (st.ph !== "MAP" ? '<button class="hud-icon-btn" id="btn-toggle-map" title="随时打开/关闭高塔地图">' + spIcon("hud", "map", 20, "🗺️") + ' ' + (mapOverlayOpen ? "返回房间" : "地图") + '</button>' : '') +
