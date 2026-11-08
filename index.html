@@ -3239,7 +3239,11 @@ function rollMonsterMove(m, bt, state, rng) {
       break;
     case "Hexaghost":
       if (!m.st.activated) setIntent(m, 5, "UNKNOWN");
-      else {
+      else if (!m.st.divDone) {
+        m.st.divDone = true;
+        const d = Math.floor(state.hp / 12) + 1;
+        setIntent(m, 1, "ATTACK", d, 6);
+      } else {
         switch (m.st.orb) {
           case 0: case 2: case 5: setIntent(m, 4, "ATTACK_DEBUFF", 6); break;
           case 1: case 4: setIntent(m, 2, "ATTACK", 5, 2); break;
@@ -3340,8 +3344,13 @@ function rollMonsterMove(m, bt, state, rng) {
       else setIntent(m, 5, "DEFEND_BUFF");
       break;
     case "BronzeOrb":
-      if (num < 70 && !lastTwoMoves(m, 1)) setIntent(m, 1, "ATTACK", 8);
-      else setIntent(m, 2, "DEFEND");
+      if (!m.st.stasis && (bt.dr.length > 0 || bt.di.length > 0) && (f || num < 75)) {
+        setIntent(m, 3, "STRONG_DEBUFF");
+      } else if (num < 70 && !lastTwoMoves(m, 1)) {
+        setIntent(m, 1, "ATTACK", 8);
+      } else {
+        setIntent(m, 2, "DEFEND");
+      }
       break;
     case "TheCollector":
       if (f) setIntent(m, 1, "UNKNOWN");
@@ -3469,7 +3478,9 @@ function rollMonsterMove(m, bt, state, rng) {
       else setIntent(m, 2, "ATTACK", 25);
       break;
     case "AwakenedOne":
-      if (m.st.form1) {
+      if (m.st.halfDead) {
+        setIntent(m, 3, "UNKNOWN");
+      } else if (m.st.form1) {
         if (f) setIntent(m, 1, "ATTACK", 20);
         else if (num < 25 && !lastMove(m, 2)) setIntent(m, 2, "ATTACK", 6, 4);
         else if (!lastTwoMoves(m, 1)) setIntent(m, 1, "ATTACK", 20);
@@ -3568,7 +3579,7 @@ function hasRelic(state, id) {
 function addLog(state, msg) {
   if (!state.lg) state.lg = [];
   state.lg.push(msg);
-  if (state.lg.length > 5) state.lg.shift();
+  if (state.lg.length > 3) state.lg.shift();
 }
 
 function syncRedSkull(state) {
@@ -3598,9 +3609,7 @@ function healPlayer(state, amt, inCombat) {
 
 function addGold(state, amt) {
   if (amt <= 0 || hasRelic(state, "Ectoplasm")) return;
-  let v = amt;
-  if (hasRelic(state, "Golden Idol")) v = Math.round(v * 1.25);
-  state.g += v;
+  state.g += amt;
   if (hasRelic(state, "Bloody Idol")) healPlayer(state, 5, Boolean(state.bt));
 }
 
@@ -3750,6 +3759,7 @@ function calcMonsterAttackDmg(state, bt, m, baseDmg) {
     const mult = hasRelic(state, "Odd Mushroom") ? 1.25 : 1.5;
     d = Math.floor(d * mult);
   }
+  if ((m.pw.BackAttack || 0) > 0) d = Math.floor(d * 1.5);
   if (bt.st === "Wrath") d *= 2;
   if ((bt.pw.Intangible || 0) > 0 && d > 0) d = 1;
   return Math.max(0, d);
@@ -3936,6 +3946,9 @@ function damageMonster(state, bt, m, rawDmg, type, rng) {
 
   // Normal Attack reactive triggers on living monster
   if (type === "NORMAL" && m.hp > 0) {
+    if (unblocked > 0 && m.id === "GremlinWarrior" && (m.pw.Anger || 0) > 0) {
+      applyMonsterPower(state, bt, m, "Strength", m.pw.Anger);
+    }
     if ((m.pw.CurlUp || 0) > 0) {
       m.b += m.pw.CurlUp;
       delete m.pw.CurlUp;
@@ -4027,16 +4040,31 @@ function onMonsterZeroHp(state, bt, m, rng) {
   }
   if (m.st.stolen) {
     state.g += m.st.stolen;
+    addLog(state, "夺回了被盗走的 " + m.st.stolen + " 金币！");
     m.st.stolen = 0;
+  }
+  if (m.st.stasisCard) {
+    addTempCardToHand(state, bt, m.st.stasisCard, 1);
+    addLog(state, "取回了被凝滞的【" + getCardDef(m.st.stasisCard).name + "】！");
+    delete m.st.stasisCard;
+    delete m.pw.Stasis;
+  }
+  if ((bt.pw.Surrounded || 0) > 0 && bt.m.filter(x => x.hp > 0).length < 2) {
+    delete bt.pw.Surrounded;
+    for (const x of bt.m) delete x.pw.BackAttack;
   }
   if (hasRelic(state, "Gremlin Horn")) {
     bt.e += 1;
     drawCards(state, bt, 1, rng);
   }
   // If a Boss/Leader dies, kill its Minions
-  if (m.id === "GremlinLeader" || m.id === "BronzeAutomaton" || m.id === "TheCollector" || m.id === "Reptomancer" || (m.id === "AwakenedOne" && !m.st.form1)) {
+  if (m.id === "GremlinLeader" || m.id === "BronzeAutomaton" || m.id === "TheCollector" || m.id === "Reptomancer") {
     for (const x of bt.m) {
-      if (x !== m && x.hp > 0 && (x.pw.Minion || x.id === "Cultist")) {
+      if (x !== m && x.hp > 0 && x.pw.Minion) {
+        if (x.st && x.st.stasisCard) {
+          addTempCardToHand(state, bt, x.st.stasisCard, 1);
+          delete x.st.stasisCard;
+        }
         x.hp = 0;
         x.b = 0;
       }
@@ -4472,11 +4500,8 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
     case "Hexaghost":
       if (mv === 5) {
         m.st.activated = true;
-        const d = Math.floor(state.hp / 12) + 1;
-        setIntent(m, 1, "ATTACK", d, 6);
-        return;
       } else if (mv === 1) {
-        const d = Math.floor(state.hp / 12) + 1;
+        const d = m.dmg || (Math.floor(state.hp / 12) + 1);
         monsterAttackPlayer(state, bt, m, d, 6, rng);
         m.st.orb = 0;
       } else if (mv === 4) {
@@ -4605,7 +4630,22 @@ function executeMonsterTurn(m, mIdx, bt, state, rng) {
       else if (mv === 2) monsterAttackPlayer(state, bt, m, 45, 1, rng);
       break;
     case "BronzeOrb":
-      if (mv === 1) monsterAttackPlayer(state, bt, m, 8, 1, rng);
+      if (mv === 3) {
+        m.st.stasis = true;
+        const src = bt.dr.length > 0 ? bt.dr : bt.di;
+        if (src.length > 0) {
+          let bestIdx = src.length - 1;
+          const rOrder = { R: 3, U: 2, C: 1, B: 0 };
+          let bestScore = -1;
+          for (let i = 0; i < src.length; i++) {
+            const sc = rOrder[getCardDef(src[i]).rarity] ?? 0;
+            if (sc >= bestScore) { bestScore = sc; bestIdx = i; }
+          }
+          m.st.stasisCard = src.splice(bestIdx, 1)[0];
+          m.pw.Stasis = 1;
+          addLog(state, "铜球使用【凝滞】夺走了你的【" + getCardDef(m.st.stasisCard).name + "】！");
+        }
+      } else if (mv === 1) monsterAttackPlayer(state, bt, m, 8, 1, rng);
       else {
         const boss = bt.m.find(x => x.id === "BronzeAutomaton" && x.hp > 0) || m;
         boss.b += 12;
@@ -4849,12 +4889,6 @@ function startCombat(state, encId, roomType, rng) {
   state.rt = roomType;
   const monsters = spawnEncounter(encId, rng, state);
 
-  // Preserved Insect (Elites -25% HP)
-  if (roomType === "E" && hasRelic(state, "PreservedInsect")) {
-    for (const m of monsters) {
-      m.hp = Math.max(1, Math.floor(m.mhp * 0.75));
-    }
-  }
   // Burning Elite (Emerald Key guardian) buff
   if (roomType === "E" && state.be) {
     const buffIdx = ((state.s || 0) + (state.a || 1)) % 4;
@@ -4863,6 +4897,12 @@ function startCombat(state, encId, roomType, rng) {
       else if (buffIdx === 1) { m.mhp = Math.floor(m.mhp * 1.25); m.hp = m.mhp; }
       else if (buffIdx === 2) m.pw.Metallicize = (m.pw.Metallicize || 0) + 4;
       else m.pw.RegenerateMonster = (m.pw.RegenerateMonster || 0) + 3;
+    }
+  }
+  // Preserved Insect (Elites -25% HP)
+  if (roomType === "E" && hasRelic(state, "PreservedInsect")) {
+    for (const m of monsters) {
+      m.hp = Math.max(1, Math.floor(m.mhp * 0.75));
     }
   }
   // Neow's Lament (first 3 combats enemies have 1 current HP, preserving mhp)
@@ -4971,9 +5011,11 @@ function startCombat(state, encId, roomType, rng) {
   }
   if (encId === "Shield and Spear") {
     bt.pw.Surrounded = 1;
+    if (bt.m[0]) bt.m[0].pw.BackAttack = 1;
   }
   if (hasRelic(state, "Mercury Hourglass")) {
     for (const m of monsters) damageMonster(state, bt, m, 3, "THORNS", rng);
+    if (isCombatWon(bt)) { onCombatVictory(state, rng); return; }
   }
 
   // Roll initial moves for all monsters
@@ -5025,6 +5067,13 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
   let t = (targetIdx !== undefined && bt.m[targetIdx] && bt.m[targetIdx].hp > 0) ? bt.m[targetIdx] : aliveTargets[0];
   const { def, dmg, blk, mag } = calcPlayerCardNumbers(state, bt, cardStr, t);
 
+  if (def.target === "E" && t && (bt.pw.Surrounded || 0) > 0 && aliveTargets.length >= 2) {
+    for (const m of bt.m) {
+      if (m === t || m.hp <= 0) delete m.pw.BackAttack;
+      else m.pw.BackAttack = 1;
+    }
+  }
+
   if (def.type === "A") {
     bt.firstAtkDone = true;
     delete bt.pw.Vigor;
@@ -5056,9 +5105,9 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
       }
     }
   } else if (def.type === "S") {
-    // Gremlin Nob Anger
+    // Gremlin Nob Anger (Enrage)
     for (const m of bt.m) {
-      if (m.hp > 0 && (m.pw.Anger || 0) > 0) {
+      if (m.hp > 0 && m.id !== "GremlinWarrior" && (m.pw.Anger || 0) > 0) {
         applyMonsterPower(state, bt, m, "Strength", m.pw.Anger);
       }
     }
@@ -5106,7 +5155,7 @@ function executeSingleCardEffect(state, bt, cardStr, targetIdx, xEnergy, rng) {
   }
 
   // Block gain
-  if (blk > 0 && def.id !== "Second Wind" && def.id !== "Auto Shields") {
+  if (blk > 0 && def.id !== "Second Wind" && def.id !== "Auto Shields" && def.id !== "Reinforced Body" && def.id !== "Escape Plan") {
     gainPlayerBlock(state, bt, blk, true, rng);
   }
 
@@ -6596,6 +6645,12 @@ function usePotion(state, potIdx, targetIdx, rng) {
 
   const alive = bt.m.filter(x => x.hp > 0);
   const t = (targetIdx !== undefined && bt.m[targetIdx] && bt.m[targetIdx].hp > 0) ? bt.m[targetIdx] : alive[0];
+  if (pDef.target === "E" && t && (bt.pw.Surrounded || 0) > 0 && alive.length >= 2) {
+    for (const m of bt.m) {
+      if (m === t || m.hp <= 0) delete m.pw.BackAttack;
+      else m.pw.BackAttack = 1;
+    }
+  }
 
   switch (pId) {
     case "Block Potion": gainPlayerBlock(state, bt, val, false, rng); break;
@@ -7186,11 +7241,12 @@ function rollCardRewards(state, rng, roomType, countOverride) {
 
 function onCombatVictory(state, rng) {
   const selfRep = (state.bt && state.bt.pw && state.bt.pw.SelfRepair) || 0;
-  state.bt = null;
+  delete state.bt;
+  const meatTrig = hasRelic(state, "Meat on the Bone") && state.hp <= Math.floor(state.mhp * 0.5);
   if (selfRep > 0) healPlayer(state, selfRep, false);
   if (hasRelic(state, "Burning Blood")) healPlayer(state, 6, false);
   if (hasRelic(state, "Black Blood")) healPlayer(state, 12, false);
-  if (hasRelic(state, "Meat on the Bone") && state.hp <= Math.floor(state.mhp * 0.5)) healPlayer(state, 12, false);
+  if (meatTrig) healPlayer(state, 12, false);
   if (hasRelic(state, "FaceOfCleric")) { state.mhp += 1; state.hp += 1; }
 
   if (state.rt === "E") state.ek = (state.ek || 0) + 1;
@@ -7238,7 +7294,7 @@ function onCombatVictory(state, rng) {
 }
 
 function onPlayerDefeat(state) {
-  state.bt = null;
+  delete state.bt;
   state.ph = "DEFEAT";
   addLog(state, "☠️ 你在尖塔中倒下了……");
 }
@@ -7606,7 +7662,7 @@ function handleEventAction(state, choiceIdx, cardIdx, rng) {
       break;
   }
 
-  state.ev = null;
+  delete state.ev;
   state.ph = "MAP";
 }
 
@@ -7674,6 +7730,7 @@ function handleShopAction(state, act, rng) {
     const item = sh.cards[idx];
     if (item && !item.sold && state.g >= item.p) {
       state.g -= item.p;
+      if (hasRelic(state, "MawBank")) state.mbOff = 1;
       item.sold = true;
       addCardToMasterDeck(state, item.c, rng);
       if (hasRelic(state, "The Courier")) {
@@ -7686,6 +7743,7 @@ function handleShopAction(state, act, rng) {
     const item = sh.relics[idx];
     if (item && !item.sold && state.g >= item.p) {
       state.g -= item.p;
+      if (hasRelic(state, "MawBank")) state.mbOff = 1;
       item.sold = true;
       obtainRelic(state, item.r, rng);
     }
@@ -7694,6 +7752,7 @@ function handleShopAction(state, act, rng) {
     const emptySlot = state.pot.indexOf("");
     if (item && !item.sold && emptySlot !== -1 && state.g >= item.p && !hasRelic(state, "Sozu")) {
       state.g -= item.p;
+      if (hasRelic(state, "MawBank")) state.mbOff = 1;
       item.sold = true;
       state.pot[emptySlot] = item.id;
       addLog(state, "购买了【" + POTIONS[item.id].name + "】");
@@ -7703,13 +7762,14 @@ function handleShopAction(state, act, rng) {
       const cIdx = (idx >= 0 && idx < state.dk.length) ? idx : 0;
       const d = getCardDef(state.dk[cIdx]);
       state.g -= sh.purge;
+      if (hasRelic(state, "MawBank")) state.mbOff = 1;
       sh.purged = true;
       state.pr = (state.pr || 0) + 1;
       state.dk.splice(cIdx, 1);
       addLog(state, "移除卡牌【" + d.name + "】");
     }
   } else if (type === "leave_shop") {
-    state.sh = null;
+    delete state.sh;
     state.ph = "MAP";
     addLog(state, "离开商店。");
   }
@@ -7799,7 +7859,7 @@ function handleTreasureAction(state, act, rng) {
 }
 
 function proceedAfterReward(state, rng) {
-  state.rw = null;
+  delete state.rw;
   if (state.rt === "B") {
     if (state.a >= 4) {
       state.ph = "VICTORY";
@@ -7899,7 +7959,11 @@ function advanceToNextAct(state, rng) {
   state.c = -1;
   state.p = [];
   state.mw = 0;
-  state.br = null;
+  delete state.br;
+  delete state.rw;
+  delete state.sh;
+  delete state.ev;
+  delete state.bt;
   // Heal 75% of missing HP between Acts
   const healAmt = Math.floor((state.mhp - state.hp) * 0.75);
   if (healAmt > 0) healPlayer(state, healAmt, false);
@@ -8059,13 +8123,13 @@ function createInitialState(seedStr, charId = "IRONCLAD") {
 }
 
 const meta = {
-  name: "杀戮尖塔·三幕攀塔",
-  description: "原汁原味四大职业、三大幕 15×7 分支地图、全怪物/卡牌/遗物/药水/商店/事件爬塔红包",
+  name: "杀戮尖塔·四幕终局完全版",
+  description: "原汁原味四大职业、四幕（含三把钥匙碎片与腐化之心真结局）15×7 分支地图、全怪物/卡牌/遗物/药水/商店/事件爬塔红包",
 };
 
 const hongbao = {
-  title: "杀戮尖塔·三幕高塔悬赏",
-  prompt: "请打开附带网页直接点击卡牌与地图节点攀爬尖塔",
+  title: "杀戮尖塔·四幕高塔悬赏",
+  prompt: "请打开附带网页选择角色与涅奥赐福，直接点击卡牌与地图节点攀爬尖塔",
   pageAutoOpen: true,
   total: { min: 100, default: 10000 },
   deadline: { value: 24, unit: "hours" },
@@ -8078,7 +8142,7 @@ const params = [
     type: "money",
     default: 1000,
     min: 10,
-    hint: "击败第三幕首领通关全部 48 层时的最高悬赏金额",
+    hint: "击败第三幕首领或第四幕腐化之心通关时的最高悬赏金额",
   },
   {
     key: "retainPercent",
@@ -8087,21 +8151,83 @@ const params = [
     default: 50,
     min: 0,
     max: 100,
-    hint: "半途战败时可带走当前已积累悬赏的百分比（仅在营火处主动撤离或通关三幕可带走100%）",
+    hint: "半途战败时可带走当前已积累悬赏的百分比（仅在营火处主动撤离或通关可带走100%）",
   },
 ];
 
-function setup(p, hb) {
-  const maxReward = (p && typeof p.maxReward === "number") ? p.maxReward : 1000;
-  const setupSeedKey = "sts-setup-" + Math.floor(Math.random() * 2147483647);
+function setup(submission, tools) {
+  const p = (submission && (submission.params || submission.args)) || submission || {};
+  const maxReward = (typeof p.maxReward === "number")
+    ? p.maxReward
+    : ((submission && submission.hongbao && typeof submission.hongbao.maxClaim === "number") ? submission.hongbao.maxClaim : 1000);
+  const randInt = (tools && tools.random && typeof tools.random.int === "function")
+    ? tools.random.int(1, 2147483647)
+    : Math.floor(Math.random() * 2147483647);
+  const setupSeedKey = "sts-setup-" + randInt;
   const preview = createInitialState(setupSeedKey);
   return {
     state: { clears: 0 },
     view: {
-      summary: "杀戮尖塔三大幕高塔已开启！打开网页选择英雄与涅奥的赐福即可踏入第一幕【塔底】。",
+      summary: "杀戮尖塔四幕高塔已开启！打开网页选择英雄与涅奥的赐福即可踏入第一幕【塔底】。",
       data: Object.assign({}, preview, { mr: maxReward, pd: 0 }),
     },
   };
+}
+
+const CHAR_BY_CODE = { I: "IRONCLAD", S: "THE_SILENT", D: "DEFECT", W: "WATCHER" };
+function decodeCompactToken(tok) {
+  if (!tok) return null;
+  if (tok === "E") return { type: "end_turn" };
+  if (tok === "RG") return { type: "claim_reward_gold" };
+  if (tok === "RP") return { type: "claim_reward_potion" };
+  if (tok === "RS") return { type: "skip_reward_card" };
+  if (tok === "RN") return { type: "proceed_from_reward" };
+  if (tok === "BS") return { type: "skip_boss_relic" };
+  if (tok === "SL") return { type: "leave_shop" };
+  if (tok === "HH") return { type: "rest_heal" };
+  if (tok === "HL") return { type: "rest_lift" };
+  if (tok === "HD") return { type: "rest_dig" };
+  if (tok === "HR") return { type: "rest_recall" };
+  if (tok === "HC") return { type: "cash_out" };
+  if (tok === "HX") return { type: "leave_rest" };
+  if (tok === "TO") return { type: "open_treasure" };
+  if (tok === "TL") return { type: "leave_treasure" };
+  const c2 = tok.slice(0, 2);
+  if (c2 === "RR") return { type: "claim_reward_relic", index: Number(tok.slice(2) || 0) };
+  if (c2 === "RK") return { type: "claim_reward_key", key: tok.slice(2) || "b" };
+  if (c2 === "RC") return { type: "pick_reward_card", index: Number(tok.slice(2) || 0) };
+  if (c2 === "BP") return { type: "pick_boss_relic", index: Number(tok.slice(2) || 0) };
+  if (c2 === "SC") return { type: "shop_buy_card", index: Number(tok.slice(2) || 0) };
+  if (c2 === "SR") return { type: "shop_buy_relic", index: Number(tok.slice(2) || 0) };
+  if (c2 === "SP") return { type: "shop_buy_potion", index: Number(tok.slice(2) || 0) };
+  if (c2 === "SX") return { type: "shop_purge", cardIdx: Number(tok.slice(2) || 0) };
+  if (c2 === "HS") return { type: "rest_smith", cardIdx: Number(tok.slice(2) || 0) };
+  if (c2 === "HT") return { type: "rest_toke", cardIdx: Number(tok.slice(2) || 0) };
+  const c1 = tok[0];
+  const rest = tok.slice(1);
+  if (c1 === "C") return { type: "select_char", char: CHAR_BY_CODE[rest] || rest || "IRONCLAD" };
+  if (c1 === "N") {
+    const [ci, cdi, ch] = rest.split(",");
+    return { type: "neow_blessing", choiceIdx: Number(ci || 0), cardIdx: Number(cdi || 0), char: CHAR_BY_CODE[ch] || ch || "IRONCLAD" };
+  }
+  if (c1 === "M") {
+    const [x, y] = rest.split(",").map(Number);
+    return { type: "choose_node", x: x || 0, y: y || 0 };
+  }
+  if (c1 === "P") {
+    const [ci, ti] = rest.split(",").map(Number);
+    return { type: "play_card", cardIdx: ci || 0, targetIdx: ti || 0 };
+  }
+  if (c1 === "U") {
+    const [pi, ti] = rest.split(",").map(Number);
+    return { type: "use_potion", potIdx: pi || 0, targetIdx: ti || 0 };
+  }
+  if (c1 === "D") return { type: "discard_potion", potIdx: Number(rest || 0) };
+  if (c1 === "V") {
+    const [ci, cdi] = rest.split(",").map(Number);
+    return { type: "event_choice", choiceIdx: ci || 0, cardIdx: cdi || 0 };
+  }
+  return null;
 }
 
 function parseSubmissionAction(submission) {
@@ -8111,6 +8237,11 @@ function parseSubmissionAction(submission) {
   if (!raw) return null;
   if (raw.startsWith("{")) {
     try { return JSON.parse(raw); } catch { return null; }
+  }
+  if (raw.startsWith("~")) {
+    const actions = raw.slice(1).split(";").map(decodeCompactToken).filter(Boolean);
+    if (actions.length === 0) return null;
+    return actions.length === 1 ? actions[0] : { type: "batch", actions };
   }
   const parts = raw.split(":");
   const cmd = parts[0].toUpperCase();
@@ -9616,6 +9747,56 @@ function resetLocalRun(charId) {
   renderApp();
 }
 
+const CODE_BY_CHAR = { IRONCLAD: "I", THE_SILENT: "S", DEFECT: "D", WATCHER: "W" };
+function encodeCompactAction(a) {
+  if (!a || typeof a !== "object") return "";
+  const t = a.type;
+  if (t === "end_turn") return "E";
+  if (t === "play_card") {
+    const ci = a.cardIdx ?? a.index ?? 0;
+    const ti = a.targetIdx ?? 0;
+    return ti ? ("P" + ci + "," + ti) : ("P" + ci);
+  }
+  if (t === "choose_node") return "M" + (a.x ?? a.col ?? 0) + "," + (a.y ?? a.row ?? 0);
+  if (t === "neow_blessing") {
+    const chCode = CODE_BY_CHAR[a.char] || a.char || "I";
+    return "N" + (a.choiceIdx ?? a.index ?? 0) + "," + (a.cardIdx ?? 0) + "," + chCode;
+  }
+  if (t === "select_char") return "C" + (CODE_BY_CHAR[a.char || a.charId] || "I");
+  if (t === "use_potion") return "U" + (a.potIdx ?? a.index ?? 0) + "," + (a.targetIdx ?? 0);
+  if (t === "discard_potion") return "D" + (a.potIdx ?? a.index ?? 0);
+  if (t === "event_choice") {
+    const ci = a.choiceIdx ?? a.index ?? 0;
+    const cdi = a.cardIdx ?? 0;
+    return cdi ? ("V" + ci + "," + cdi) : ("V" + ci);
+  }
+  if (t === "claim_reward_gold") return "RG";
+  if (t === "claim_reward_potion") return "RP";
+  if (t === "claim_reward_relic") return "RR" + (a.index ?? 0);
+  if (t === "claim_reward_key") return "RK" + (a.key || "b");
+  if (t === "pick_reward_card") return "RC" + (a.index ?? a.cardIdx ?? 0);
+  if (t === "skip_reward_card") return "RS";
+  if (t === "proceed_from_reward") return "RN";
+  if (t === "pick_boss_relic") return "BP" + (a.index ?? 0);
+  if (t === "skip_boss_relic") return "BS";
+  if (t === "shop_buy_card") return "SC" + (a.index ?? 0);
+  if (t === "shop_buy_relic") return "SR" + (a.index ?? 0);
+  if (t === "shop_buy_potion") return "SP" + (a.index ?? 0);
+  if (t === "shop_purge") return "SX" + (a.cardIdx ?? a.index ?? 0);
+  if (t === "leave_shop") return "SL";
+  if (t === "rest_heal") return "HH";
+  if (t === "rest_smith") return "HS" + (a.cardIdx ?? a.index ?? 0);
+  if (t === "rest_lift") return "HL";
+  if (t === "rest_dig") return "HD";
+  if (t === "rest_toke") return "HT" + (a.cardIdx ?? a.index ?? 0);
+  if (t === "rest_recall") return "HR";
+  if (t === "cash_out" || t === "rest_retreat") return "HC";
+  if (t === "leave_rest") return "HX";
+  if (t === "open_treasure") return "TO";
+  if (t === "leave_treasure") return "TL";
+  return "";
+}
+
 function shouldFlushToServer(prevPh, nextPh, actObj) {
   const t = actObj && actObj.type;
   // 1. Initial Neow blessing initializes server seed
@@ -9633,22 +9814,46 @@ function flushPendingActions() {
   if (!hbConnected || !window.hb || typeof window.hb.submit !== "function") return;
   if (isFlushingBatch || pendingActionsQueue.length === 0) return;
 
+  // Build a compact batch chunk strictly <= 185 characters (under the 200-char SDK limit)
+  const batchToSend = [];
+  const tokens = [];
+  let len = 1; // "~"
+  while (pendingActionsQueue.length > 0) {
+    const nextAct = pendingActionsQueue[0];
+    const tok = encodeCompactAction(nextAct);
+    if (!tok) {
+      pendingActionsQueue.shift();
+      continue;
+    }
+    const addLen = (tokens.length > 0 ? 1 : 0) + tok.length;
+    if (tokens.length > 0 && len + addLen > 185) break;
+    pendingActionsQueue.shift();
+    batchToSend.push(nextAct);
+    tokens.push(tok);
+    len += addLen;
+  }
+  if (tokens.length === 0) return;
+
   isFlushingBatch = true;
-  const batchToSend = pendingActionsQueue.splice(0, pendingActionsQueue.length);
   persistSessionState();
   renderApp();
 
-  const payload = batchToSend.length === 1
-    ? batchToSend[0]
-    : { type: "batch", actions: batchToSend };
-  const str = typeof payload === "string" ? payload : JSON.stringify(payload);
+  const str = "~" + tokens.join(";");
 
   window.hb.submit(str).then((res) => {
     isFlushingBatch = false;
     if (!res || !res.judged) {
-      // Server rejected or didn't judge; keep local state
+      if (res && res.reason === "cooldown") {
+        pendingActionsQueue = batchToSend.concat(pendingActionsQueue);
+        persistSessionState();
+        setTimeout(() => flushPendingActions(), ((res.seconds || 1) * 1000) + 200);
+        return;
+      }
+      if (res && res.reason === "login" && typeof window.hb.login === "function") {
+        window.hb.login().catch(() => {});
+      }
     }
-    if (pendingActionsQueue.length > 0 && currentData && (currentData.ph === "VICTORY" || currentData.ph === "DEFEAT" || currentData.ph === "RETREAT")) {
+    if (pendingActionsQueue.length > 0) {
       flushPendingActions();
     } else {
       renderApp();
@@ -10012,7 +10217,7 @@ const CombatVfxEngine = (() => {
         }
 
         // Enemy died! Spawn death ghost so it dissolves cleanly
-        if (prevM.hp > 0 && nextM.hp <= 0) {
+        if (prevM.hp > 0 && nextM.hp <= 0 && !(nextM.st && nextM.st.halfDead)) {
           spawnDeathGhost(eRect, prevM.spriteKey, prevM.size, idx);
         }
 
@@ -10092,6 +10297,36 @@ function sendAction(payload) {
   mapOverlayOpen = false;
   const actObj = typeof payload === "string" ? JSON.parse(payload) : payload;
   const prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "NEOW";
+
+  // When connected to hb server, let the initial Neow blessing fetch the authoritative server seed first
+  // so there is zero map/relic jump between client preview and server userRandom seed.
+  if (hbConnected && window.hb && typeof window.hb.submit === "function" && prevPh === "NEOW" && actObj && actObj.type === "neow_blessing") {
+    if (isFlushingBatch) return;
+    isFlushingBatch = true;
+    const str = "~" + encodeCompactAction(actObj);
+    window.hb.submit(str).then(async (res) => {
+      isFlushingBatch = false;
+      if (res && res.judged) {
+        try {
+          const mv = await window.hb.myView();
+          if (mv && mv.data) {
+            applyServerViewData(mv.data);
+            return;
+          }
+        } catch {}
+      } else {
+        if (res && res.reason === "login" && typeof window.hb.login === "function") {
+          window.hb.login().catch(() => {});
+        }
+        runLocalJudge(actObj);
+      }
+    }).catch(() => {
+      isFlushingBatch = false;
+      runLocalJudge(actObj);
+    });
+    return;
+  }
+
   const vfxSnap = CombatVfxEngine.capturePreAction(actObj);
 
   // Always execute locally at 0ms for instant UI responsiveness
@@ -10141,11 +10376,7 @@ function getMonsterIntentInfo(st, bt, m) {
   const it = m.in || m.it || "UNKNOWN";
   let dmg = (m.dmg !== undefined ? m.dmg : m.idmg) || 0;
   if (dmg > 0) {
-    let d = dmg + (m.pw.Strength || 0);
-    if ((m.pw.Weak || 0) > 0) d = Math.floor(d * 0.75);
-    if ((bt.pw.Vulnerable || 0) > 0) d = Math.floor(d * (hasRelic(st, "Odd Mushroom") ? 1.25 : 1.5));
-    if ((bt.pw.Intangible || 0) > 0 && d > 0) d = 1;
-    dmg = Math.max(0, d);
+    dmg = calcMonsterAttackDmg(st, bt, m, dmg);
   }
   const hitCnt = m.hits || m.ihit || 1;
   const hits = hitCnt > 1 ? ("x" + hitCnt) : "";
@@ -10477,12 +10708,13 @@ function renderCombatStage(st) {
   const heroPws = renderPowerChipsHtml(bt.pw, bt);
   const heroIntangible = ((bt.pw && bt.pw.Intangible) || 0) > 0;
   const heroSpec = getMonsterVisualSpec(hm.spine, hm.spine, 1);
+  const heroFacingLeft = Boolean(bt.pw && bt.pw.Surrounded && bt.m && bt.m[1] && bt.m[1].pw && bt.m[1].pw.BackAttack);
 
   hero.innerHTML =
     '<div class="sprite-stage-box' + (heroIntangible ? ' is-intangible' : '') + '" style="width:' + heroSpec.size + 'px;height:' + heroSpec.size + 'px">' +
       renderHeroMechanicsHtml(st, bt) +
       '<div class="unit-shadow" style="width:' + heroSpec.shadowW + 'px"></div>' +
-      spMonster(hm.spine, heroSpec.size) +
+      (heroFacingLeft ? '<div style="transform:scaleX(-1);display:flex">' + spMonster(hm.spine, heroSpec.size) + '</div>' : spMonster(hm.spine, heroSpec.size)) +
     '</div>' +
     '<div class="sts-under-foot">' +
       '<div class="sts-hp-wrap" style="width:' + heroSpec.hpW + 'px">' +
@@ -10897,21 +11129,25 @@ function renderEventStage(st) {
 
   const list = dialog.querySelector("#ev-choices");
   const btnBgStyle = uiPanelBgStyle("eventBtnEnabled");
+  const disBgStyle = uiPanelBgStyle("eventBtnDisabled");
   def.opts.forEach((opt, idx) => {
+    const locked = (evId === "TheCleric" && ((idx === 0 && st.g < 35) || (idx === 1 && st.g < 50)));
     const btn = document.createElement("button");
     btn.className = "sts-event-opt-btn";
-    btn.setAttribute("style", btnBgStyle);
-    btn.innerHTML = '<span>' + formatStsEventOptionLabel(opt.label) + '</span>';
-    btn.addEventListener("click", () => {
-      const actType = st.ph === "NEOW" ? "neow_blessing" : "event_choice";
-      if (opt.needCard) {
-        openCardPickerModal("选择 1 张牌执行【" + opt.tag + "】", st.dk, st, (cardIdx) => {
-          sendAction({ type: actType, choiceIdx: idx, cardIdx });
-        });
-      } else {
-        sendAction({ type: actType, choiceIdx: idx, cardIdx: 0 });
-      }
-    });
+    btn.setAttribute("style", (locked ? disBgStyle : btnBgStyle) + (locked ? "opacity:0.55;cursor:not-allowed;" : ""));
+    btn.innerHTML = '<span>' + (locked ? '<span class="sts-opt-neg">[锁定·金币不足]</span> ' : '') + formatStsEventOptionLabel(opt.label) + '</span>';
+    if (!locked) {
+      btn.addEventListener("click", () => {
+        const actType = st.ph === "NEOW" ? "neow_blessing" : "event_choice";
+        if (opt.needCard) {
+          openCardPickerModal("选择 1 张牌执行【" + opt.tag + "】", st.dk, st, (cardIdx) => {
+            sendAction({ type: actType, choiceIdx: idx, cardIdx });
+          });
+        } else {
+          sendAction({ type: actType, choiceIdx: idx, cardIdx: 0 });
+        }
+      });
+    }
     list.appendChild(btn);
   });
 
@@ -11612,13 +11848,15 @@ function renderApp() {
   if (rstBtn) rstBtn.addEventListener("click", () => resetLocalRun());
 
   const potBar = top.querySelector("#hud-potions");
+  const potMult = hasRelic(st, "SacredBark") ? 2 : 1;
   (st.pot || []).forEach((pId, pIdx) => {
     const slot = document.createElement("span");
     slot.setAttribute("data-pot-idx", String(pIdx));
     if (pId && POTIONS[pId]) {
       const p = POTIONS[pId];
+      const pVal = p.val * potMult;
       slot.className = "potion-icon-btn has-pot" + (activePotionIdx === pIdx ? " active-aim" : "");
-      slot.title = "【" + p.name + "】" + p.desc.replace(/!V!/g, p.val) + (p.target === "E" ? "（点击瞄准敌人投掷）" : "（点击饮用）");
+      slot.title = "【" + p.name + "】" + p.desc.replace(/!V!/g, pVal) + (p.target === "E" ? "（左键瞄准敌人投掷，右键丢弃）" : "（左键饮用，右键丢弃）");
       slot.innerHTML = spIcon("potions", pId, 24, "🧪");
       slot.addEventListener("click", (ev) => {
         ev.stopPropagation();
@@ -11634,6 +11872,12 @@ function renderApp() {
         } else {
           sendAction({ type: "use_potion", potIdx: pIdx, targetIdx: selectedTargetIdx });
         }
+      });
+      slot.addEventListener("contextmenu", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        clearTargeting(false);
+        sendAction({ type: "discard_potion", potIdx: pIdx });
       });
     } else {
       slot.className = "potion-icon-btn empty";
@@ -11798,6 +12042,7 @@ function applyServerViewData(serverData) {
   renderApp();
 }
 
+let hadServerMyView = false;
 if (window.hb) {
   if (typeof window.hb.ready === "function") {
     window.hb.ready().then(() => { hbConnected = true; }).catch(() => {});
@@ -11805,14 +12050,19 @@ if (window.hb) {
   window.hb.on("myView", (v) => {
     hbConnected = true;
     if (v && v.data) {
+      hadServerMyView = true;
       applyServerViewData(v.data);
+    } else if (!v && hadServerMyView) {
+      // Switched to a player with no saved run or game was restarted in simulator
+      hadServerMyView = false;
+      resetLocalRun("IRONCLAD");
     }
   });
   window.hb.on("view", (v) => {
     hbConnected = true;
-    if ((!currentData || currentData === defaultPreview) && v && v.data) {
-      currentData = v.data;
-      localPlayerState = v.data;
+    if ((!currentData || currentData === defaultPreview || !hadServerMyView) && v && v.data) {
+      currentData = JSON.parse(JSON.stringify(v.data));
+      localPlayerState = JSON.parse(JSON.stringify(v.data));
       renderApp();
     }
   });
@@ -11821,13 +12071,14 @@ if (window.hb) {
       const myV = await window.hb.myView();
       hbConnected = true;
       if (myV && myV.data) {
+        hadServerMyView = true;
         applyServerViewData(myV.data);
         return;
       }
       const pubV = await window.hb.view();
       if (pubV && pubV.data) {
-        currentData = pubV.data;
-        localPlayerState = pubV.data;
+        currentData = JSON.parse(JSON.stringify(pubV.data));
+        localPlayerState = JSON.parse(JSON.stringify(pubV.data));
         renderApp();
       }
     } catch {}
