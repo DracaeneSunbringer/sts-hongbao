@@ -7348,14 +7348,15 @@ function calcBounty(state, args, maxReward) {
     const bossPct = (state.bk || 0) * 0.14;               // +14% per Act Boss
     rawPct = Math.min(0.92, floorPct + elitePct + bossPct);
   }
-  const fullPending = Math.floor(maxReward * rawPct);
+  let fullPending = Math.floor(maxReward * rawPct);
+  if (fullPending === 0 && (state.fl || 0) >= 1 && rawPct > 0) fullPending = 1;
 
   if (state.ph === "DEFEAT") {
     const retainPct = (args && typeof args.retainPercent === "number")
       ? Math.max(0, Math.min(100, args.retainPercent))
       : 50;
     const retained = Math.floor(fullPending * retainPct / 100);
-    if (retained === 0 && (state.fl || 0) >= 2 && retainPct > 0 && fullPending > 0) return 1;
+    if (retained === 0 && (state.fl || 0) >= 1 && retainPct > 0 && fullPending > 0) return 1;
     return retained;
   }
   return fullPending;
@@ -8047,15 +8048,32 @@ function enterMapNode(state, x, y, rng) {
 
   if (y !== nextRow) return false;
   if (y < 0 || y >= 15 || x < 0 || x >= 7) return false;
-  const targetNode = map[y] && map[y].find(n => n.x === x);
-  if (!targetNode || !targetNode.t) return false;
+  let targetNode = map[y] && map[y].find(n => n.x === x);
 
   // Validate edge connection from previous node (unless Row 0 or WingedGreaves)
-  if (state.r >= 0) {
+  if (state.r >= 0 && targetNode && !hasRelic(state, "WingedGreaves")) {
     const prevNode = map[state.r] && map[state.r].find(n => n.x === state.c);
     const connected = prevNode && prevNode.e && prevNode.e.indexOf(x) !== -1;
-    if (!connected && !hasRelic(state, "WingedGreaves")) return false;
+    if (!connected) targetNode = null;
   }
+
+  // Fallback snap to nearest valid connected node on row y if client/server seed ever differed
+  if ((!targetNode || !targetNode.t) && map[y] && map[y].length > 0) {
+    let candidates = map[y].filter(n => n && n.t);
+    if (state.r >= 0 && !hasRelic(state, "WingedGreaves")) {
+      const prevNode = map[state.r] && map[state.r].find(n => n.x === state.c);
+      if (prevNode && prevNode.e && prevNode.e.length > 0) {
+        const conn = candidates.filter(n => prevNode.e.indexOf(n.x) !== -1);
+        if (conn.length > 0) candidates = conn;
+      }
+    }
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x));
+      targetNode = candidates[0];
+      x = targetNode.x;
+    }
+  }
+  if (!targetNode || !targetNode.t) return false;
 
   state.r = y;
   state.c = x;
@@ -8331,13 +8349,24 @@ function judge(submission, tools) {
   function applySingleAction(subAct) {
     if (!subAct || subAct.type === "init" || st.ph === "VICTORY" || st.ph === "DEFEAT" || st.ph === "RETREAT") return;
     const t = subAct.type;
+    const reqChar = subAct.char || subAct.charId;
+    if (st.ph === "NEOW" && (st.fl || 0) === 0 && reqChar && CHAR_META[reqChar] && st.ch !== reqChar) {
+      applyCharacterToInitialState(st, reqChar);
+    }
 
     if (t === "select_char") {
       if (st.ph === "NEOW" && (st.fl || 0) === 0) {
-        applyCharacterToInitialState(st, subAct.char || subAct.charId || "IRONCLAD");
         addLog(st, "已切换角色为【" + CHAR_META[st.ch].name + "】！");
       }
       return;
+    }
+
+    // Auto-complete room transition if player chooses next map node directly from Map Overlay
+    if (t === "choose_node" && st.ph !== "MAP") {
+      if (st.ph === "REWARD") proceedAfterReward(st, rng);
+      else if (st.ph === "NEOW") handleEventAction(st, 0, 0, rng);
+      else if (st.ph === "SHOP") { delete st.sh; st.ph = "MAP"; }
+      else if (st.ph === "REST" || st.ph === "TREASURE") { st.ph = "MAP"; }
     }
 
     if (t === "use_potion") {
@@ -8355,9 +8384,6 @@ function judge(submission, tools) {
       }
     } else if (st.ph === "NEOW" || st.ph === "EVENT") {
       if (t === "event_choice" || t === "neow_blessing") {
-        if (st.ph === "NEOW" && (st.fl || 0) === 0 && subAct.char && CHAR_META[subAct.char] && st.ch !== subAct.char) {
-          applyCharacterToInitialState(st, subAct.char);
-        }
         handleEventAction(st, subAct.choiceIdx ?? subAct.index ?? 0, subAct.cardIdx ?? 0, rng);
       }
     } else if (st.ph === "MAP") {
@@ -8381,6 +8407,7 @@ function judge(submission, tools) {
     } else if (st.ph === "TREASURE") {
       handleTreasureAction(st, subAct, rng);
     }
+    st.rs = rng.s;
   }
 
   if (act && act.type === "batch" && Array.isArray(act.actions)) {
@@ -9748,8 +9775,14 @@ window.addEventListener("keydown", (e) => {
 });
 
 let pendingActionsQueue = [];
+let inFlightBatch = [];
 let isFlushingBatch = false;
+let needsServerFlush = false;
 let charSelectConfirmed = false;
+let selectedCharId = "IRONCLAD";
+let legacyJudgeMode = false;
+let latestServerViewData = null;
+let flushRetryTimer = null;
 
 function persistSessionState() {
   try {
@@ -9757,8 +9790,10 @@ function persistSessionState() {
       localPlayerState,
       localPending,
       currentData,
-      pendingActionsQueue,
+      pendingActionsQueue: inFlightBatch.concat(pendingActionsQueue),
       charSelectConfirmed,
+      selectedCharId,
+      legacyJudgeMode,
     }));
   } catch {}
 }
@@ -9785,13 +9820,21 @@ function runLocalJudge(payload, skipRender = false) {
 }
 
 function resetLocalRun(charId) {
-  const ch = charId || (currentData && currentData.ch) || "IRONCLAD";
+  if (isFlushingBatch || inFlightBatch.length > 0 || pendingActionsQueue.length > 0) {
+    flushPendingActions();
+    return;
+  }
+  const ch = charId || selectedCharId || (currentData && currentData.ch) || "IRONCLAD";
+  selectedCharId = ch;
+  const maxR = (currentData && currentData.mr) || 1000;
   const fresh = createInitialState("sts-spire-seed-" + Date.now() + "-" + Math.floor(Math.random() * 100000), ch);
   localPlayerState = fresh;
   localPending = 0;
+  inFlightBatch = [];
   pendingActionsQueue = [];
+  needsServerFlush = false;
   charSelectConfirmed = false;
-  currentData = Object.assign({}, fresh, { mr: 1000, pd: 0 });
+  currentData = Object.assign({}, fresh, { mr: maxR, pd: 0 });
   persistSessionState();
   renderApp();
 }
@@ -9808,10 +9851,11 @@ function encodeCompactAction(a) {
   }
   if (t === "choose_node") return "M" + (a.x ?? a.col ?? 0) + "," + (a.y ?? a.row ?? 0);
   if (t === "neow_blessing") {
-    const chCode = CODE_BY_CHAR[a.char] || a.char || "I";
+    const ch = a.char || selectedCharId || (localPlayerState && localPlayerState.ch) || "IRONCLAD";
+    const chCode = CODE_BY_CHAR[ch] || ch || "I";
     return "N" + (a.choiceIdx ?? a.index ?? 0) + "," + (a.cardIdx ?? 0) + "," + chCode;
   }
-  if (t === "select_char") return "C" + (CODE_BY_CHAR[a.char || a.charId] || "I");
+  if (t === "select_char") return "C" + (CODE_BY_CHAR[a.char || a.charId || selectedCharId] || "I");
   if (t === "use_potion") return "U" + (a.potIdx ?? a.index ?? 0) + "," + (a.targetIdx ?? 0);
   if (t === "discard_potion") return "D" + (a.potIdx ?? a.index ?? 0);
   if (t === "event_choice") {
@@ -9846,71 +9890,218 @@ function encodeCompactAction(a) {
   return "";
 }
 
+function compactLegacyActionObj(a) {
+  if (!a || typeof a !== "object") return null;
+  const t = a.type;
+  if (t === "neow_blessing") {
+    const ch = a.char || selectedCharId || (localPlayerState && localPlayerState.ch) || "IRONCLAD";
+    const o = { type: "neow_blessing", index: a.choiceIdx ?? a.index ?? 0, char: ch };
+    if (a.cardIdx) o.cardIdx = a.cardIdx;
+    return o;
+  }
+  if (t === "choose_node") return { type: "choose_node", x: a.x ?? a.col ?? 0, y: a.y ?? a.row ?? 0 };
+  if (t === "play_card") {
+    const o = { type: "play_card", index: a.cardIdx ?? a.index ?? 0 };
+    if (a.targetIdx) o.targetIdx = a.targetIdx;
+    return o;
+  }
+  if (t === "use_potion") {
+    const o = { type: "use_potion", index: a.potIdx ?? a.index ?? 0 };
+    if (a.targetIdx) o.targetIdx = a.targetIdx;
+    return o;
+  }
+  if (t === "discard_potion") return { type: "discard_potion", index: a.potIdx ?? a.index ?? 0 };
+  if (t === "event_choice") {
+    const o = { type: "event_choice", index: a.choiceIdx ?? a.index ?? 0 };
+    if (a.cardIdx) o.cardIdx = a.cardIdx;
+    return o;
+  }
+  if (t === "pick_reward_card" || t === "claim_reward_relic" || t === "pick_boss_relic" || t === "shop_buy_card" || t === "shop_buy_relic" || t === "shop_buy_potion") {
+    return { type: t, index: a.index ?? a.cardIdx ?? 0 };
+  }
+  if (t === "shop_purge" || t === "rest_smith" || t === "rest_toke") {
+    return { type: t, cardIdx: a.cardIdx ?? a.index ?? 0 };
+  }
+  if (t === "claim_reward_key") return { type: t, key: a.key || "b" };
+  return { type: t };
+}
+
+function getQueuedEncodedLength() {
+  if (pendingActionsQueue.length === 0) return 0;
+  if (legacyJudgeMode) {
+    return JSON.stringify({ type: "batch", actions: pendingActionsQueue.map(compactLegacyActionObj).filter(Boolean) }).length;
+  }
+  return 1 + pendingActionsQueue.map(encodeCompactAction).filter(Boolean).join(";").length;
+}
+
 function shouldFlushToServer(prevPh, nextPh, actObj) {
   const t = actObj && actObj.type;
-  // 1. Initial Neow blessing initializes server seed
+  // 1. Initial Neow blessing initializes server seed and character
   if (prevPh === "NEOW" && nextPh !== "NEOW") return true;
   // 2. Every time a floor's monster combat finishes (COMBAT -> REWARD / VICTORY / DEFEAT)
   if (prevPh === "COMBAT" && nextPh !== "COMBAT") return true;
-  // 3. Act Boss Relic chosen (entering next Act)
-  if (prevPh === "BOSS_RELIC" && nextPh === "MAP") return true;
+  // 3. Leaving any room back to MAP or entering REST (keeps queue tiny before Campfire Retreat / next floor)
+  if ((prevPh !== "MAP" && nextPh === "MAP") || (prevPh === "MAP" && nextPh === "REST")) return true;
   // 4. Run settlement (Victory, Defeat, or Campfire Retreat / Cash Out)
   if (nextPh === "VICTORY" || nextPh === "DEFEAT" || nextPh === "RETREAT" || t === "cash_out" || t === "rest_retreat") return true;
+  // 5. Proactive mid-combat flush before queue approaches the 200-char SDK limit
+  if (getQueuedEncodedLength() >= (legacyJudgeMode ? 115 : 145)) return true;
   return false;
 }
 
 function flushPendingActions() {
   if (!hbConnected || !window.hb || typeof window.hb.submit !== "function") return;
   if (isFlushingBatch || pendingActionsQueue.length === 0) return;
-
-  // Build a compact batch chunk strictly <= 185 characters (under the 200-char SDK limit)
-  const batchToSend = [];
-  const tokens = [];
-  let len = 1; // "~"
-  while (pendingActionsQueue.length > 0) {
-    const nextAct = pendingActionsQueue[0];
-    const tok = encodeCompactAction(nextAct);
-    if (!tok) {
-      pendingActionsQueue.shift();
-      continue;
-    }
-    const addLen = (tokens.length > 0 ? 1 : 0) + tok.length;
-    if (tokens.length > 0 && len + addLen > 185) break;
-    pendingActionsQueue.shift();
-    batchToSend.push(nextAct);
-    tokens.push(tok);
-    len += addLen;
+  if (flushRetryTimer) {
+    clearTimeout(flushRetryTimer);
+    flushRetryTimer = null;
   }
-  if (tokens.length === 0) return;
 
+  const batchToSend = [];
+  let str = "";
+
+  if (!legacyJudgeMode) {
+    // Special case: single Neow blessing or single Cash Out uses universal colon/command syntax
+    // that works on BOTH legacy cff2292 judge.js and current judge.js!
+    if (pendingActionsQueue[0] && pendingActionsQueue[0].type === "neow_blessing") {
+      const a = pendingActionsQueue.shift();
+      batchToSend.push(a);
+      const ch = a.char || selectedCharId || (localPlayerState && localPlayerState.ch) || "IRONCLAD";
+      str = "BLESS:" + (a.choiceIdx ?? a.index ?? 0) + ":" + ch;
+    } else if (pendingActionsQueue.length === 1 && (pendingActionsQueue[0].type === "cash_out" || pendingActionsQueue[0].type === "rest_retreat")) {
+      const a = pendingActionsQueue.shift();
+      batchToSend.push(a);
+      str = "CASH_OUT";
+    } else {
+      // Build a compact batch chunk strictly <= 185 characters (under the 200-char SDK limit)
+      const tokens = [];
+      let len = 1; // "~"
+      while (pendingActionsQueue.length > 0) {
+        const nextAct = pendingActionsQueue[0];
+        const tok = encodeCompactAction(nextAct);
+        if (!tok) {
+          pendingActionsQueue.shift();
+          continue;
+        }
+        const addLen = (tokens.length > 0 ? 1 : 0) + tok.length;
+        if (tokens.length > 0 && len + addLen > 185) break;
+        pendingActionsQueue.shift();
+        batchToSend.push(nextAct);
+        tokens.push(tok);
+        len += addLen;
+      }
+      if (tokens.length > 0) str = "~" + tokens.join(";");
+    }
+  } else {
+    // Legacy judge.js (pre-45feed7) compatible chunk strictly <= 195 characters
+    const first = pendingActionsQueue[0];
+    if (first && first.type === "neow_blessing") {
+      const a = pendingActionsQueue.shift();
+      batchToSend.push(a);
+      const ch = a.char || selectedCharId || (localPlayerState && localPlayerState.ch) || "IRONCLAD";
+      str = "BLESS:" + (a.choiceIdx ?? a.index ?? 0) + ":" + ch;
+    } else {
+      const objs = [];
+      while (pendingActionsQueue.length > 0) {
+        const nextAct = pendingActionsQueue[0];
+        const compactObj = compactLegacyActionObj(nextAct);
+        if (!compactObj) {
+          pendingActionsQueue.shift();
+          continue;
+        }
+        const candidate = objs.concat([compactObj]);
+        const candidateStr = candidate.length === 1
+          ? JSON.stringify(candidate[0])
+          : JSON.stringify({ type: "batch", actions: candidate });
+        if (objs.length > 0 && candidateStr.length > 195) break;
+        pendingActionsQueue.shift();
+        batchToSend.push(nextAct);
+        objs.push(compactObj);
+        str = candidateStr;
+      }
+    }
+  }
+
+  if (!str || batchToSend.length === 0) return;
+
+  inFlightBatch = batchToSend;
   isFlushingBatch = true;
+  if (pendingActionsQueue.length === 0) {
+    needsServerFlush = false;
+  } else {
+    needsServerFlush = true;
+  }
   persistSessionState();
   renderApp();
 
-  const str = "~" + tokens.join(";");
-
-  window.hb.submit(str).then((res) => {
+  window.hb.submit(str).then(async (res) => {
     isFlushingBatch = false;
-    if (!res || !res.judged) {
-      if (res && res.reason === "cooldown") {
-        pendingActionsQueue = batchToSend.concat(pendingActionsQueue);
+    if (res && res.judged) {
+      let srvData = latestServerViewData;
+      try {
+        const mv = await window.hb.myView();
+        if (mv && mv.data) srvData = mv.data;
+      } catch {}
+
+      // Auto-detect pre-45feed7 judge.js if "~..." batch was treated as a no-op at Floor 0 NEOW
+      if (!legacyJudgeMode && str.startsWith("~") && srvData && srvData.ph === "NEOW" && (srvData.fl || 0) === 0 &&
+          inFlightBatch.some(a => a && (a.type === "neow_blessing" || a.type === "choose_node"))) {
+        legacyJudgeMode = true;
+        pendingActionsQueue = inFlightBatch.concat(pendingActionsQueue);
+        inFlightBatch = [];
+        needsServerFlush = true;
         persistSessionState();
-        setTimeout(() => flushPendingActions(), ((res.seconds || 1) * 1000) + 200);
+        flushPendingActions();
         return;
       }
-      if (res && res.reason === "login" && typeof window.hb.login === "function") {
-        window.hb.login().catch(() => {});
+
+      inFlightBatch = [];
+      if (srvData) {
+        hadServerMyView = true;
+        applyServerViewData(srvData, true);
+      } else {
+        persistSessionState();
       }
+      if (pendingActionsQueue.length > 0 && (needsServerFlush || getQueuedEncodedLength() >= (legacyJudgeMode ? 115 : 145))) {
+        flushPendingActions();
+      } else {
+        renderApp();
+      }
+      return;
     }
-    if (pendingActionsQueue.length > 0) {
-      flushPendingActions();
-    } else {
+
+    // Submission was not judged (cooldown, busy, judge_failed, login, etc.) — NEVER drop inFlightBatch!
+    pendingActionsQueue = inFlightBatch.concat(pendingActionsQueue);
+    inFlightBatch = [];
+    needsServerFlush = true;
+    persistSessionState();
+
+    if (res && res.reason === "login" && typeof window.hb.login === "function") {
+      window.hb.login().catch(() => {});
+    }
+    if (res && (res.reason === "already_claimed" || res.reason === "ended")) {
+      needsServerFlush = false;
       renderApp();
+      return;
     }
+    const waitMs = (res && res.reason === "cooldown" && res.seconds)
+      ? ((res.seconds * 1000) + 250)
+      : 1200;
+    flushRetryTimer = setTimeout(() => {
+      flushRetryTimer = null;
+      flushPendingActions();
+    }, waitMs);
+    renderApp();
   }).catch(() => {
     isFlushingBatch = false;
-    pendingActionsQueue = batchToSend.concat(pendingActionsQueue);
+    pendingActionsQueue = inFlightBatch.concat(pendingActionsQueue);
+    inFlightBatch = [];
+    needsServerFlush = true;
     persistSessionState();
+    flushRetryTimer = setTimeout(() => {
+      flushRetryTimer = null;
+      flushPendingActions();
+    }, 1500);
     renderApp();
   });
 }
@@ -10345,35 +10536,38 @@ function sendAction(payload) {
   clearTargeting(false);
   mapOverlayOpen = false;
   const actObj = typeof payload === "string" ? JSON.parse(payload) : payload;
-  const prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "NEOW";
+  if (!actObj || typeof actObj !== "object") return;
+  let prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "NEOW";
 
-  // When connected to hb server, let the initial Neow blessing fetch the authoritative server seed first
-  // so there is zero map/relic jump between client preview and server userRandom seed.
-  if (hbConnected && window.hb && typeof window.hb.submit === "function" && prevPh === "NEOW" && actObj && actObj.type === "neow_blessing") {
-    if (isFlushingBatch) return;
-    isFlushingBatch = true;
-    const str = "~" + encodeCompactAction(actObj);
-    window.hb.submit(str).then(async (res) => {
-      isFlushingBatch = false;
-      if (res && res.judged) {
-        try {
-          const mv = await window.hb.myView();
-          if (mv && mv.data) {
-            applyServerViewData(mv.data);
-            return;
-          }
-        } catch {}
-      } else {
-        if (res && res.reason === "login" && typeof window.hb.login === "function") {
-          window.hb.login().catch(() => {});
-        }
-        runLocalJudge(actObj);
-      }
-    }).catch(() => {
-      isFlushingBatch = false;
-      runLocalJudge(actObj);
-    });
+  if (actObj.type === "select_char") {
+    selectedCharId = actObj.char || actObj.charId || "IRONCLAD";
+    runLocalJudge(actObj);
+    persistSessionState();
+    renderApp();
     return;
+  }
+
+  if (actObj.type === "neow_blessing") {
+    actObj.char = actObj.char || selectedCharId || (localPlayerState && localPlayerState.ch) || (currentData && currentData.ch) || "IRONCLAD";
+    selectedCharId = actObj.char;
+  }
+
+  // If player clicked a reachable map node from the Map Overlay while still inside a room,
+  // auto-prepend the room-leave action so both client and server transition to MAP first.
+  if (actObj.type === "choose_node" && prevPh !== "MAP") {
+    let leaveType = null;
+    if (prevPh === "REWARD") leaveType = "proceed_from_reward";
+    else if (prevPh === "SHOP") leaveType = "leave_shop";
+    else if (prevPh === "REST") leaveType = "leave_rest";
+    else if (prevPh === "TREASURE") leaveType = "leave_treasure";
+    if (leaveType) {
+      const leaveAct = { type: leaveType };
+      runLocalJudge(leaveAct, true);
+      if (window.hb && typeof window.hb.submit === "function") {
+        pendingActionsQueue.push(leaveAct);
+      }
+      prevPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || "MAP";
+    }
   }
 
   const vfxSnap = CombatVfxEngine.capturePreAction(actObj);
@@ -10383,16 +10577,14 @@ function sendAction(payload) {
   const nextPh = (localPlayerState && localPlayerState.ph) || (currentData && currentData.ph) || prevPh;
   CombatVfxEngine.playPostAction(vfxSnap, currentData, actObj);
 
-  if (hbConnected && window.hb && typeof window.hb.submit === "function") {
-    if (actObj && actObj.type === "select_char" && prevPh === "NEOW") {
-      // Character selection in Neow room is carried by neow_blessing.char on first server flush
-      persistSessionState();
-      renderApp();
-      return;
-    }
+  if (window.hb && typeof window.hb.submit === "function") {
     pendingActionsQueue.push(actObj);
+    const shouldFlush = shouldFlushToServer(prevPh, nextPh, actObj);
+    if (shouldFlush) {
+      needsServerFlush = true;
+    }
     persistSessionState();
-    if (shouldFlushToServer(prevPh, nextPh, actObj)) {
+    if (shouldFlush || needsServerFlush) {
       flushPendingActions();
     } else {
       renderApp();
@@ -11800,6 +11992,7 @@ function renderSettlementStage(st) {
   const bannerTitle = isWin ? (st.a === 4 ? "真结局！" : "胜利！") : (isRetreat ? "见好就收" : "败北……");
   const yuan = ((st.pd || 0) / 100).toFixed(2);
   const maxFl = st.a === 4 || (st.fl || 0) > 48 ? 52 : 48;
+  const isSyncingSettlement = Boolean(window.hb && (isFlushingBatch || inFlightBatch.length > 0 || pendingActionsQueue.length > 0));
 
   const stageWrap = document.createElement("div");
   stageWrap.className = "sts-reward-stage";
@@ -11820,13 +12013,18 @@ function renderSettlementStage(st) {
         '<div style="font-size:14px;font-weight:900;color:#6ee7b7;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.45);padding:4px 12px;border-radius:12px">' +
           '🧧 结算赏金：' + yuan +
         '</div>' +
+        '<div style="font-size:12px;font-weight:700;color:' + (isSyncingSettlement ? '#fde047' : '#86efac') + ';text-align:center">' +
+          (isSyncingSettlement ? '⏳ 正在向红包站同步结算并划转额度……' : '✅ 已完成红包结算同步') +
+        '</div>' +
       '</div>' +
       '<div style="width:100%;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#e2e8f0;background:rgba(9,13,22,0.55);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">' +
         '<div style="display:flex;justify-content:space-between"><span>攀登进度</span><b>第 ' + st.a + ' 幕 · ' + (st.fl || 0) + ' / ' + maxFl + ' 层</b></div>' +
         '<div style="display:flex;justify-content:space-between"><span>击败精英 / 首领</span><b>' + (st.ek || 0) + ' 精英 / ' + (st.bk || 0) + ' 首领</b></div>' +
         '<div style="display:flex;justify-content:space-between"><span>收集遗物 / 主牌组</span><b>' + (st.rel ? st.rel.length : 1) + ' 遗物 / ' + (st.dk ? st.dk.length : 10) + ' 张牌</b></div>' +
       '</div>' +
-      '<button class="end-turn-btn" id="btn-restart-run" style="width:100%;' + uiPanelBgStyle("endTurnBtn") + '">🔄 重新开启新一局尖塔</button>' +
+      '<button class="end-turn-btn" id="btn-restart-run" style="width:100%;' + uiPanelBgStyle("endTurnBtn") + '">' +
+        (isSyncingSettlement ? '⏳ 正在同步结算至红包站…' : '🔄 重新开启新一局尖塔') +
+      '</button>' +
     '</div>';
 
   center.querySelector("#btn-restart-run").addEventListener("click", () => resetLocalRun());
@@ -12063,6 +12261,14 @@ try {
       localPlayerState = parsed.localPlayerState || parsed.currentData;
       localPending = parsed.localPending || 0;
       currentData = parsed.currentData;
+      if (parsed.selectedCharId) {
+        selectedCharId = parsed.selectedCharId;
+      } else if (currentData && currentData.ch) {
+        selectedCharId = currentData.ch;
+      }
+      if (parsed.legacyJudgeMode !== undefined) {
+        legacyJudgeMode = Boolean(parsed.legacyJudgeMode);
+      }
       if (parsed.charSelectConfirmed !== undefined) {
         charSelectConfirmed = Boolean(parsed.charSelectConfirmed);
       }
@@ -12078,13 +12284,35 @@ if (!currentData) {
 }
 renderApp();
 
-function applyServerViewData(serverData) {
+function checkSummaryForLegacyJudge(v) {
+  if (v && typeof v.summary === "string") {
+    if (v.summary.includes("三大幕")) legacyJudgeMode = true;
+    else if (v.summary.includes("四幕")) legacyJudgeMode = false;
+  }
+}
+
+function applyServerViewData(serverData, forceApply = false) {
   if (!serverData) return;
-  currentData = serverData;
-  localPlayerState = serverData;
-  localPending = serverData.pd || 0;
-  if (pendingActionsQueue.length > 0) {
-    runLocalJudge({ type: "batch", actions: pendingActionsQueue }, true);
+  latestServerViewData = serverData;
+  // Never overwrite localPlayerState while a batch is mid-flight over the network
+  if (isFlushingBatch && !forceApply) return;
+
+  const cloned = JSON.parse(JSON.stringify(serverData));
+  currentData = cloned;
+  localPlayerState = cloned;
+  localPending = cloned.pd || 0;
+
+  if (cloned.ph !== "NEOW" || (cloned.fl || 0) > 0) {
+    selectedCharId = cloned.ch || selectedCharId;
+    charSelectConfirmed = true;
+  } else if (selectedCharId && selectedCharId !== cloned.ch) {
+    // Preserve player's chosen character if server state is still at Floor 0 NEOW
+    runLocalJudge({ type: "select_char", char: selectedCharId }, true);
+  }
+
+  const remainingToReplay = inFlightBatch.concat(pendingActionsQueue);
+  if (remainingToReplay.length > 0) {
+    runLocalJudge({ type: "batch", actions: remainingToReplay }, true);
   } else {
     persistSessionState();
   }
@@ -12094,41 +12322,53 @@ function applyServerViewData(serverData) {
 let hadServerMyView = false;
 if (window.hb) {
   if (typeof window.hb.ready === "function") {
-    window.hb.ready().then(() => { hbConnected = true; }).catch(() => {});
+    window.hb.ready().then(() => {
+      hbConnected = true;
+      if (pendingActionsQueue.length > 0) flushPendingActions();
+    }).catch(() => {});
   }
   window.hb.on("myView", (v) => {
     hbConnected = true;
+    checkSummaryForLegacyJudge(v);
     if (v && v.data) {
       hadServerMyView = true;
       applyServerViewData(v.data);
     } else if (!v && hadServerMyView) {
       // Switched to a player with no saved run or game was restarted in simulator
       hadServerMyView = false;
+      inFlightBatch = [];
+      pendingActionsQueue = [];
+      needsServerFlush = false;
       resetLocalRun("IRONCLAD");
     }
   });
   window.hb.on("view", (v) => {
     hbConnected = true;
-    if ((!currentData || currentData === defaultPreview || !hadServerMyView) && v && v.data) {
-      currentData = JSON.parse(JSON.stringify(v.data));
-      localPlayerState = JSON.parse(JSON.stringify(v.data));
-      renderApp();
+    checkSummaryForLegacyJudge(v);
+    // Only sync maxReward (mr) from public view — NEVER overwrite player's selected character or local run state!
+    if (v && v.data && typeof v.data.mr === "number") {
+      if (currentData) currentData.mr = v.data.mr;
+      if (localPlayerState) localPlayerState.mr = v.data.mr;
     }
   });
   (async () => {
     try {
       const myV = await window.hb.myView();
       hbConnected = true;
+      checkSummaryForLegacyJudge(myV);
       if (myV && myV.data) {
         hadServerMyView = true;
         applyServerViewData(myV.data);
-        return;
       }
       const pubV = await window.hb.view();
-      if (pubV && pubV.data) {
-        currentData = JSON.parse(JSON.stringify(pubV.data));
-        localPlayerState = JSON.parse(JSON.stringify(pubV.data));
+      checkSummaryForLegacyJudge(pubV);
+      if (pubV && pubV.data && typeof pubV.data.mr === "number") {
+        if (currentData) currentData.mr = pubV.data.mr;
+        if (localPlayerState) localPlayerState.mr = pubV.data.mr;
         renderApp();
+      }
+      if (pendingActionsQueue.length > 0) {
+        flushPendingActions();
       }
     } catch {}
   })();
