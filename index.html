@@ -2340,9 +2340,9 @@ function getCardDef(cardStr) {
   let mag = isUp ? r[11] : r[10];
   let extra = 0;
   if (mod !== "") {
-    const cMatch = mod.match(/c(d+)/);
+    const cMatch = mod.match(/c(\d+)/);
     if (cMatch) cost = parseInt(cMatch[1], 10);
-    const nMatch = mod.replace(/cd+/g, "").match(/-?d+/);
+    const nMatch = mod.replace(/c\d+/g, "").match(/-?\d+/);
     if (nMatch) {
       extra = parseInt(nMatch[0], 10) || 0;
       if (id === "Rampage" || id === "Glass Knife" || id === "WindmillStrike") {
@@ -6850,7 +6850,7 @@ function endPlayerTurn(state, rng, skipMonsters = false) {
       if (!hasRelic(state, "Runic Pyramid") && !eqRetain && !def.retain && !isMedRetained && wlpLeft > 0) wlpLeft--;
       let rc = c;
       if (def.id === "WindmillStrike" || def.id === "Perseverance") {
-        const cMatch = def.mod ? def.mod.match(/cd+/) : null;
+        const cMatch = def.mod ? def.mod.match(/c\d+/) : null;
         rc = def.id + (def.up ? "+" : "") + "|" + ((def.extra || 0) + def.mag) + (cMatch ? cMatch[0] : "");
       } else if (def.id === "SandsOfTime") {
         rc = modifyCardCostInCombat(rc, Math.max(0, def.cost - 1));
@@ -11159,9 +11159,9 @@ function renderCombatStage(st) {
 
 // ==================== NON-COMBAT ROOM RENDERERS ====================
 function formatStsEventOptionLabel(raw) {
-  let s = raw.replace(/^【([^】]+)】s*/, '<span class="sts-opt-bracket">[$1]</span>');
-  s = s.replace(/(失去s*d+%?s*最大?生命[值上限]*|被诅咒【[^】]+】|获得【[^】]+】诅咒|触发滚石失去s*d+%?s*生命)/g, '<span class="sts-opt-neg">$1</span>');
-  s = s.replace(/(恢复s*d+%?s*最大生命值?|完全恢复所有生命值|最大生命[值上限]*s*[+提升]+s*d+s*点?|获得s*d+s*金币|从牌组中移除s*1s*张牌|将牌组中s*1s*张牌变化为随机新牌|升级牌组中[^，。！]+|获得[^，。]*遗物[^，。]*|前s*3s*场战斗敌人只有s*1s*点生命)/g, '<span class="sts-opt-pos">$1</span>');
+  let s = raw.replace(/^【([^】]+)】\s*/, '<span class="sts-opt-bracket">[$1]</span>');
+  s = s.replace(/(失去\s*\d+%?\s*最大?生命[值上限]*|被诅咒【[^】]+】|获得【[^】]+】诅咒|触发滚石失去\s*\d+%?\s*生命)/g, '<span class="sts-opt-neg">$1</span>');
+  s = s.replace(/(恢复\s*\d+%?\s*最大生命值?|完全恢复所有生命值|最大生命[值上限]*\s*[+提升]+\s*\d+\s*点?|获得\s*\d+\s*金币|从牌组中移除\s*1\s*张牌|将牌组中\s*1\s*张牌变化为随机新牌|升级牌组中[^，。！]+|获得[^，。]*遗物[^，。]*|前\s*3\s*场战斗敌人只有\s*1\s*点生命)/g, '<span class="sts-opt-pos">$1</span>');
   return s;
 }
 
